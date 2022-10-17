@@ -1,0 +1,1 @@
+﻿Remove-Migration -StartupProject Api -Project MaidContexts
