@@ -11,8 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore;
 
-using Models.DbContext;
+using Models.CodeMaid;
+
+using Serilog;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -47,13 +50,13 @@ namespace Api
 						var ns = context.NameSpaceDefinitions.FirstOrDefault(x => x.Name == namespaceDeclaration.Name.ToString());
 						if (ns == null)
 						{
-							ns = await nameSpaces.AddAndSave(new Models.DbContext.NameSpaceDefinition() { Name = namespaceDeclaration.Name.ToString() });
+							ns = await nameSpaces.AddAndSave(new Models.CodeMaid.NameSpaceDefinition() { Name = namespaceDeclaration.Name.ToString() });
 						}
 						foreach (var node2 in namespaceDeclaration.Members)
 						{
 							if (node2 is ClassDeclarationSyntax classDeclaration)
 							{
-								var c = context.ClassDefinitions.FirstOrDefault(x => x.Name == classDeclaration.Identifier.ValueText);
+								var c = context.ClassDefinitions.Include(x => x.NameSpaceDefinition).FirstOrDefault(x => x.Name == classDeclaration.Identifier.ValueText);
 								if (c == null)
 								{
 									c = CreateClassEntity(ns, classDeclaration);
@@ -78,25 +81,31 @@ namespace Api
 				var parentList = context.ClassDefinitions.Where(x => x.Name == baseClassName).ToList();
 				foreach (var item in parentList)
 				{
-					if (File.Exists(Path.Combine(configPath, $"{item.Name}Configuration.cs")))
+					string fileName = Path.Combine(configPath, $"{item.Name}Configuration.cs");
+					if (File.Exists(fileName))
 					{
-
+						var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
+						compilationUnit = UpdateBaseConfigurationNode(compilationUnit, item);
+						File.WriteAllText(fileName, compilationUnit.ToFullString());
 					}
 					else
 					{
-						var x = CreateBaseConfigurationNode(item);
+						var compilationUnit = CreateBaseConfigurationNode(item);
+						File.WriteAllText(fileName, compilationUnit.ToFullString());
 					}
 				}
 				var childList = context.ClassDefinitions.Where(x => x.Name != baseClassName).ToList();
 				foreach (var item in childList)
 				{
-					if (File.Exists(Path.Combine(configPath, $"{item.Name}Configuration.cs")))
+					string fileName = Path.Combine(configPath, $"{item.Name}Configuration.cs");
+					if (File.Exists(fileName))
 					{
 
 					}
 					else
 					{
-						var x = CreateConfigurationNode(item);
+						var compilationUnit = CreateConfigurationNode(item);
+						File.WriteAllText(fileName, compilationUnit.ToFullString());
 					}
 				}
 			}
@@ -152,18 +161,24 @@ namespace Api
 		static CompilationUnitSyntax CreateBaseConfigurationNode(ClassDefinition classDefinition)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore;");
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore.Metadata.Builders;");
+			stringBuilder.AppendLine($"");
+			stringBuilder.AppendLine($"using {classDefinition.NameSpaceDefinition.Name};");
 			stringBuilder.AppendLine($"/// <summary>");
 			stringBuilder.AppendLine($"/// 基类的配置");
 			stringBuilder.AppendLine($"/// </summary>");
 			stringBuilder.AppendLine($"/// <typeparam name=\"Entity\"></typeparam>");
 			stringBuilder.AppendLine($"internal abstract class {classDefinition.Name}Configuration<Entity> : IEntityTypeConfiguration<Entity> where Entity : {classDefinition.Name}");
 			stringBuilder.AppendLine($"{{");
-			stringBuilder.AppendLine($"\tpublic void Configure(EntityTypeBuilder<Entity> builder)");
+			stringBuilder.AppendLine($"\tpublic virtual void Configure(EntityTypeBuilder<Entity> builder)");
 			stringBuilder.AppendLine($"\t{{");
 			foreach (var item in classDefinition.Properties)
 			{
-				stringBuilder.AppendLine($"\t\tbuilder.Property(x => x.{item.Name}).HasComment(\"{item.Summary}\")");
+				stringBuilder.Append($"\t\tbuilder.Property(x => x.{item.Name})");
+				if (item.Summary != null)
+					stringBuilder.Append($".HasComment(\"{item.Summary?.Replace("\"", "\\\"")}\")");
+				stringBuilder.AppendLine(";");
 			}
 			stringBuilder.AppendLine($"\t}}");
 			stringBuilder.AppendLine($"}}");
@@ -202,24 +217,43 @@ namespace Api
 		static CompilationUnitSyntax CreateConfigurationNode(ClassDefinition classDefinition)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore;");
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore.Metadata.Builders;");
+			stringBuilder.AppendLine($"");
+			stringBuilder.AppendLine($"using {classDefinition.NameSpaceDefinition.Name};");
 			stringBuilder.AppendLine($"/// <summary>");
 			stringBuilder.AppendLine($"/// 派生类的配置");
 			stringBuilder.AppendLine($"/// </summary>");
 			stringBuilder.AppendLine($"/// <typeparam name=\"Entity\"></typeparam>");
-			stringBuilder.AppendLine($"internal abstract class {classDefinition.Name}Configuration<Entity> : IEntityTypeConfiguration<{classDefinition.Base}>");
+			stringBuilder.AppendLine($"internal abstract class {classDefinition.Name}Configuration : {classDefinition.Base}Configuration<{classDefinition.Name}>");
 			stringBuilder.AppendLine($"{{");
-			stringBuilder.AppendLine($"\tpublic void Configure(EntityTypeBuilder<{classDefinition.Base}> builder)");
+			stringBuilder.AppendLine($"\tpublic override void Configure(EntityTypeBuilder<{classDefinition.Name}> builder)");
 			stringBuilder.AppendLine($"\t{{");
 			stringBuilder.AppendLine($"\t\tbase.Configure(builder);");
 			foreach (var item in classDefinition.Properties)
 			{
-				stringBuilder.AppendLine($"\t\tbuilder.Property(x => x.{item.Name}).HasComment(\"{item.Summary}\")");
+				stringBuilder.Append($"\t\tbuilder.Property(x => x.{item.Name})");
+				if (item.Summary != null)
+					stringBuilder.Append($".HasComment(\"{item.Summary?.Replace("\"", "\\\"")}\")");
+				stringBuilder.AppendLine(";");
 			}
 			stringBuilder.AppendLine($"\t}}");
 			stringBuilder.AppendLine($"}}");
 
 			return ParseSyntaxTree(stringBuilder.ToString()).GetCompilationUnitRoot();
+		}
+
+		static CompilationUnitSyntax UpdateBaseConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
+		{
+			try
+			{
+			}
+			catch (Exception)
+			{
+				Log.Error("基类{name}配置格式错误,重新生成了配置文件", classDefinition.Name);
+				source = CreateBaseConfigurationNode(classDefinition);
+			}
+			return source;
 		}
 
 		/// <summary>

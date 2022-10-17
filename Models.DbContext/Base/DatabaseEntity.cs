@@ -1,11 +1,11 @@
-﻿using Models.Database.Interface;
+﻿using Models.CodeMaid.Interface;
 
-namespace Models.Database
+namespace Models.CodeMaid
 {
 	/// <summary>
 	/// 所有数据库对象的基类
 	/// </summary>
-	public class DatabaseEntity : IDatabaseEntity
+	public abstract class DatabaseEntity : IDatabaseEntity
 	{
 		///<inheritdoc cref="IDatabaseEntity.Id"/>
 		public long Id { get; }

@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.Database.Interface
+namespace Models.CodeMaid.Interface
 {
 	/// <summary>
 	/// 数据库对象

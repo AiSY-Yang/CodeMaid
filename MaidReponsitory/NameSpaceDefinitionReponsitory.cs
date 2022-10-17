@@ -2,7 +2,7 @@
 
 using MaidReponsitory.Base;
 
-using Models.DbContext;
+using Models.CodeMaid;
 
 namespace MaidReponsitory
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-using Models.Database.Interface;
+using Models.CodeMaid.Interface;
 
 namespace Reponsitory
 {

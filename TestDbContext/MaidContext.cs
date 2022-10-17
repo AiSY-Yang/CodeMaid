@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using Models.Database;
-using Models.DbContext;
+using Models.CodeMaid;
 
 namespace MaidContexts
 {
@@ -17,6 +16,9 @@ namespace MaidContexts
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.ApplyConfigurationsFromAssembly(typeof(MaidContext).Assembly);
+			modelBuilder.Entity<NameSpaceDefinition>().HasKey(x => x.Id);
+			modelBuilder.Entity<ClassDefinition>().HasKey(x => x.Id);
+			modelBuilder.Entity<PropertyDefinition>().HasKey(x => x.Id);
 			base.OnModelCreating(modelBuilder);
 		}
 		public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)

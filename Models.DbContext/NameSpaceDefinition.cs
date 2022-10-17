@@ -1,6 +1,6 @@
-﻿using Models.Database;
+﻿using Models.CodeMaid;
 
-namespace Models.DbContext
+namespace Models.CodeMaid
 {
 	/// <summary>
 	/// 命名空间定义

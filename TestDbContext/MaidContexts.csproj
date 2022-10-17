@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Reponsitory\Reponsitory.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Configrations\" />
+  </ItemGroup>
+
 </Project>

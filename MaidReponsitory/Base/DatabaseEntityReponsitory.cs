@@ -3,7 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-using Models.Database;
+using Models.CodeMaid;
 
 using Reponsitory;
 

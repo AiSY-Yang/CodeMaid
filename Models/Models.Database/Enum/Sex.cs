@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.Database.Enum
+namespace Models.CodeMaid.Enum
 {
 	/// <summary>
 	/// 性别
