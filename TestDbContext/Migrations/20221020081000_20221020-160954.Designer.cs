@@ -3,6 +3,7 @@ using System;
 using MaidContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaidContexts.Migrations
 {
     [DbContext(typeof(MaidContext))]
-    partial class MaidContextModelSnapshot : ModelSnapshot
+    [Migration("20221020081000_20221020-160954")]
+    partial class _20221020160954
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,7 +160,7 @@ namespace MaidContexts.Migrations
             modelBuilder.Entity("Models.CodeMaid.AttributeDefinition", b =>
                 {
                     b.HasOne("Models.CodeMaid.PropertyDefinition", null)
-                        .WithMany("Attributes")
+                        .WithMany("AttributeDefinitions")
                         .HasForeignKey("PropertyDefinitionId");
                 });
 
@@ -196,7 +198,7 @@ namespace MaidContexts.Migrations
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
                 {
-                    b.Navigation("Attributes");
+                    b.Navigation("AttributeDefinitions");
                 });
 #pragma warning restore 612, 618
         }

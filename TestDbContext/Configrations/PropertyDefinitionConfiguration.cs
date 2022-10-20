@@ -17,7 +17,7 @@ internal abstract class PropertyDefinitionConfiguration : DatabaseEntityConfigur
 		builder.Property(x => x.FullText).HasComment("完整文本内容");
 		builder.Property(x => x.Modifiers).HasComment("修饰符");
 		builder.Property(x => x.Initializer).HasComment("初始化器");
-		builder.Property(x => x.Name).HasComment("");
+		builder.Property(x => x.Name).HasComment("属性名称").HasMaxLength(20);
 		builder.Property(x => x.Get).HasComment("");
 		builder.Property(x => x.Set).HasComment("");
 	}

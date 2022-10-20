@@ -1,4 +1,6 @@
-﻿using Models.CodeMaid;
+﻿using System.ComponentModel.DataAnnotations;
+
+using Models.CodeMaid;
 
 namespace Models.CodeMaid
 {
@@ -31,6 +33,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 属性名称
 		/// </summary>
+		[MaxLength(20)]
 		public string Name { get; set; } = null!;
 		/// <summary>
 		/// Get方法体
@@ -40,5 +43,9 @@ namespace Models.CodeMaid
 		/// Set方法体
 		/// </summary>
 		public string? Set { get; set; } = null!;
+		/// <summary>
+		/// 属性列表
+		/// </summary>
+		public List<AttributeDefinition> Attributes { get; set; } = null!;
 	}
 }

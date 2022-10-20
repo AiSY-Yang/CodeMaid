@@ -9,16 +9,18 @@ namespace MaidContexts
 		public DbSet<NameSpaceDefinition> NameSpaceDefinitions { get; set; } = null!;
 		public DbSet<ClassDefinition> ClassDefinitions { get; set; } = null!;
 		public DbSet<PropertyDefinition> PropertyDefinitions { get; set; } = null!;
+		public DbSet<AttributeDefinition> AttributeDefinitions { get; set; } = null!;
 		public MaidContext(DbContextOptions<MaidContext> options) : base(options)
 		{
 			Database.Migrate();
 		}
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			modelBuilder.Entity<NameSpaceDefinition>().HasKey(x=>x.Id);
+			modelBuilder.Entity<ClassDefinition>().HasKey(x=>x.Id);
+			modelBuilder.Entity<PropertyDefinition>().HasKey(x=>x.Id);
+			modelBuilder.Entity<AttributeDefinition>().HasKey(x=>x.Id);
 			modelBuilder.ApplyConfigurationsFromAssembly(typeof(MaidContext).Assembly);
-			modelBuilder.Entity<NameSpaceDefinition>().HasKey(x => x.Id);
-			modelBuilder.Entity<ClassDefinition>().HasKey(x => x.Id);
-			modelBuilder.Entity<PropertyDefinition>().HasKey(x => x.Id);
 			base.OnModelCreating(modelBuilder);
 		}
 		public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)

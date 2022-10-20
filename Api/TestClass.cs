@@ -53,10 +53,11 @@ namespace Api
 						var ns = context.NameSpaceDefinitions
 							.Include(x => x.Classes)
 							.ThenInclude(x => x.Properties)
+							.ThenInclude(x => x.Attributes)
 							.FirstOrDefault(x => x.Name == namespaceDeclaration.Name.ToString());
 						if (ns == null)
 						{
-							ns = await nameSpaces.AddAndSave(new Models.CodeMaid.NameSpaceDefinition() { Name = namespaceDeclaration.Name.ToString() });
+							ns = new Models.CodeMaid.NameSpaceDefinition() { Name = namespaceDeclaration.Name.ToString() };
 							nameSpaces.Add(ns);
 						}
 						else
@@ -81,7 +82,17 @@ namespace Api
 								foreach (var item in classDeclaration.Members)
 								{
 									var newP = CreatePropertyEntity(ns, c, item);
+									if (newP == null)
+									{
+										Console.WriteLine();
+									}
 									var p = c.Properties.FirstOrDefault(x => x.Name == newP.Name);
+#if DEBUG
+									if (c.Name == "PropertyDefinition" && newP.Name == "Name")
+									{
+										Console.WriteLine();
+									}
+#endif
 									if (p == null)
 									{
 										p = CreatePropertyEntity(ns, c, item);
@@ -275,6 +286,7 @@ namespace Api
 			}
 			return source;
 		}
+
 		/// <summary>
 		/// 更新配置的编译单元
 		/// </summary>
@@ -316,6 +328,17 @@ namespace Api
 			stringBuilder.Append($"\t\tbuilder.Property(x => x.{property.Name})");
 			if (property.Summary != null)
 				stringBuilder.Append($".HasComment(\"{property.Summary?.Replace("\"", "\\\"")}\")");
+			foreach (var attribute in property.Attributes)
+			{
+				switch (attribute.Name)
+				{
+					case "MaxLength":
+						stringBuilder.Append($".HasMaxLength({attribute.Arguments})");
+						break;
+					default:
+						break;
+				}
+			}
 			stringBuilder.Append(';');
 			return stringBuilder.ToString();
 		}
@@ -346,7 +369,8 @@ namespace Api
 			{
 				var x = CSharpCompilation.Create(null, new[] { propertyDeclaration.SyntaxTree });
 				var leaderTrivia = propertyDeclaration.GetLeadingTrivia();
-				StringBuilder stringBuilder = new StringBuilder();
+				//获取注释
+				StringBuilder summary = new StringBuilder();
 				foreach (var item in leaderTrivia)
 				{
 					foreach (var line in item.ToFullString().Split('\n', StringSplitOptions.RemoveEmptyEntries))
@@ -357,22 +381,37 @@ namespace Api
 							var comment = match.Groups[1].Value.Trim();
 							if (comment != "<summary>" && comment != "</summary>")
 							{
-								stringBuilder.Append(comment);
+								summary.Append(comment);
 							}
 						}
 					}
 				}
-				return new PropertyDefinition()
+				var result = new PropertyDefinition()
 				{
 					ClassDefinition = owner,
 					FullText = propertyDeclaration.ToString(),
 					LeadingTrivia = leaderTrivia.ToFullString(),
-					Summary = stringBuilder.ToString(),
+					Summary = summary.ToString(),
 					Name = propertyDeclaration.Identifier.Text,
 					Modifiers = propertyDeclaration.Modifiers.ToString(),
 					Initializer = propertyDeclaration.Initializer?.ToString(),
+					Attributes = new(),
 					//Base = classDeclaration.BaseList?.Types.ToString(),
 				};
+
+				foreach (var item in member.AttributeLists)
+				{
+					AttributeDefinition attributeDefinition = new AttributeDefinition()
+					{
+						Name = item.Attributes[0].Name.ToString(),
+						Text = item.Attributes[0].ToString(),
+						ArgumentsText = item.Attributes[0].ArgumentList?.ToString(),
+						Arguments = item.Attributes[0].ArgumentList == null ? null : string.Join(", ", item.Attributes[0].ArgumentList?.Arguments.Select(x => x.ToString())!),
+					};
+					result.Attributes.Add(attributeDefinition);
+				}
+
+				return result;
 			}
 			return null;
 		}

@@ -1,4 +1,6 @@
-﻿using Models.CodeMaid.Interface;
+﻿using System.ComponentModel.DataAnnotations;
+
+using Models.CodeMaid.Interface;
 
 namespace Models.CodeMaid
 {
@@ -8,6 +10,7 @@ namespace Models.CodeMaid
 	public abstract class DatabaseEntity : IDatabaseEntity
 	{
 		///<inheritdoc cref="IDatabaseEntity.Id"/>
+		[Key]
 		public long Id { get; }
 		///<inheritdoc cref="IDatabaseEntity.CreateTime"/>
 		public DateTimeOffset CreateTime { get; }
