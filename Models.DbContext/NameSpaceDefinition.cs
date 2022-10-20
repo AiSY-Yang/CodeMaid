@@ -8,11 +8,11 @@ namespace Models.CodeMaid
 	public class NameSpaceDefinition : DatabaseEntity
 	{
 		/// <summary>
-		/// 名称
+		/// 命名空间名称
 		/// </summary>
 		public string Name { get; set; } = null!;
 		/// <summary>
-		/// 类
+		/// 类列表
 		/// </summary>
 		public List<ClassDefinition> Classes { get; set; } = new();
 	}

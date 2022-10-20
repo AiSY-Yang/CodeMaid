@@ -12,8 +12,8 @@ internal abstract class ClassDefinitionConfiguration : DatabaseEntityConfigurati
 	{
 		base.Configure(builder);
 		builder.Property(x => x.NameSpaceDefinition).HasComment("命名空间定义");
-		builder.Property(x => x.Name).HasComment("");
-		builder.Property(x => x.Base).HasComment("");
-		builder.Property(x => x.Properties).HasComment("");
+		builder.Property(x => x.Name).HasComment("类名");
+		builder.Property(x => x.Base).HasComment("基类或者接口名称");
+		builder.Property(x => x.Properties).HasComment("属性列表");
 	}
 }

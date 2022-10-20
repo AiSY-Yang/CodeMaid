@@ -12,11 +12,11 @@ internal abstract class PropertyDefinitionConfiguration : DatabaseEntityConfigur
 	{
 		base.Configure(builder);
 		builder.Property(x => x.ClassDefinition).HasComment("");
-		builder.Property(x => x.LeadingTrivia).HasComment("");
-		builder.Property(x => x.Summary).HasComment("");
-		builder.Property(x => x.FullText).HasComment("");
-		builder.Property(x => x.Modifiers).HasComment("");
-		builder.Property(x => x.Initializer).HasComment("");
+		builder.Property(x => x.LeadingTrivia).HasComment("前导");
+		builder.Property(x => x.Summary).HasComment("注释");
+		builder.Property(x => x.FullText).HasComment("完整文本内容");
+		builder.Property(x => x.Modifiers).HasComment("修饰符");
+		builder.Property(x => x.Initializer).HasComment("初始化器");
 		builder.Property(x => x.Name).HasComment("");
 		builder.Property(x => x.Get).HasComment("");
 		builder.Property(x => x.Set).HasComment("");

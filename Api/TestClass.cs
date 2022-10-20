@@ -1,9 +1,12 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography.Xml;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using MaidContexts;
 
 using MaidReponsitory;
+
+using Mapster;
 
 using MassTransit;
 
@@ -47,27 +50,47 @@ namespace Api
 					{
 						var namespaceDeclaration = (BaseNamespaceDeclarationSyntax)node;
 						//是否已经存在解析好的命名空间
-						var ns = context.NameSpaceDefinitions.FirstOrDefault(x => x.Name == namespaceDeclaration.Name.ToString());
+						var ns = context.NameSpaceDefinitions
+							.Include(x => x.Classes)
+							.ThenInclude(x => x.Properties)
+							.FirstOrDefault(x => x.Name == namespaceDeclaration.Name.ToString());
 						if (ns == null)
 						{
 							ns = await nameSpaces.AddAndSave(new Models.CodeMaid.NameSpaceDefinition() { Name = namespaceDeclaration.Name.ToString() });
+							nameSpaces.Add(ns);
+						}
+						else
+						{
+							new Models.CodeMaid.NameSpaceDefinition() { Name = namespaceDeclaration.Name.ToString(), UpdateTime = DateTimeOffset.Now }.Adapt(ns);
 						}
 						foreach (var node2 in namespaceDeclaration.Members)
 						{
 							if (node2 is ClassDeclarationSyntax classDeclaration)
 							{
-								var c = context.ClassDefinitions.Include(x => x.NameSpaceDefinition).FirstOrDefault(x => x.Name == classDeclaration.Identifier.ValueText);
+								var c = ns.Classes.FirstOrDefault(x => x.Name == classDeclaration.Identifier.ValueText);
 								if (c == null)
 								{
 									c = CreateClassEntity(ns, classDeclaration);
-									await classes.AddAndSave(c);
+									ns.Classes.Add(c);
+									classes.Add(c);
+								}
+								else
+								{
+									CreateClassEntity(ns, classDeclaration).Adapt(c);
 								}
 								foreach (var item in classDeclaration.Members)
 								{
-									var p = CreatePropertyEntity(ns, c, item);
-									if (p != null)
+									var newP = CreatePropertyEntity(ns, c, item);
+									var p = c.Properties.FirstOrDefault(x => x.Name == newP.Name);
+									if (p == null)
 									{
+										p = CreatePropertyEntity(ns, c, item);
 										c.Properties.Add(p);
+										context.Add(p);
+									}
+									else
+									{
+										CreatePropertyEntity(ns, c, item).Adapt(p);
 									}
 								}
 							}
@@ -75,43 +98,49 @@ namespace Api
 					}
 				}
 			}
+			await context.SaveChangesAsync();
 			//生成配置
-			foreach (var baseClassName in context.ClassDefinitions.Select(x => x.Base).Distinct())
+			var baseClassNameList = context.ClassDefinitions.Select(x => x.Base).Distinct();
+			//先生成基类的配置
+			var baseClassList = context.ClassDefinitions
+				.Include(x => x.Properties)
+				.Where(x => baseClassNameList.Contains(x.Name)).ToList();
+			foreach (var item in baseClassList)
 			{
-				var parentList = context.ClassDefinitions.Where(x => x.Name == baseClassName).ToList();
-				foreach (var item in parentList)
+				string fileName = Path.Combine(configPath, $"{item.Name}Configuration.cs");
+				if (File.Exists(fileName))
 				{
-					string fileName = Path.Combine(configPath, $"{item.Name}Configuration.cs");
-					if (File.Exists(fileName))
-					{
-						var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
-						compilationUnit = UpdateBaseConfigurationNode(compilationUnit, item);
-						File.WriteAllText(fileName, compilationUnit.ToFullString());
-					}
-					else
-					{
-						var compilationUnit = CreateBaseConfigurationNode(item);
-						File.WriteAllText(fileName, compilationUnit.ToFullString());
-					}
+					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
+					compilationUnit = UpdateBaseConfigurationNode(compilationUnit, item);
+					File.WriteAllText(fileName, compilationUnit.ToFullString());
 				}
-				var childList = context.ClassDefinitions.Where(x => x.Name != baseClassName).ToList();
-				foreach (var item in childList)
+				else
 				{
-					string fileName = Path.Combine(configPath, $"{item.Name}Configuration.cs");
-					if (File.Exists(fileName))
-					{
+					var compilationUnit = CreateBaseConfigurationNode(item);
+					File.WriteAllText(fileName, compilationUnit.ToFullString());
+				}
+			}
+			var derivedClassList = context.ClassDefinitions
+				.Include(x => x.Properties)
+				.Where(x => !baseClassNameList.Contains(x.Name)).ToList();
+			foreach (var item in derivedClassList)
+			{
+				string fileName = Path.Combine(configPath, $"{item.Name}Configuration.cs");
+				if (File.Exists(fileName))
+				{
+					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
+					compilationUnit = UpdateDerivedConfigurationNode(compilationUnit, item);
+					File.WriteAllText(fileName, compilationUnit.ToFullString());
 
-					}
-					else
-					{
-						var compilationUnit = CreateConfigurationNode(item);
-						File.WriteAllText(fileName, compilationUnit.ToFullString());
-					}
+				}
+				else
+				{
+					var compilationUnit = CreateConfigurationNode(item);
+					File.WriteAllText(fileName, compilationUnit.ToFullString());
 				}
 			}
 
 			Console.WriteLine("--- over");
-			await context.SaveChangesAsync();
 		}
 		/// <summary>
 		/// 创建基类的配置
@@ -175,44 +204,12 @@ namespace Api
 			stringBuilder.AppendLine($"\t{{");
 			foreach (var item in classDefinition.Properties)
 			{
-				stringBuilder.Append($"\t\tbuilder.Property(x => x.{item.Name})");
-				if (item.Summary != null)
-					stringBuilder.Append($".HasComment(\"{item.Summary?.Replace("\"", "\\\"")}\")");
-				stringBuilder.AppendLine(";");
+				stringBuilder.AppendLine(CreateBuilderStatement(item));
 			}
 			stringBuilder.AppendLine($"\t}}");
 			stringBuilder.AppendLine($"}}");
 
 			return ParseSyntaxTree(stringBuilder.ToString()).GetCompilationUnitRoot();
-			//			var usingList = new List<UsingDirectiveSyntax>()
-			//			{
-			//			FormatUsing(UsingDirective(IdentifierName(classDefinition.NameSpaceDefinition.Name))),
-			//			FormatUsing(UsingDirective(IdentifierName("Microsoft.EntityFrameworkCore.Metadata.Builders")))
-			//			};
-			//			var modifiers = TokenList();
-			//			modifiers = modifiers.Add(Token(SyntaxKind.PublicKeyword).WithTrailingTrivia(ParseTrailingTrivia(" ")));
-			//			var members = new SyntaxList<MemberDeclarationSyntax>()
-			//			{
-			//				MethodDeclaration(new SyntaxList<AttributeListSyntax>(),
-			//				Identifier(classDefinition.Name + "Configuration").WithLeadingTrivia(ParseTrailingTrivia(" ")),
-			//				PredefinedType(Token(SyntaxKind.VoidKeyword)),
-			//null,
-			//Identifier("Configure"),
-			//TypeParameterList(Token())
-			//				)
-			//			};
-			//			var config = ClassDeclaration(new SyntaxList<AttributeListSyntax>(),
-			//				modifiers,
-			//			Identifier(classDefinition.Name + "Configuration").WithLeadingTrivia(ParseTrailingTrivia(" ")),
-			//			null,
-			//			null,
-			//			new SyntaxList<TypeParameterConstraintClauseSyntax>(),
-			//			members);
-			//			CompilationUnitSyntax.
-			//			return CompilationUnit(new SyntaxList<ExternAliasDirectiveSyntax>(),
-			//				new SyntaxList<UsingDirectiveSyntax>(usingList),
-			//				new SyntaxList<AttributeListSyntax>(),
-			//				new SyntaxList<MemberDeclarationSyntax>(config));
 		}
 		static CompilationUnitSyntax CreateConfigurationNode(ClassDefinition classDefinition)
 		{
@@ -232,10 +229,7 @@ namespace Api
 			stringBuilder.AppendLine($"\t\tbase.Configure(builder);");
 			foreach (var item in classDefinition.Properties)
 			{
-				stringBuilder.Append($"\t\tbuilder.Property(x => x.{item.Name})");
-				if (item.Summary != null)
-					stringBuilder.Append($".HasComment(\"{item.Summary?.Replace("\"", "\\\"")}\")");
-				stringBuilder.AppendLine(";");
+				stringBuilder.AppendLine(CreateBuilderStatement(item));
 			}
 			stringBuilder.AppendLine($"\t}}");
 			stringBuilder.AppendLine($"}}");
@@ -243,10 +237,17 @@ namespace Api
 			return ParseSyntaxTree(stringBuilder.ToString()).GetCompilationUnitRoot();
 		}
 
+		/// <summary>
+		/// 使用当前类更新编译单元
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="classDefinition"></param>
+		/// <returns></returns>
 		static CompilationUnitSyntax UpdateBaseConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
 		{
 			try
 			{
+				source = UpdateConfigurationNode(source, classDefinition);
 			}
 			catch (Exception)
 			{
@@ -255,7 +256,69 @@ namespace Api
 			}
 			return source;
 		}
+		/// <summary>
+		/// 使用当前派生类更新编译单元
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="classDefinition"></param>
+		/// <returns></returns>
+		static CompilationUnitSyntax UpdateDerivedConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
+		{
+			try
+			{
+				source = UpdateConfigurationNode(source, classDefinition);
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "派生类{name}配置格式错误,重新生成了配置文件", classDefinition.Name);
+				source = CreateConfigurationNode(classDefinition);
+			}
+			return source;
+		}
+		/// <summary>
+		/// 更新配置的编译单元
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="classDefinition"></param>
+		/// <returns></returns>
+		static CompilationUnitSyntax UpdateConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
+		{
+			var classCode = source.ChildNodes().First(x => x is ClassDeclarationSyntax);
+			var methodCode = classCode.ChildNodes().First(x => x is MethodDeclarationSyntax);
+			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
+			var newBlockCode = blockCode;
+			var propNameRegex = new Regex("Property\\(.*?\\.(.*?)\\)\\.");
+			foreach (var item in newBlockCode.ChildNodes().Where(x => x is ExpressionStatementSyntax))
+			{
+				var match = propNameRegex.Match(item.ToFullString());
+				if (match.Success && match.Groups.Count == 2)
+				{
+					string propName = match.Groups[1].Value;
+					var prop = classDefinition.Properties.First(x => x.Name == propName);
+					var expression = CreateBuilderStatement(prop) + Environment.NewLine;
+					if (item.ToFullString() != expression)
+					{
+						newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression));
+					}
+				}
+			}
+			return source.ReplaceNode(blockCode, newBlockCode);
+		}
 
+		/// <summary>
+		/// 生成属性的builder语句
+		/// </summary>
+		/// <param name="property"></param>
+		/// <returns></returns>
+		static string CreateBuilderStatement(PropertyDefinition property)
+		{
+			StringBuilder stringBuilder = new();
+			stringBuilder.Append($"\t\tbuilder.Property(x => x.{property.Name})");
+			if (property.Summary != null)
+				stringBuilder.Append($".HasComment(\"{property.Summary?.Replace("\"", "\\\"")}\")");
+			stringBuilder.Append(';');
+			return stringBuilder.ToString();
+		}
 		/// <summary>
 		/// 创建类的实体
 		/// </summary>

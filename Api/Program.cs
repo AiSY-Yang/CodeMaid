@@ -39,6 +39,7 @@ namespace Api
 			{
 				x.ListenAnyIP(5241);
 			});
+			builder.Services.AddMapster();
 			//添加数据库
 			string conn = builder.Configuration.GetConnectionString("MaidContext");
 			builder.Services.AddDbContext<MaidContext>(x => x.UseMySql(conn, ServerVersion.AutoDetect(conn),
