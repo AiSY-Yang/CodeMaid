@@ -11,6 +11,7 @@ internal abstract class AttributeDefinitionConfiguration : DatabaseEntityConfigu
 	public override void Configure(EntityTypeBuilder<AttributeDefinition> builder)
 	{
 		base.Configure(builder);
+		builder.HasComment("类定义");
 		builder.Property(x => x.Name).HasComment("Attribute名称");
 		builder.Property(x => x.Text).HasComment("Attribute文本");
 		builder.Property(x => x.ArgumentsText).HasComment("参数文本");

@@ -16,6 +16,10 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string Name { get; set; } = null!;
 		/// <summary>
+		/// 注释
+		/// </summary>
+		public string? Summary { get; set; } = null!;
+		/// <summary>
 		/// 基类或者接口名称
 		/// </summary>
 		public string? Base { get; set; } = null!;

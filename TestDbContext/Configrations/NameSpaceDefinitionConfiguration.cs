@@ -11,7 +11,7 @@ internal abstract class NameSpaceDefinitionConfiguration : DatabaseEntityConfigu
 	public override void Configure(EntityTypeBuilder<NameSpaceDefinition> builder)
 	{
 		base.Configure(builder);
-		builder.HasIndex(x => x.Name);
+		builder.HasComment("命名空间定义");
 		builder.Property(x => x.Name).HasComment("命名空间名称");
 		builder.Property(x => x.Classes).HasComment("类列表");
 	}

@@ -87,12 +87,6 @@ namespace Api
 										Console.WriteLine();
 									}
 									var p = c.Properties.FirstOrDefault(x => x.Name == newP.Name);
-#if DEBUG
-									if (c.Name == "PropertyDefinition" && newP.Name == "Name")
-									{
-										Console.WriteLine();
-									}
-#endif
 									if (p == null)
 									{
 										p = CreatePropertyEntity(ns, c, item);
@@ -238,6 +232,7 @@ namespace Api
 			stringBuilder.AppendLine($"\tpublic override void Configure(EntityTypeBuilder<{classDefinition.Name}> builder)");
 			stringBuilder.AppendLine($"\t{{");
 			stringBuilder.AppendLine($"\t\tbase.Configure(builder);");
+			stringBuilder.AppendLine($"\t\tbuilder.HasComment(\"{classDefinition.Summary}\");");
 			foreach (var item in classDefinition.Properties)
 			{
 				stringBuilder.AppendLine(CreateBuilderStatement(item));
@@ -299,6 +294,7 @@ namespace Api
 			var methodCode = classCode.ChildNodes().First(x => x is MethodDeclarationSyntax);
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
 			var newBlockCode = blockCode;
+			//更新属性信息
 			var propNameRegex = new Regex("Property\\(.*?\\.(.*?)\\)\\.");
 			foreach (var item in newBlockCode.ChildNodes().Where(x => x is ExpressionStatementSyntax))
 			{
@@ -310,6 +306,25 @@ namespace Api
 					var expression = CreateBuilderStatement(prop) + Environment.NewLine;
 					if (item.ToFullString() != expression)
 					{
+						newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression));
+					}
+				}
+			}
+			//更新表名注释
+			var tableNameRegex = new Regex("builder\\.HasComment\\(\\\"(.*?)\\\"\\)");
+			foreach (var item in newBlockCode.ChildNodes().Where(x => x is ExpressionStatementSyntax))
+			{
+				var match = tableNameRegex.Match(item.ToFullString());
+				if (match.Success && match.Groups.Count == 2)
+				{
+					string tableName = match.Groups[1].Value;
+					if (tableName == classDefinition.Summary)
+					{
+						continue;
+					}
+					else
+					{
+						var expression = $"\t\tbuilder.HasComment(\"{classDefinition.Summary}\");" + Environment.NewLine;
 						newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression));
 					}
 				}
@@ -354,6 +369,7 @@ namespace Api
 			{
 				NameSpaceDefinition = nameSpace,
 				Name = classDeclaration.Identifier.Text,
+				Summary = GetSummay(classDeclaration.GetLeadingTrivia()),
 				Base = classDeclaration.BaseList?.Types.ToString(),
 			};
 		}
@@ -370,28 +386,12 @@ namespace Api
 				var x = CSharpCompilation.Create(null, new[] { propertyDeclaration.SyntaxTree });
 				var leaderTrivia = propertyDeclaration.GetLeadingTrivia();
 				//获取注释
-				StringBuilder summary = new StringBuilder();
-				foreach (var item in leaderTrivia)
-				{
-					foreach (var line in item.ToFullString().Split('\n', StringSplitOptions.RemoveEmptyEntries))
-					{
-						var match = Regex.Match(line.Trim(), "///(.*)");
-						if (match.Success)
-						{
-							var comment = match.Groups[1].Value.Trim();
-							if (comment != "<summary>" && comment != "</summary>")
-							{
-								summary.Append(comment);
-							}
-						}
-					}
-				}
 				var result = new PropertyDefinition()
 				{
 					ClassDefinition = owner,
 					FullText = propertyDeclaration.ToString(),
 					LeadingTrivia = leaderTrivia.ToFullString(),
-					Summary = summary.ToString(),
+					Summary = GetSummay(leaderTrivia),
 					Name = propertyDeclaration.Identifier.Text,
 					Modifiers = propertyDeclaration.Modifiers.ToString(),
 					Initializer = propertyDeclaration.Initializer?.ToString(),
@@ -414,6 +414,28 @@ namespace Api
 				return result;
 			}
 			return null;
+		}
+
+		static string GetSummay(SyntaxTriviaList trivias)
+		{
+			//获取注释
+			StringBuilder summary = new StringBuilder();
+			foreach (var item in trivias)
+			{
+				foreach (var line in item.ToFullString().Split('\n', StringSplitOptions.RemoveEmptyEntries))
+				{
+					var match = Regex.Match(line.Trim(), "///(.*)");
+					if (match.Success)
+					{
+						var comment = match.Groups[1].Value.Trim();
+						if (comment != "<summary>" && comment != "</summary>")
+						{
+							summary.Append(comment);
+						}
+					}
+				}
+			}
+			return summary.ToString();
 		}
 		/// <summary>
 		/// 格式化Using
