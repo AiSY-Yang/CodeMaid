@@ -13,7 +13,7 @@ namespace Models.CodeMaid
 		[Key]
 		public long Id { get; }
 		///<inheritdoc cref="IDatabaseEntity.CreateTime"/>
-		public DateTimeOffset CreateTime { get; }
+		public DateTimeOffset CreateTime { get; set; }
 		///<inheritdoc cref="IDatabaseEntity.UpdateTime"/>
 		public DateTimeOffset UpdateTime { get; set; }
 		///<inheritdoc cref="IDatabaseEntity.IsDeleted"/>

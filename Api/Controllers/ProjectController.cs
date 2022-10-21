@@ -6,11 +6,11 @@ namespace Api.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class TestController : ControllerBase, IDictQuery
+	public class ProjectController : ControllerBase, IDictQuery
 	{
-		private readonly ILogger<TestController> _logger;
+		private readonly ILogger<ProjectController> _logger;
 
-		public TestController(ILogger<TestController> logger)
+		public ProjectController(ILogger<ProjectController> logger)
 		{
 			_logger = logger;
 		}

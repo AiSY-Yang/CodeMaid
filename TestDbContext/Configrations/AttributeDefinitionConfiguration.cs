@@ -6,7 +6,7 @@ using Models.CodeMaid;
 /// 派生类的配置
 /// </summary>
 /// <typeparam name="Entity"></typeparam>
-internal abstract class AttributeDefinitionConfiguration : DatabaseEntityConfiguration<AttributeDefinition>
+internal class AttributeDefinitionConfiguration : DatabaseEntityConfiguration<AttributeDefinition>
 {
 	public override void Configure(EntityTypeBuilder<AttributeDefinition> builder)
 	{

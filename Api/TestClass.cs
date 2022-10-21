@@ -15,6 +15,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 using Models.CodeMaid;
 
@@ -34,6 +35,8 @@ namespace Api
 		public IServiceProvider Service { get; }
 		string modelPath = "C:\\Users\\kai\\source\\Github\\Template.WebApi\\Models.DbContext\\";
 		string configPath = "C:\\Users\\kai\\source\\Github\\Template.WebApi\\TestDbContext\\Configrations\\";
+		//string modelPath = "D:\\Work\\marketDataPlatform\\src\\Core\\Models";
+		//string configPath = "D:\\Work\\marketDataPlatform\\src\\Database\\EntityFramework\\EntityTypeConfigurations";
 
 		public async void Task()
 		{
@@ -109,7 +112,8 @@ namespace Api
 			//先生成基类的配置
 			var baseClassList = context.ClassDefinitions
 				.Include(x => x.Properties)
-				.Where(x => baseClassNameList.Contains(x.Name)).ToList();
+				.ThenInclude(x => x.Attributes)
+				.Where(x => baseClassNameList.Contains(x.Name) || x.Base == null).ToList();
 			foreach (var item in baseClassList)
 			{
 				string fileName = Path.Combine(configPath, $"{item.Name}Configuration.cs");
@@ -125,8 +129,10 @@ namespace Api
 					File.WriteAllText(fileName, compilationUnit.ToFullString());
 				}
 			}
+			//在生成派生类的配置
 			var derivedClassList = context.ClassDefinitions
 				.Include(x => x.Properties)
+				.ThenInclude(x => x.Attributes)
 				.Where(x => !baseClassNameList.Contains(x.Name)).ToList();
 			foreach (var item in derivedClassList)
 			{
@@ -173,25 +179,7 @@ namespace Api
 				new SyntaxList<AttributeListSyntax>(),
 				new SyntaxList<MemberDeclarationSyntax>(config));
 		}
-		//static CompilationUnitSyntax CreateBaseConfigurationNode(MaidContext context)
-		//{
-		//	var baseList = context.ClassDefinitions.Select(x => new { x.NameSpaceDefinition.Name, x.Base }).Distinct().ToList();
-		//	var usingList = new List<UsingDirectiveSyntax>(baseList.Count + 1);
-		//	foreach (var item in baseList)
-		//	{
-		//		usingList.Add(FormatUsing(UsingDirective(IdentifierName(item.Name + "." + item.Base))));
-		//	}
-		//	usingList.Add(FormatUsing(UsingDirective(IdentifierName("Microsoft.EntityFrameworkCore.Metadata.Builders"))));
 
-		//	var config = ClassDeclaration(new SyntaxList<AttributeListSyntax>(), new SyntaxTokenList(),
-		//Identifier((classDeclaration.Type as IdentifierNameSyntax).Identifier.Text + "Configuration"), null, null,
-		//new SyntaxList<TypeParameterConstraintClauseSyntax>(),
-		//new SyntaxList<MemberDeclarationSyntax>());
-		//	return CompilationUnit(new SyntaxList<ExternAliasDirectiveSyntax>(),
-		//		new SyntaxList<UsingDirectiveSyntax>(usingList),
-		//		new SyntaxList<AttributeListSyntax>(),
-		//		new SyntaxList<MemberDeclarationSyntax>(config));
-		//}
 		static CompilationUnitSyntax CreateBaseConfigurationNode(ClassDefinition classDefinition)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
@@ -227,7 +215,7 @@ namespace Api
 			stringBuilder.AppendLine($"/// 派生类的配置");
 			stringBuilder.AppendLine($"/// </summary>");
 			stringBuilder.AppendLine($"/// <typeparam name=\"Entity\"></typeparam>");
-			stringBuilder.AppendLine($"internal abstract class {classDefinition.Name}Configuration : {classDefinition.Base}Configuration<{classDefinition.Name}>");
+			stringBuilder.AppendLine($"internal class {classDefinition.Name}Configuration : {classDefinition.Base}Configuration<{classDefinition.Name}>");
 			stringBuilder.AppendLine($"{{");
 			stringBuilder.AppendLine($"\tpublic override void Configure(EntityTypeBuilder<{classDefinition.Name}> builder)");
 			stringBuilder.AppendLine($"\t{{");
@@ -235,7 +223,8 @@ namespace Api
 			stringBuilder.AppendLine($"\t\tbuilder.HasComment(\"{classDefinition.Summary}\");");
 			foreach (var item in classDefinition.Properties)
 			{
-				stringBuilder.AppendLine(CreateBuilderStatement(item));
+				if (IsBaseType(item.Type))
+					stringBuilder.AppendLine(CreateBuilderStatement(item));
 			}
 			stringBuilder.AppendLine($"\t}}");
 			stringBuilder.AppendLine($"}}");
@@ -303,10 +292,13 @@ namespace Api
 				{
 					string propName = match.Groups[1].Value;
 					var prop = classDefinition.Properties.First(x => x.Name == propName);
-					var expression = CreateBuilderStatement(prop) + Environment.NewLine;
-					if (item.ToFullString() != expression)
+					if (IsBaseType(prop.Type))
 					{
-						newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression));
+						var expression = CreateBuilderStatement(prop) + Environment.NewLine;
+						if (item.ToFullString() != expression)
+						{
+							newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression));
+						}
 					}
 				}
 			}
@@ -358,6 +350,15 @@ namespace Api
 			return stringBuilder.ToString();
 		}
 		/// <summary>
+		/// 是否是基础类型
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		static bool IsBaseType(string type)
+		{
+			return new string[] { "int", "int?", "short", "short?", "long", "long?", "string", "string?", "Guid", "Guid?", "DateTime", "DateTime?", "DateTimeOffset", "DateTimeOffset?" }.Contains(type);
+		}
+		/// <summary>
 		/// 创建类的实体
 		/// </summary>
 		/// <param name="nameSpace"></param>
@@ -393,6 +394,7 @@ namespace Api
 					LeadingTrivia = leaderTrivia.ToFullString(),
 					Summary = GetSummay(leaderTrivia),
 					Name = propertyDeclaration.Identifier.Text,
+					Type = propertyDeclaration.Type.ToString(),
 					Modifiers = propertyDeclaration.Modifiers.ToString(),
 					Initializer = propertyDeclaration.Initializer?.ToString(),
 					Attributes = new(),

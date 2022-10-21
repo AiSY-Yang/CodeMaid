@@ -33,8 +33,11 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 属性名称
 		/// </summary>
-		[MaxLength(20)]
 		public string Name { get; set; } = null!;
+		/// <summary>
+		/// 数据类型
+		/// </summary>
+		public string Type { get; set; } = null!;
 		/// <summary>
 		/// Get方法体
 		/// </summary>

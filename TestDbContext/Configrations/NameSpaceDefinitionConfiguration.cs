@@ -6,13 +6,12 @@ using Models.CodeMaid;
 /// 派生类的配置
 /// </summary>
 /// <typeparam name="Entity"></typeparam>
-internal abstract class NameSpaceDefinitionConfiguration : DatabaseEntityConfiguration<NameSpaceDefinition>
+internal class NameSpaceDefinitionConfiguration : DatabaseEntityConfiguration<NameSpaceDefinition>
 {
 	public override void Configure(EntityTypeBuilder<NameSpaceDefinition> builder)
 	{
 		base.Configure(builder);
 		builder.HasComment("命名空间定义");
 		builder.Property(x => x.Name).HasComment("命名空间名称");
-		builder.Property(x => x.Classes).HasComment("类列表");
 	}
 }
