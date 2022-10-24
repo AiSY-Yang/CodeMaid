@@ -6,7 +6,8 @@ namespace MaidContexts
 {
 	public class MaidContext : DbContext
 	{
-		public DbSet<NameSpaceDefinition> NameSpaceDefinitions { get; set; } = null!;
+		public DbSet<Project> Projects { get; set; } = null!;
+		public DbSet<Maid> Maids { get; set; } = null!;
 		public DbSet<ClassDefinition> ClassDefinitions { get; set; } = null!;
 		public DbSet<PropertyDefinition> PropertyDefinitions { get; set; } = null!;
 		public DbSet<AttributeDefinition> AttributeDefinitions { get; set; } = null!;
@@ -16,7 +17,8 @@ namespace MaidContexts
 		}
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<NameSpaceDefinition>().HasKey(x=>x.Id);
+			modelBuilder.Entity<Project>().HasKey(x=>x.Id);
+			modelBuilder.Entity<Maid>().HasKey(x=>x.Id);
 			modelBuilder.Entity<ClassDefinition>().HasKey(x=>x.Id);
 			modelBuilder.Entity<PropertyDefinition>().HasKey(x=>x.Id);
 			modelBuilder.Entity<AttributeDefinition>().HasKey(x=>x.Id);

@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaidContexts.Migrations
 {
     [DbContext(typeof(MaidContext))]
-    [Migration("20221020081000_20221020-160954")]
-    partial class _20221020160954
+    [Migration("20221024022453_20221024-102442")]
+    partial class _20221024102442
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,6 +33,9 @@ namespace MaidContexts.Migrations
                     b.Property<string>("ArgumentsText")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTimeOffset>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
@@ -40,7 +43,7 @@ namespace MaidContexts.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<long?>("PropertyDefinitionId")
+                    b.Property<long>("PropertyDefinitionId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Text")
@@ -66,37 +69,64 @@ namespace MaidContexts.Migrations
                     b.Property<string>("Base")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTimeOffset>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<long?>("MaidId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<long>("NameSpaceDefinitionId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("NameSpace")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("UpdateTime")
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NameSpaceDefinitionId");
+                    b.HasIndex("MaidId");
 
                     b.ToTable("ClassDefinitions");
                 });
 
-            modelBuilder.Entity("Models.CodeMaid.NameSpaceDefinition", b =>
+            modelBuilder.Entity("Models.CodeMaid.Maid", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("Autonomous")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTimeOffset>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DestinationPath")
+                        .HasColumnType("longtext");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int>("MaidWork")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SourcePath")
                         .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("UpdateTime")
@@ -104,7 +134,36 @@ namespace MaidContexts.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NameSpaceDefinitions");
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Maids");
+                });
+
+            modelBuilder.Entity("Models.CodeMaid.Project", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTimeOffset>("UpdateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
@@ -115,6 +174,9 @@ namespace MaidContexts.Migrations
 
                     b.Property<long>("ClassDefinitionId")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreateTime")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("FullText")
                         .IsRequired()
@@ -138,13 +200,16 @@ namespace MaidContexts.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Set")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Summary")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("UpdateTime")
@@ -159,20 +224,31 @@ namespace MaidContexts.Migrations
 
             modelBuilder.Entity("Models.CodeMaid.AttributeDefinition", b =>
                 {
-                    b.HasOne("Models.CodeMaid.PropertyDefinition", null)
-                        .WithMany("AttributeDefinitions")
-                        .HasForeignKey("PropertyDefinitionId");
+                    b.HasOne("Models.CodeMaid.PropertyDefinition", "PropertyDefinition")
+                        .WithMany("Attributes")
+                        .HasForeignKey("PropertyDefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PropertyDefinition");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.ClassDefinition", b =>
                 {
-                    b.HasOne("Models.CodeMaid.NameSpaceDefinition", "NameSpaceDefinition")
+                    b.HasOne("Models.CodeMaid.Maid", null)
                         .WithMany("Classes")
-                        .HasForeignKey("NameSpaceDefinitionId")
+                        .HasForeignKey("MaidId");
+                });
+
+            modelBuilder.Entity("Models.CodeMaid.Maid", b =>
+                {
+                    b.HasOne("Models.CodeMaid.Project", "Project")
+                        .WithMany("Maids")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NameSpaceDefinition");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
@@ -191,14 +267,19 @@ namespace MaidContexts.Migrations
                     b.Navigation("Properties");
                 });
 
-            modelBuilder.Entity("Models.CodeMaid.NameSpaceDefinition", b =>
+            modelBuilder.Entity("Models.CodeMaid.Maid", b =>
                 {
                     b.Navigation("Classes");
                 });
 
+            modelBuilder.Entity("Models.CodeMaid.Project", b =>
+                {
+                    b.Navigation("Maids");
+                });
+
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
                 {
-                    b.Navigation("AttributeDefinitions");
+                    b.Navigation("Attributes");
                 });
 #pragma warning restore 612, 618
         }

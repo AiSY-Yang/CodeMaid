@@ -15,5 +15,6 @@ namespace Models.CodeMaid
 		/// 项目路径
 		/// </summary>
 		public string? Path { get; set; } = null!;
+		public List<Maid> Maids { get; set; } = null!;
 	}
 }

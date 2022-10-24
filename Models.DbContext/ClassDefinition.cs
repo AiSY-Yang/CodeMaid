@@ -8,9 +8,9 @@ namespace Models.CodeMaid
 	public class ClassDefinition : DatabaseEntity
 	{
 		/// <summary>
-		/// 命名空间定义
+		/// 命名空间
 		/// </summary>
-		public NameSpaceDefinition NameSpaceDefinition { get; set; } = null!;
+		public string? NameSpace { get; set; } = null!;
 		/// <summary>
 		/// 类名
 		/// </summary>

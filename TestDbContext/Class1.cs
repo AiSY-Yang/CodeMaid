@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -25,8 +26,9 @@ namespace Microsoft.Extensions.DependencyInjection
 		public void Register()
 		{
 			TypeAdapterConfig<DatabaseEntity, DatabaseEntity>.ForType().Ignore(x => x.Id).Ignore(x => x.CreateTime).Ignore(x => x.UpdateTime).Ignore(x => x.IsDeleted);
-			TypeAdapterConfig<NameSpaceDefinition, NameSpaceDefinition>.ForType().Ignore(x => x.Classes);
+			TypeAdapterConfig<Maid, Maid>.ForType().Ignore(x => x.Classes);
 			TypeAdapterConfig<ClassDefinition, ClassDefinition>.ForType().Ignore(x => x.Properties);
+			TypeAdapterConfig<PropertyDefinition, PropertyDefinition>.ForType().Ignore(x => x.Attributes);
 
 		}
 	}

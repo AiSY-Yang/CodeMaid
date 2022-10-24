@@ -33,7 +33,6 @@ namespace Api
 		}
 
 		public IServiceProvider Service { get; }
-		string modelPath = "C:\\Users\\kai\\source\\Github\\Template.WebApi\\Models.DbContext\\";
 		string configPath = "C:\\Users\\kai\\source\\Github\\Template.WebApi\\TestDbContext\\Configrations\\";
 		//string modelPath = "D:\\Work\\marketDataPlatform\\src\\Core\\Models";
 		//string configPath = "D:\\Work\\marketDataPlatform\\src\\Database\\EntityFramework\\EntityTypeConfigurations";
@@ -41,67 +40,45 @@ namespace Api
 		public async void Task()
 		{
 			var context = Service.GetRequiredService<MaidContext>();
-			var nameSpaces = Service.GetRequiredService<NameSpaceDefinitionReponsitory>();
-			var classes = Service.GetRequiredService<ClassDefinitionReponsitory>();
-			foreach (var file in Directory.GetFiles(modelPath, "*.cs", SearchOption.AllDirectories))
+			var project = context.Projects
+				.Include(x => x.Maids)
+				.ThenInclude(x => x.Classes)
+				.ThenInclude(x => x.Properties)
+				.ThenInclude(x => x.Attributes)
+				.First();
+			var maid = project.Maids.First();
+			foreach (var file in Directory.GetFiles(maid.SourcePath, "*.cs", SearchOption.AllDirectories))
 			{
 				var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(file));
 				var root = tree.GetCompilationUnitRoot();
-				foreach (var node in root.Members)
+				var classes = GetClassDeclarationSyntaxes(root);
+
+				foreach (var classNode in classes)
 				{
-					if (node.IsKind(SyntaxKind.NamespaceDeclaration) || node.IsKind(SyntaxKind.FileScopedNamespaceDeclaration))
+					var c = maid.Classes.FirstOrDefault(x => x.Name == classNode.Identifier.ValueText);
+					if (c == null)
 					{
-						var namespaceDeclaration = (BaseNamespaceDeclarationSyntax)node;
-						//是否已经存在解析好的命名空间
-						var ns = context.NameSpaceDefinitions
-							.Include(x => x.Classes)
-							.ThenInclude(x => x.Properties)
-							.ThenInclude(x => x.Attributes)
-							.FirstOrDefault(x => x.Name == namespaceDeclaration.Name.ToString());
-						if (ns == null)
+						c = CreateClassEntity(classNode);
+						maid.Classes.Add(c);
+						context.Add(c);
+					}
+					else
+					{
+						CreateClassEntity(classNode).Adapt(c);
+					}
+					foreach (var item in classNode.Members)
+					{
+						var newP = CreatePropertyEntity(c, item);
+						var p = c.Properties.FirstOrDefault(x => x.Name == newP.Name);
+						if (p == null)
 						{
-							ns = new Models.CodeMaid.NameSpaceDefinition() { Name = namespaceDeclaration.Name.ToString() };
-							nameSpaces.Add(ns);
+							p = CreatePropertyEntity(c, item);
+							c.Properties.Add(p);
+							context.Add(p);
 						}
 						else
 						{
-							new Models.CodeMaid.NameSpaceDefinition() { Name = namespaceDeclaration.Name.ToString(), UpdateTime = DateTimeOffset.Now }.Adapt(ns);
-						}
-						foreach (var node2 in namespaceDeclaration.Members)
-						{
-							if (node2 is ClassDeclarationSyntax classDeclaration)
-							{
-								var c = ns.Classes.FirstOrDefault(x => x.Name == classDeclaration.Identifier.ValueText);
-								if (c == null)
-								{
-									c = CreateClassEntity(ns, classDeclaration);
-									ns.Classes.Add(c);
-									classes.Add(c);
-								}
-								else
-								{
-									CreateClassEntity(ns, classDeclaration).Adapt(c);
-								}
-								foreach (var item in classDeclaration.Members)
-								{
-									var newP = CreatePropertyEntity(ns, c, item);
-									if (newP == null)
-									{
-										Console.WriteLine();
-									}
-									var p = c.Properties.FirstOrDefault(x => x.Name == newP.Name);
-									if (p == null)
-									{
-										p = CreatePropertyEntity(ns, c, item);
-										c.Properties.Add(p);
-										context.Add(p);
-									}
-									else
-									{
-										CreatePropertyEntity(ns, c, item).Adapt(p);
-									}
-								}
-							}
+							CreatePropertyEntity(c, item).Adapt(p);
 						}
 					}
 				}
@@ -186,7 +163,7 @@ namespace Api
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore;");
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore.Metadata.Builders;");
 			stringBuilder.AppendLine($"");
-			stringBuilder.AppendLine($"using {classDefinition.NameSpaceDefinition.Name};");
+			stringBuilder.AppendLine($"using {classDefinition.NameSpace};");
 			stringBuilder.AppendLine($"/// <summary>");
 			stringBuilder.AppendLine($"/// 基类的配置");
 			stringBuilder.AppendLine($"/// </summary>");
@@ -210,7 +187,7 @@ namespace Api
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore;");
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore.Metadata.Builders;");
 			stringBuilder.AppendLine($"");
-			stringBuilder.AppendLine($"using {classDefinition.NameSpaceDefinition.Name};");
+			stringBuilder.AppendLine($"using {classDefinition.NameSpace};");
 			stringBuilder.AppendLine($"/// <summary>");
 			stringBuilder.AppendLine($"/// 派生类的配置");
 			stringBuilder.AppendLine($"/// </summary>");
@@ -244,9 +221,9 @@ namespace Api
 			{
 				source = UpdateConfigurationNode(source, classDefinition);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				Log.Error("基类{name}配置格式错误,重新生成了配置文件", classDefinition.Name);
+				Log.Error(ex, "基类{name}配置格式错误,重新生成了配置文件", classDefinition.Name);
 				source = CreateBaseConfigurationNode(classDefinition);
 			}
 			return source;
@@ -279,8 +256,9 @@ namespace Api
 		/// <returns></returns>
 		static CompilationUnitSyntax UpdateConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
 		{
-			var classCode = source.ChildNodes().First(x => x is ClassDeclarationSyntax);
+			var classCode = GetClassDeclarationSyntaxes(source).First();
 			var methodCode = classCode.ChildNodes().First(x => x is MethodDeclarationSyntax);
+			//此处要保留原有块信息引用 以在后面可以替换节点
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
 			var newBlockCode = blockCode;
 			//更新属性信息
@@ -294,10 +272,10 @@ namespace Api
 					var prop = classDefinition.Properties.First(x => x.Name == propName);
 					if (IsBaseType(prop.Type))
 					{
-						var expression = CreateBuilderStatement(prop) + Environment.NewLine;
+						var expression = CreateBuilderStatement(prop, "") + Environment.NewLine;
 						if (item.ToFullString() != expression)
 						{
-							newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression));
+							newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression).WithLeadingTrivia(item.GetLeadingTrivia()));
 						}
 					}
 				}
@@ -316,8 +294,8 @@ namespace Api
 					}
 					else
 					{
-						var expression = $"\t\tbuilder.HasComment(\"{classDefinition.Summary}\");" + Environment.NewLine;
-						newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression));
+						var expression = $"builder.HasComment(\"{classDefinition.Summary}\");" + Environment.NewLine;
+						newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression).WithLeadingTrivia(item.GetLeadingTrivia()));
 					}
 				}
 			}
@@ -325,14 +303,29 @@ namespace Api
 		}
 
 		/// <summary>
+		/// 获取编译单元下的所有类
+		/// </summary>
+		/// <param name="compilationUnit"></param>
+		/// <returns></returns>
+		static List<ClassDeclarationSyntax> GetClassDeclarationSyntaxes(CompilationUnitSyntax compilationUnit)
+		{
+			//自动生成的文件是没有命名空间的
+			var classCode = compilationUnit.ChildNodes().Where(x => x is ClassDeclarationSyntax).ToList();
+			//如果是原有的文件可能有命名空间 取命名空间下的配置类
+			var classCode2 = compilationUnit.ChildNodes()
+				.Where(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax).SelectMany(x => x.ChildNodes())
+					   .Where(x => x is ClassDeclarationSyntax).ToList();
+			return classCode.Union(classCode2).Select(x => x as ClassDeclarationSyntax).ToList()!;
+		}
+		/// <summary>
 		/// 生成属性的builder语句
 		/// </summary>
 		/// <param name="property"></param>
 		/// <returns></returns>
-		static string CreateBuilderStatement(PropertyDefinition property)
+		static string CreateBuilderStatement(PropertyDefinition property, string leader = "\t\t")
 		{
 			StringBuilder stringBuilder = new();
-			stringBuilder.Append($"\t\tbuilder.Property(x => x.{property.Name})");
+			stringBuilder.Append($"{leader}builder.Property(x => x.{property.Name})");
 			if (property.Summary != null)
 				stringBuilder.Append($".HasComment(\"{property.Summary?.Replace("\"", "\\\"")}\")");
 			foreach (var attribute in property.Attributes)
@@ -356,7 +349,11 @@ namespace Api
 		/// <returns></returns>
 		static bool IsBaseType(string type)
 		{
-			return new string[] { "int", "int?", "short", "short?", "long", "long?", "string", "string?", "Guid", "Guid?", "DateTime", "DateTime?", "DateTimeOffset", "DateTimeOffset?" }.Contains(type);
+			return new string[] { "int", "int?" , "short", "short?" , "long", "long?",
+				"string", "string?",
+				"bool", "bool?",
+				"Guid", "Guid?",
+				"DateTime", "DateTime?", "DateTimeOffset", "DateTimeOffset?" }.Contains(type);
 		}
 		/// <summary>
 		/// 创建类的实体
@@ -364,11 +361,11 @@ namespace Api
 		/// <param name="nameSpace"></param>
 		/// <param name="classDeclaration"></param>
 		/// <returns></returns>
-		static ClassDefinition CreateClassEntity(NameSpaceDefinition nameSpace, ClassDeclarationSyntax classDeclaration)
+		static ClassDefinition CreateClassEntity(ClassDeclarationSyntax classDeclaration)
 		{
 			return new ClassDefinition()
 			{
-				NameSpaceDefinition = nameSpace,
+				NameSpace = (classDeclaration.SyntaxTree.GetRoot().ChildNodes().FirstOrDefault(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax) as BaseNamespaceDeclarationSyntax).Name.ToString(),
 				Name = classDeclaration.Identifier.Text,
 				Summary = GetSummay(classDeclaration.GetLeadingTrivia()),
 				Base = classDeclaration.BaseList?.Types.ToString(),
@@ -380,7 +377,7 @@ namespace Api
 		/// <param name="nameSpace"></param>
 		/// <param name="classDeclaration"></param>
 		/// <returns></returns>
-		static PropertyDefinition? CreatePropertyEntity(NameSpaceDefinition nameSpace, ClassDefinition owner, MemberDeclarationSyntax member)
+		static PropertyDefinition? CreatePropertyEntity(ClassDefinition owner, MemberDeclarationSyntax member)
 		{
 			if (member is PropertyDeclarationSyntax propertyDeclaration)
 			{
@@ -410,6 +407,7 @@ namespace Api
 						ArgumentsText = item.Attributes[0].ArgumentList?.ToString(),
 						Arguments = item.Attributes[0].ArgumentList == null ? null : string.Join(", ", item.Attributes[0].ArgumentList?.Arguments.Select(x => x.ToString())!),
 					};
+					attributeDefinition.PropertyDefinition = result;
 					result.Attributes.Add(attributeDefinition);
 				}
 
@@ -418,6 +416,11 @@ namespace Api
 			return null;
 		}
 
+		/// <summary>
+		/// 获取注释
+		/// </summary>
+		/// <param name="trivias"></param>
+		/// <returns></returns>
 		static string GetSummay(SyntaxTriviaList trivias)
 		{
 			//获取注释

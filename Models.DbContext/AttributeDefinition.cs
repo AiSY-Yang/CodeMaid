@@ -23,5 +23,6 @@ namespace Models.CodeMaid
 		/// 参数
 		/// </summary>
 		public string? Arguments { get; set; } = null!;
+		public PropertyDefinition PropertyDefinition { get; set; } = null!;
 	}
 }

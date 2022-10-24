@@ -23,248 +23,230 @@ namespace MaidContexts.Migrations
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Arguments")
-                        .HasColumnType("longtext")
-                        .HasComment("参数");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ArgumentsText")
-                        .HasColumnType("longtext")
-                        .HasComment("参数文本");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.CreateTime\"/>");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.IsDeleted\"/>");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasComment("Attribute名称");
+                        .HasColumnType("longtext");
 
-                    b.Property<long?>("PropertyDefinitionId")
+                    b.Property<long>("PropertyDefinitionId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasComment("Attribute文本");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.UpdateTime\"/>");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PropertyDefinitionId");
 
                     b.ToTable("AttributeDefinitions");
-
-                    b.HasComment("类定义");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.ClassDefinition", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Base")
-                        .HasColumnType("longtext")
-                        .HasComment("基类或者接口名称");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.CreateTime\"/>");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.IsDeleted\"/>");
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<long?>("MaidId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasComment("类名");
+                        .HasColumnType("longtext");
 
-                    b.Property<long>("NameSpaceDefinitionId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("NameSpace")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Summary")
-                        .HasColumnType("longtext")
-                        .HasComment("注释");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.UpdateTime\"/>");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NameSpaceDefinitionId");
+                    b.HasIndex("MaidId");
 
                     b.ToTable("ClassDefinitions");
-
-                    b.HasComment("类定义");
                 });
 
-            modelBuilder.Entity("Models.CodeMaid.NameSpaceDefinition", b =>
+            modelBuilder.Entity("Models.CodeMaid.Maid", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Autonomous")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.CreateTime\"/>");
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DestinationPath")
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.IsDeleted\"/>");
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("MaidWork")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasComment("命名空间名称");
+                        .HasColumnType("longtext");
+
+                    b.Property<long>("ProjectId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("SourcePath")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.UpdateTime\"/>");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("NameSpaceDefinitions");
+                    b.HasIndex("ProjectId");
 
-                    b.HasComment("命名空间定义");
+                    b.ToTable("Maids");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.Project", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.CreateTime\"/>");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.IsDeleted\"/>");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasComment("项目名");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Path")
-                        .HasColumnType("longtext")
-                        .HasComment("项目路径");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.UpdateTime\"/>");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Project");
-
-                    b.HasComment("项目定义");
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
 
                     b.Property<long>("ClassDefinitionId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.CreateTime\"/>");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("FullText")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasComment("完整文本内容");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Get")
-                        .HasColumnType("longtext")
-                        .HasComment("Get方法体");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Initializer")
-                        .HasColumnType("longtext")
-                        .HasComment("初始化器");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.IsDeleted\"/>");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("LeadingTrivia")
-                        .HasColumnType("longtext")
-                        .HasComment("前导");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Modifiers")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasComment("修饰符");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasComment("属性名称");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Set")
-                        .HasColumnType("longtext")
-                        .HasComment("Set方法体");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Summary")
-                        .HasColumnType("longtext")
-                        .HasComment("注释");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasComment("数据类型");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.UpdateTime\"/>");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ClassDefinitionId");
 
                     b.ToTable("PropertyDefinitions");
-
-                    b.HasComment("类定义");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.AttributeDefinition", b =>
                 {
-                    b.HasOne("Models.CodeMaid.PropertyDefinition", null)
+                    b.HasOne("Models.CodeMaid.PropertyDefinition", "PropertyDefinition")
                         .WithMany("Attributes")
-                        .HasForeignKey("PropertyDefinitionId");
+                        .HasForeignKey("PropertyDefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PropertyDefinition");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.ClassDefinition", b =>
                 {
-                    b.HasOne("Models.CodeMaid.NameSpaceDefinition", "NameSpaceDefinition")
+                    b.HasOne("Models.CodeMaid.Maid", null)
                         .WithMany("Classes")
-                        .HasForeignKey("NameSpaceDefinitionId")
+                        .HasForeignKey("MaidId");
+                });
+
+            modelBuilder.Entity("Models.CodeMaid.Maid", b =>
+                {
+                    b.HasOne("Models.CodeMaid.Project", "Project")
+                        .WithMany("Maids")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NameSpaceDefinition");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
@@ -283,9 +265,14 @@ namespace MaidContexts.Migrations
                     b.Navigation("Properties");
                 });
 
-            modelBuilder.Entity("Models.CodeMaid.NameSpaceDefinition", b =>
+            modelBuilder.Entity("Models.CodeMaid.Maid", b =>
                 {
                     b.Navigation("Classes");
+                });
+
+            modelBuilder.Entity("Models.CodeMaid.Project", b =>
+                {
+                    b.Navigation("Maids");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
