@@ -39,9 +39,17 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string Type { get; set; } = null!;
 		/// <summary>
+		/// 是否可以Get
+		/// </summary>
+		public bool HasGet { get; set; }
+		/// <summary>
 		/// Get方法体
 		/// </summary>
 		public string? Get { get; set; } = null!;
+		/// <summary>
+		/// 是否可以Set
+		/// </summary>
+		public bool HasSet { get; set; }
 		/// <summary>
 		/// Set方法体
 		/// </summary>

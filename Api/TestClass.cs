@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.Xml;
+﻿using System.Linq.Expressions;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -33,20 +34,19 @@ namespace Api
 		}
 
 		public IServiceProvider Service { get; }
-		string configPath = "C:\\Users\\kai\\source\\Github\\Template.WebApi\\TestDbContext\\Configrations\\";
-		//string modelPath = "D:\\Work\\marketDataPlatform\\src\\Core\\Models";
-		//string configPath = "D:\\Work\\marketDataPlatform\\src\\Database\\EntityFramework\\EntityTypeConfigurations";
 
 		public async void Task()
 		{
 			var context = Service.GetRequiredService<MaidContext>();
 			var project = context.Projects
+				.Where(x => x.Id == 2)
 				.Include(x => x.Maids)
 				.ThenInclude(x => x.Classes)
 				.ThenInclude(x => x.Properties)
 				.ThenInclude(x => x.Attributes)
 				.First();
 			var maid = project.Maids.First();
+			//生成数据库的数据模型
 			foreach (var file in Directory.GetFiles(maid.SourcePath, "*.cs", SearchOption.AllDirectories))
 			{
 				var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(file));
@@ -80,20 +80,20 @@ namespace Api
 						{
 							CreatePropertyEntity(c, item).Adapt(p);
 						}
+						p.Attributes = newP.Attributes;
 					}
 				}
 			}
 			await context.SaveChangesAsync();
+
 			//生成配置
-			var baseClassNameList = context.ClassDefinitions.Select(x => x.Base).Distinct();
+			var baseClassNameList = maid.Classes.Select(x => x.Base).Distinct();
 			//先生成基类的配置
-			var baseClassList = context.ClassDefinitions
-				.Include(x => x.Properties)
-				.ThenInclude(x => x.Attributes)
+			var baseClassList = maid.Classes
 				.Where(x => baseClassNameList.Contains(x.Name) || x.Base == null).ToList();
 			foreach (var item in baseClassList)
 			{
-				string fileName = Path.Combine(configPath, $"{item.Name}Configuration.cs");
+				string fileName = Path.Combine(maid.DestinationPath, $"{item.Name}Configuration.cs");
 				if (File.Exists(fileName))
 				{
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
@@ -107,13 +107,11 @@ namespace Api
 				}
 			}
 			//在生成派生类的配置
-			var derivedClassList = context.ClassDefinitions
-				.Include(x => x.Properties)
-				.ThenInclude(x => x.Attributes)
+			var derivedClassList = maid.Classes
 				.Where(x => !baseClassNameList.Contains(x.Name)).ToList();
 			foreach (var item in derivedClassList)
 			{
-				string fileName = Path.Combine(configPath, $"{item.Name}Configuration.cs");
+				string fileName = Path.Combine(maid.DestinationPath, $"{item.Name}Configuration.cs");
 				if (File.Exists(fileName))
 				{
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
@@ -200,7 +198,7 @@ namespace Api
 			stringBuilder.AppendLine($"\t\tbuilder.HasComment(\"{classDefinition.Summary}\");");
 			foreach (var item in classDefinition.Properties)
 			{
-				if (IsBaseType(item.Type))
+				if (IsBaseType(item.Type) && item.HasSet)
 					stringBuilder.AppendLine(CreateBuilderStatement(item));
 			}
 			stringBuilder.AppendLine($"\t}}");
@@ -210,10 +208,10 @@ namespace Api
 		}
 
 		/// <summary>
-		/// 使用当前类更新编译单元
+		/// 使用当前类更新基类的配置结点
 		/// </summary>
-		/// <param name="source"></param>
-		/// <param name="classDefinition"></param>
+		/// <param name="source">源数据</param>
+		/// <param name="classDefinition">类</param>
 		/// <returns></returns>
 		static CompilationUnitSyntax UpdateBaseConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
 		{
@@ -229,7 +227,7 @@ namespace Api
 			return source;
 		}
 		/// <summary>
-		/// 使用当前派生类更新编译单元
+		/// 使用当前派生类更新派生类的配置节点
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="classDefinition"></param>
@@ -260,25 +258,10 @@ namespace Api
 			var methodCode = classCode.ChildNodes().First(x => x is MethodDeclarationSyntax);
 			//此处要保留原有块信息引用 以在后面可以替换节点
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
-			var newBlockCode = blockCode;
-			//更新属性信息
-			var propNameRegex = new Regex("Property\\(.*?\\.(.*?)\\)\\.");
-			foreach (var item in newBlockCode.ChildNodes().Where(x => x is ExpressionStatementSyntax))
+			var newBlockCode = (BlockSyntax)blockCode;
+			foreach (var item in classDefinition.Properties.Where(x => IsBaseType(x.Type) && x.HasSet))
 			{
-				var match = propNameRegex.Match(item.ToFullString());
-				if (match.Success && match.Groups.Count == 2)
-				{
-					string propName = match.Groups[1].Value;
-					var prop = classDefinition.Properties.First(x => x.Name == propName);
-					if (IsBaseType(prop.Type))
-					{
-						var expression = CreateBuilderStatement(prop, "") + Environment.NewLine;
-						if (item.ToFullString() != expression)
-						{
-							newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression).WithLeadingTrivia(item.GetLeadingTrivia()));
-						}
-					}
-				}
+				newBlockCode = UpdateOrInsertConfigurationStatement(newBlockCode, item);
 			}
 			//更新表名注释
 			var tableNameRegex = new Regex("builder\\.HasComment\\(\\\"(.*?)\\\"\\)");
@@ -300,6 +283,28 @@ namespace Api
 				}
 			}
 			return source.ReplaceNode(blockCode, newBlockCode);
+		}
+		/// <summary>
+		/// 更新或者插入配置文件的语句
+		/// </summary>
+		/// <param name="blockSyntax"></param>
+		/// <param name="property"></param>
+		/// <returns></returns>
+		static BlockSyntax UpdateOrInsertConfigurationStatement(BlockSyntax blockSyntax, PropertyDefinition property)
+		{
+			//更新属性信息
+			var propNameRegex = new Regex("Property\\(.*?\\.(.*?)\\)\\.");
+			foreach (var item in blockSyntax.ChildNodes().Where(x => x is ExpressionStatementSyntax))
+			{
+				var match = propNameRegex.Match(item.ToFullString());
+				if (match.Success && match.Groups.Count == 2 && match.Groups[1].Value == property.Name)
+				{
+					var expression = CreateBuilderStatement(property, "") + Environment.NewLine;
+					return blockSyntax.ReplaceNode(item, ParseStatement(expression).WithLeadingTrivia(item.GetLeadingTrivia()));
+				}
+				continue;
+			}
+			return blockSyntax.InsertNodesAfter(blockSyntax.ChildNodes().Last(), new[] { ParseStatement(CreateBuilderStatement(property) + Environment.NewLine) });
 		}
 
 		/// <summary>
@@ -334,6 +339,13 @@ namespace Api
 				{
 					case "MaxLength":
 						stringBuilder.Append($".HasMaxLength({attribute.Arguments})");
+						break;
+					case "Column":
+						var match = Regex.Match(attribute.Arguments!, "\"(.*?)\\((\\d*),(\\d*)\\)\"");
+						stringBuilder.Append($".HasPrecision({match.Groups[2]}, {match.Groups[3]})");
+						break;
+					case "Unicode":
+						stringBuilder.Append($".IsUnicode({attribute.Arguments})");
 						break;
 					default:
 						break;
@@ -383,6 +395,8 @@ namespace Api
 			{
 				var x = CSharpCompilation.Create(null, new[] { propertyDeclaration.SyntaxTree });
 				var leaderTrivia = propertyDeclaration.GetLeadingTrivia();
+				var get = propertyDeclaration.AccessorList.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.GetAccessorDeclaration));
+				var set = propertyDeclaration.AccessorList.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.SetAccessorDeclaration));
 				//获取注释
 				var result = new PropertyDefinition()
 				{
@@ -395,6 +409,10 @@ namespace Api
 					Modifiers = propertyDeclaration.Modifiers.ToString(),
 					Initializer = propertyDeclaration.Initializer?.ToString(),
 					Attributes = new(),
+					HasGet = get != null,
+					Get = get?.ExpressionBody?.ToFullString(),
+					HasSet = set != null,
+					Set = set?.ExpressionBody?.ToFullString(),
 					//Base = classDeclaration.BaseList?.Types.ToString(),
 				};
 

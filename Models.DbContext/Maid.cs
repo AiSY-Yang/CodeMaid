@@ -19,15 +19,15 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 原路径
 		/// </summary>
-		public string? SourcePath { get; set; } = null!;
+		public string SourcePath { get; set; } = null!;
 		/// <summary>
 		/// 目标路径
 		/// </summary>
-		public string? DestinationPath { get; set; } = null!;
+		public string DestinationPath { get; set; } = null!;
 		/// <summary>
-		/// 自动修复
+		/// 是否自动修复
 		/// </summary>
 		public bool Autonomous { get; set; }
-		public List<ClassDefinition> Classes { get; set; }
+		public List<ClassDefinition> Classes { get; set; } = null!;
 	}
 }

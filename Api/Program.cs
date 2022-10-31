@@ -28,10 +28,6 @@ namespace Api
 			{
 				//先从配置文件读取一些日志规则
 				config.ReadFrom.Configuration(context.Configuration)
-				//当采用分布式日志记录的时候添加日志来源
-				.Enrich.WithProperty("ApplicationName", "Api")
-				//所有日志输出到控制台
-				//.WriteTo.Logger(x => x.WriteTo.Console(Serilog.Events.LogEventLevel.Debug, "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj} {Properties} {NewLine}{Exception}"))
 				;
 			});
 			//配置服务器
@@ -115,6 +111,7 @@ namespace Api
 
 			//保存容器为全局变量 以便手动创建DI对象
 			Services = app.Services;
+			//开发环境显示swagger文档
 			if (app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
@@ -141,7 +138,7 @@ namespace Api
 			{
 				//x.MapGet("/version", () => $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
 			});
-			//支持静态文件
+			//添加静态文件支持
 			app.UseDefaultFiles();
 			app.UseStaticFiles();
 			Task.Run(() =>

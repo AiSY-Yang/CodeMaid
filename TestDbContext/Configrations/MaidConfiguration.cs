@@ -15,6 +15,6 @@ internal class MaidConfiguration : DatabaseEntityConfiguration<Maid>
 		builder.Property(x => x.Name).HasComment("名称");
 		builder.Property(x => x.SourcePath).HasComment("原路径");
 		builder.Property(x => x.DestinationPath).HasComment("目标路径");
-		builder.Property(x => x.Autonomous).HasComment("自动修复");
+		builder.Property(x => x.Autonomous).HasComment("是否自动修复");
 	}
 }
