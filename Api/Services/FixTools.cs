@@ -2,7 +2,7 @@
 
 namespace Api.Services
 {
-	public class Class
+	public class FixTools
 	{
 		/// <summary>
 		/// 修复谷歌翻译问题

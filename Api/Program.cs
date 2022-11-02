@@ -1,8 +1,13 @@
+using System.Reflection;
 using System.Text.Json.Serialization;
 
+using Api.Controllers;
+using Api.MasstransitConsumer;
 using Api.Middleware;
 
 using MaidContexts;
+
+using MassTransit;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +31,7 @@ namespace Api
 			//配置使用serilog记录日志
 			builder.Host.UseSerilog((context, services, config) =>
 			{
-				//先从配置文件读取一些日志规则
+				//从配置文件读取日志规则
 				config.ReadFrom.Configuration(context.Configuration)
 				;
 			});
@@ -35,7 +40,6 @@ namespace Api
 			{
 				x.ListenAnyIP(5241);
 			});
-			builder.Services.AddMapster();
 			//添加数据库
 			string conn = builder.Configuration.GetConnectionString("MaidContext");
 			builder.Services.AddDbContext<MaidContext>(x => x.UseMySql(conn, ServerVersion.AutoDetect(conn),
@@ -106,9 +110,22 @@ namespace Api
 			Directory.CreateDirectory("/files");
 			var f = new PhysicalFileProvider("/files");
 			builder.Services.AddSingleton(f);
+			//添加mapster配置
+			builder.Services.AddMapster();
+			//添加消息总线
+			builder.Services.AddMassTransitHostedService();
+			builder.Services.AddMassTransit(x =>
+			{
+				x.AddConsumer<FileChangeEventConsumer, OrderEtoConsumerDefinition>();
+				x.UsingInMemory((context, cfg) =>
+				{
+
+					cfg.ConfigureEndpoints(context);
+				});
+			});
 
 			var app = builder.Build();
-
+			
 			//保存容器为全局变量 以便手动创建DI对象
 			Services = app.Services;
 			//开发环境显示swagger文档
@@ -144,6 +161,8 @@ namespace Api
 			Task.Run(() =>
 			{
 				var scope = app.Services.CreateScope();
+				var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
+				Maids.Init(app.Services);
 				new TestClass(scope.ServiceProvider).Task();
 			});
 			//开始运行

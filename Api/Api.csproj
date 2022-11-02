@@ -24,6 +24,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\MaidReponsitory\MaidReponsitory.csproj" />
+		<ProjectReference Include="..\MasstransitModels\MasstransitModels.csproj" />
 		<ProjectReference Include="..\Models.Service\ServicesModels.csproj" />
 		<ProjectReference Include="..\TestDbContext\MaidContexts.csproj" />
 	</ItemGroup>
