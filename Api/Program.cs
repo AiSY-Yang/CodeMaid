@@ -110,16 +110,15 @@ namespace Api
 			Directory.CreateDirectory("/files");
 			var f = new PhysicalFileProvider("/files");
 			builder.Services.AddSingleton(f);
-			//添加mapster配置
-			builder.Services.AddMapster();
 			//添加消息总线
 			builder.Services.AddMassTransitHostedService();
 			builder.Services.AddMassTransit(x =>
 			{
-				x.AddConsumer<FileChangeEventConsumer, OrderEtoConsumerDefinition>();
+				//添加所有消费者
+				x.AddConsumers(Assembly.GetExecutingAssembly());
+				//使用内存队列
 				x.UsingInMemory((context, cfg) =>
 				{
-
 					cfg.ConfigureEndpoints(context);
 				});
 			});

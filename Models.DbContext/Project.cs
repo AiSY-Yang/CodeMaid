@@ -1,4 +1,6 @@
-﻿using Models.CodeMaid;
+﻿using Mapster;
+
+using Models.CodeMaid;
 
 namespace Models.CodeMaid
 {
@@ -15,6 +17,7 @@ namespace Models.CodeMaid
 		/// 项目路径
 		/// </summary>
 		public string? Path { get; set; } = null!;
+		[AdaptIgnore]
 		public List<Maid> Maids { get; set; } = null!;
 	}
 }

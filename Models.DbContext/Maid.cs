@@ -1,4 +1,6 @@
-﻿using Models.CodeMaid;
+﻿using Mapster;
+
+using Models.CodeMaid;
 
 namespace Models.CodeMaid
 {
@@ -28,6 +30,7 @@ namespace Models.CodeMaid
 		/// 是否自动修复
 		/// </summary>
 		public bool Autonomous { get; set; }
+		[AdaptIgnore]
 		public List<ClassDefinition> Classes { get; set; } = null!;
 	}
 }

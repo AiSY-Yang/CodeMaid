@@ -13,15 +13,20 @@ namespace MaidContexts
 		public DbSet<AttributeDefinition> AttributeDefinitions { get; set; } = null!;
 		public MaidContext(DbContextOptions<MaidContext> options) : base(options)
 		{
-			Database.Migrate();
+			if (!HasMigrate)
+			{
+				Database.Migrate();
+				HasMigrate = true;
+			}
 		}
+		private static bool HasMigrate = false;
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			modelBuilder.Entity<Project>().HasKey(x=>x.Id);
-			modelBuilder.Entity<Maid>().HasKey(x=>x.Id);
-			modelBuilder.Entity<ClassDefinition>().HasKey(x=>x.Id);
-			modelBuilder.Entity<PropertyDefinition>().HasKey(x=>x.Id);
-			modelBuilder.Entity<AttributeDefinition>().HasKey(x=>x.Id);
+			modelBuilder.Entity<Project>().HasKey(x => x.Id);
+			modelBuilder.Entity<Maid>().HasKey(x => x.Id);
+			modelBuilder.Entity<ClassDefinition>().HasKey(x => x.Id);
+			modelBuilder.Entity<PropertyDefinition>().HasKey(x => x.Id);
+			modelBuilder.Entity<AttributeDefinition>().HasKey(x => x.Id);
 			modelBuilder.ApplyConfigurationsFromAssembly(typeof(MaidContext).Assembly);
 			base.OnModelCreating(modelBuilder);
 		}

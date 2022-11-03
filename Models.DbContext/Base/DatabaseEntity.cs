@@ -18,7 +18,7 @@ namespace Models.CodeMaid
 		///<inheritdoc cref="IDatabaseEntity.CreateTime"/>
 		public DateTimeOffset CreateTime { get; set; } = DateTimeOffset.Now;
 		///<inheritdoc cref="IDatabaseEntity.UpdateTime"/>
-		public DateTimeOffset UpdateTime { get; set; }
+		public DateTimeOffset UpdateTime { get; set; } = DateTimeOffset.Now;
 		///<inheritdoc cref="IDatabaseEntity.IsDeleted"/>
 		public bool IsDeleted { get; set; }
 	}

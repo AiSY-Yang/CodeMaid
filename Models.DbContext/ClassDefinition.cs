@@ -1,4 +1,6 @@
-﻿using Models.CodeMaid;
+﻿using Mapster;
+
+using Models.CodeMaid;
 
 namespace Models.CodeMaid
 {
@@ -26,6 +28,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 属性列表
 		/// </summary>
+		[AdaptIgnore]
 		public List<PropertyDefinition> Properties { get; set; } = new();
 	}
 }

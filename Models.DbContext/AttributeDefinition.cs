@@ -1,4 +1,6 @@
-﻿using Models.CodeMaid;
+﻿using Mapster;
+
+using Models.CodeMaid;
 
 namespace Models.CodeMaid
 {
@@ -23,6 +25,7 @@ namespace Models.CodeMaid
 		/// 参数
 		/// </summary>
 		public string? Arguments { get; set; } = null!;
+		[AdaptIgnore]
 		public PropertyDefinition PropertyDefinition { get; set; } = null!;
 	}
 }

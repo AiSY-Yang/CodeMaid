@@ -19,10 +19,14 @@ using Serilog;
 
 namespace Api
 {
-	static class Maids
+	class Maids
 	{
 		static IServiceProvider serviceProvider = null!;
 		volatile static ConcurrentDictionary<FileSystemWatcher, Maid> Watchers = new();
+		/// <summary>
+		/// 初始化文件监听器
+		/// </summary>
+		/// <param name="serviceProvider"></param>
 		public static async void Init(IServiceProvider serviceProvider)
 		{
 			Maids.serviceProvider = serviceProvider;
@@ -52,7 +56,6 @@ namespace Api
 					Log.Information("添加项目{project}的{func}监听器,路径为{path}", item.Project.Name, item.Name, item.SourcePath);
 				}
 			}
-			Console.WriteLine(Watchers.Count);
 		}
 
 		private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
@@ -64,12 +67,13 @@ namespace Api
 		{
 			await FileChange(Watchers[(FileSystemWatcher)sender], e.FullPath);
 		}
-		static async Task FileChange(Maid maid, string filePath)
+		private static async Task FileChange(Maid maid, string filePath)
 		{
 			if (Path.GetExtension(filePath) != ".TMP")
 			{
 				var msg = new FileChangeEvent() { FilePath = filePath, MaidId = maid.Id };
 				using var scope = serviceProvider.CreateScope();
+				Console.WriteLine(msg);
 				await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(msg);
 			}
 		}
