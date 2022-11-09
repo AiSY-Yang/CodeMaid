@@ -10,6 +10,10 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 配置同步功能
 		/// </summary>
-		ConfigurationSync
+		ConfigurationSync,
+		/// <summary>
+		/// DTO同步
+		/// </summary>
+		DtoSync,
 	}
 }

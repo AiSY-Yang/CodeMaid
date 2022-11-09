@@ -30,6 +30,10 @@ namespace Models.CodeMaid
 		/// 是否自动修复
 		/// </summary>
 		public bool Autonomous { get; set; }
+		/// <summary>
+		/// 序列化保存的设置
+		/// </summary>
+		public string? Setting { get; set; } = null!;
 		[AdaptIgnore]
 		public List<ClassDefinition> Classes { get; set; } = null!;
 	}

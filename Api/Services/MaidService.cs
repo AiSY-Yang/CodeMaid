@@ -11,13 +11,17 @@ using Serilog;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Mapster;
 using static ExtensionMethods.AssemblyExtension;
+using ServicesModels;
+using System.Linq.Expressions;
+using ExtensionMethods;
+using static ServicesModels.DtoSyncSetting;
 
 namespace Api.Services
 {
 	public class MaidService
 	{
 		/// <summary>
-		/// 更新maid记录的信息 
+		/// 更新maid记录的信息
 		/// </summary>
 		/// <param name="maid"></param>
 		/// <param name="compilationUnit"></param>
@@ -27,7 +31,8 @@ namespace Api.Services
 			var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
 			var compilationUnit = tree.GetCompilationUnitRoot();
 			var classes = GetClassDeclarationSyntaxes(compilationUnit);
-
+			//记录下文件的using
+			var usingText = compilationUnit.Usings.ToFullString();
 			foreach (var classNode in classes)
 			{
 				var c = maid.Classes.FirstOrDefault(x => x.Name == classNode.Identifier.ValueText);
@@ -40,25 +45,32 @@ namespace Api.Services
 				{
 					CreateClassEntity(classNode).Adapt(c);
 				}
+				c.Using = usingText;
 				foreach (var item in classNode.Members)
 				{
 					if (item is not PropertyDeclarationSyntax propertyDeclaration) continue;
-					var newP = CreatePropertyEntity(c, item);
+					var newP = CreatePropertyEntity(c, propertyDeclaration);
 					var p = c.Properties.FirstOrDefault(x => x.Name == newP.Name);
 					if (p == null)
 					{
-						p = CreatePropertyEntity(c, item);
+						p = CreatePropertyEntity(c, propertyDeclaration);
 						c.Properties.Add(p);
 					}
 					else
 					{
-						CreatePropertyEntity(c, item).Adapt(p);
+						CreatePropertyEntity(c, propertyDeclaration).Adapt(p);
 					}
 					p.Attributes = newP.Attributes;
 				}
 			}
 			return maid;
 		}
+
+		/// <summary>
+		/// 执行Maid工作
+		/// </summary>
+		/// <param name="maid"></param>
+		/// <returns></returns>
 		public static async Task Work(Maid maid)
 		{
 			switch (maid.MaidWork)
@@ -66,12 +78,15 @@ namespace Api.Services
 				case Models.CodeMaid.MaidWork.ConfigurationSync:
 					await UpdateConfiguration(maid);
 					break;
+				case Models.CodeMaid.MaidWork.DtoSync:
+					await UpdateDto(maid);
+					break;
 				default:
 					break;
 			}
 		}
 
-
+		#region Configuration
 		/// <summary>
 		/// 更新配置
 		/// </summary>
@@ -126,7 +141,7 @@ namespace Api.Services
 		/// </summary>
 		/// <param name="classDefinition"></param>
 		/// <returns></returns>
-		public static CompilationUnitSyntax CreateBaseConfigurationNode(ClassDefinition classDefinition)
+		private static CompilationUnitSyntax CreateBaseConfigurationNode(ClassDefinition classDefinition)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore;");
@@ -155,7 +170,7 @@ namespace Api.Services
 		/// </summary>
 		/// <param name="classDefinition"></param>
 		/// <returns></returns>
-		public static CompilationUnitSyntax CreateDerivedConfigurationNode(ClassDefinition classDefinition)
+		private static CompilationUnitSyntax CreateDerivedConfigurationNode(ClassDefinition classDefinition)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore;");
@@ -189,7 +204,7 @@ namespace Api.Services
 		/// <param name="source">源数据</param>
 		/// <param name="classDefinition">类</param>
 		/// <returns></returns>
-		public static CompilationUnitSyntax UpdateBaseConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
+		private static CompilationUnitSyntax UpdateBaseConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
 		{
 			try
 			{
@@ -208,7 +223,7 @@ namespace Api.Services
 		/// <param name="source"></param>
 		/// <param name="classDefinition"></param>
 		/// <returns></returns>
-		public static CompilationUnitSyntax UpdateDerivedConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
+		private static CompilationUnitSyntax UpdateDerivedConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
 		{
 			try
 			{
@@ -228,7 +243,7 @@ namespace Api.Services
 		/// <param name="source"></param>
 		/// <param name="classDefinition"></param>
 		/// <returns></returns>
-		public static CompilationUnitSyntax UpdateConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
+		private static CompilationUnitSyntax UpdateConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
 		{
 			var classCode = GetClassDeclarationSyntaxes(source).First();
 			var methodCode = classCode.ChildNodes().First(x => x is MethodDeclarationSyntax);
@@ -260,13 +275,14 @@ namespace Api.Services
 			}
 			return source.ReplaceNode(blockCode, newBlockCode);
 		}
+
 		/// <summary>
 		/// 更新或者插入配置文件的语句
 		/// </summary>
 		/// <param name="blockSyntax"></param>
 		/// <param name="property"></param>
 		/// <returns></returns>
-		public static BlockSyntax UpdateOrInsertConfigurationStatement(BlockSyntax blockSyntax, PropertyDefinition property)
+		private static BlockSyntax UpdateOrInsertConfigurationStatement(BlockSyntax blockSyntax, PropertyDefinition property)
 		{
 			//更新属性信息
 			var propNameRegex = new Regex("Property\\(.*?\\.(.*?)\\)\\.");
@@ -282,13 +298,110 @@ namespace Api.Services
 			}
 			return blockSyntax.InsertNodesAfter(blockSyntax.ChildNodes().Last(), new[] { ParseStatement(CreateBuilderStatement(property) + Environment.NewLine) });
 		}
+		#endregion
+		#region Dto
+		static async Task UpdateDto(Maid maid)
+		{
+			//确认目标路径的存在
+			if (!Directory.Exists(maid.DestinationPath))
+				Directory.CreateDirectory(maid.DestinationPath);
+			//读取设置
+			DtoSyncSetting settings = maid.Setting!.AsJsonToObject<DtoSyncSetting>();
+			//所有的类都进行更新
+			foreach (var item in maid.Classes)
+			{
+				//生成Dto的目录
+				string dirPath = Path.Combine(maid.DestinationPath, item.Name + settings.DirectorySuffix);
+				if (!Directory.Exists(dirPath))
+					Directory.CreateDirectory(dirPath);
+				foreach (var setting in settings.DtoSyncSettings)
+				{
+					await UpdateDto(dirPath, item, setting);
+				}
+				Console.WriteLine(item.Name);
+			}
+		}
+		/// <summary>
+		/// 更新Dto
+		/// </summary>
+		/// <param name="path">文件的路径</param>
+		/// <param name="classDefinition">类信息</param>
+		/// <param name="setting">设置</param>
+		/// <returns></returns>
+		static async Task UpdateDto(string path, ClassDefinition classDefinition, DtoSyncSettingItem setting)
+		{
+			string DtoName = classDefinition.Name + setting.Suffix;
+			string filePath = Path.Combine(path, DtoName + ".cs");
+			CompilationUnitSyntax compilationUnit;
+			if (File.Exists(filePath))
+				compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(filePath)).GetCompilationUnitRoot();
+			else
+				compilationUnit = CSharpSyntaxTree.ParseText(@$"using System.ComponentModel.DataAnnotations.Schema;
+{classDefinition.Using}using {classDefinition.NameSpace};
+namespace Models;
+/// <summary>
+/// {classDefinition.Summary}
+/// </summary>
+public class {DtoName}
+{{
+}}").GetCompilationUnitRoot();
+
+			var c = GetClassDeclarationSyntaxes(compilationUnit).First();
+			var newC = c;
+			foreach (var item in classDefinition.Properties
+				.Where(setting.JustInclude.Count != 0, x => setting.JustInclude.Contains(x.Name))
+				.Where(x => !setting.ExcludePropertity.Contains(x.Name))
+				)
+			{
+				newC = AddOrUpdatePropertyDeclarationSyntax(newC, item);
+			}
+			compilationUnit = compilationUnit.ReplaceNode(c, newC);
+			await File.WriteAllTextAsync(filePath, compilationUnit.ToFullString());
+
+			ClassDeclarationSyntax AddOrUpdatePropertyDeclarationSyntax(ClassDeclarationSyntax classDeclarationSyntax, PropertyDefinition property)
+			{
+				var node = classDeclarationSyntax.ChildNodes()
+						.Where(x => x is PropertyDeclarationSyntax)
+						.Cast<PropertyDeclarationSyntax>()
+						.FirstOrDefault(x => x.Identifier.Text == property.Name);
+				var newNode = (PropertyDeclarationSyntax)ParseMemberDeclaration(property.FullText)!;
+				if (setting.ExcludeList)
+				{
+					if (newNode.Type.ToString().StartsWith("List"))
+						return classDeclarationSyntax;
+				}
+				if (setting.ConvertToNullable)
+				{
+					if (!newNode.Type.ToString().EndsWith("?"))
+						newNode = newNode.WithType(ParseTypeName(property.Type + "?"));
+				}
+				if (node == null)
+				{
+					//新增的属性 原结点不存在这个属性 或者原结点有过这个属性但是被手动删除了
+					//判断如果更新时间在一分钟内 则当成新增的属性进行更新
+#if DEBUG
+#else
+					if (property.UpdateTime < DateTimeOffset.Now.AddMinutes(-1))
+#endif
+					{
+						classDeclarationSyntax = classDeclarationSyntax.AddMembers(newNode);
+					}
+				}
+				else
+				{
+					classDeclarationSyntax = classDeclarationSyntax.ReplaceNode(node, newNode);
+				}
+				return classDeclarationSyntax;
+			}
+		}
+		#endregion Dto
 
 		/// <summary>
 		/// 获取编译单元下的所有类
 		/// </summary>
 		/// <param name="compilationUnit"></param>
 		/// <returns></returns>
-		public static List<ClassDeclarationSyntax> GetClassDeclarationSyntaxes(CompilationUnitSyntax compilationUnit)
+		private static List<ClassDeclarationSyntax> GetClassDeclarationSyntaxes(CompilationUnitSyntax compilationUnit)
 		{
 			//自动生成的文件是没有命名空间的
 			var classCode = compilationUnit.ChildNodes().Where(x => x is ClassDeclarationSyntax).ToList();
@@ -298,12 +411,13 @@ namespace Api.Services
 					   .Where(x => x is ClassDeclarationSyntax).ToList();
 			return classCode.Union(classCode2).Select(x => x as ClassDeclarationSyntax).ToList()!;
 		}
+
 		/// <summary>
 		/// 生成属性的builder语句
 		/// </summary>
 		/// <param name="property"></param>
 		/// <returns></returns>
-		public static string CreateBuilderStatement(PropertyDefinition property, string leader = "\t\t")
+		private static string CreateBuilderStatement(PropertyDefinition property, string leader = "\t\t")
 		{
 			StringBuilder stringBuilder = new();
 			stringBuilder.Append($"{leader}builder.Property(x => x.{property.Name})");
@@ -335,7 +449,7 @@ namespace Api.Services
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		public static bool IsBaseType(string type)
+		private static bool IsBaseType(string type)
 		{
 			return new string[] { "int", "int?" , "short", "short?" , "long", "long?",
 				"string", "string?",
@@ -350,7 +464,7 @@ namespace Api.Services
 		/// <param name="nameSpace"></param>
 		/// <param name="classDeclaration"></param>
 		/// <returns></returns>
-		public static ClassDefinition CreateClassEntity(ClassDeclarationSyntax classDeclaration)
+		private static ClassDefinition CreateClassEntity(ClassDeclarationSyntax classDeclaration)
 		{
 			return new ClassDefinition()
 			{
@@ -366,48 +480,41 @@ namespace Api.Services
 		/// <param name="nameSpace"></param>
 		/// <param name="classDeclaration"></param>
 		/// <returns></returns>
-		public static PropertyDefinition? CreatePropertyEntity(ClassDefinition owner, MemberDeclarationSyntax member)
+		private static PropertyDefinition CreatePropertyEntity(ClassDefinition owner, PropertyDeclarationSyntax propertyDeclaration)
 		{
-			if (member is PropertyDeclarationSyntax propertyDeclaration)
+			var leaderTrivia = propertyDeclaration.GetLeadingTrivia();
+			var get = propertyDeclaration.AccessorList!.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.GetAccessorDeclaration));
+			var set = propertyDeclaration.AccessorList.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.SetAccessorDeclaration));
+			var result = new PropertyDefinition()
 			{
-				var x = CSharpCompilation.Create(null, new[] { propertyDeclaration.SyntaxTree });
-				var leaderTrivia = propertyDeclaration.GetLeadingTrivia();
-				var get = propertyDeclaration.AccessorList!.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.GetAccessorDeclaration));
-				var set = propertyDeclaration.AccessorList.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.SetAccessorDeclaration));
-				var result = new PropertyDefinition()
+				ClassDefinition = owner,
+				FullText = propertyDeclaration.ToFullString(),
+				LeadingTrivia = leaderTrivia.ToFullString(),
+				Summary = GetSummay(leaderTrivia),
+				Name = propertyDeclaration.Identifier.Text,
+				Type = propertyDeclaration.Type.ToString(),
+				Modifiers = propertyDeclaration.Modifiers.ToString(),
+				Initializer = propertyDeclaration.Initializer?.ToString(),
+				Attributes = new(),
+				HasGet = get != null,
+				Get = get?.ExpressionBody?.ToFullString(),
+				HasSet = set != null,
+				Set = set?.ExpressionBody?.ToFullString(),
+			};
+
+			foreach (var item in propertyDeclaration.AttributeLists)
+			{
+				AttributeDefinition attributeDefinition = new AttributeDefinition()
 				{
-					ClassDefinition = owner,
-					FullText = propertyDeclaration.ToString(),
-					LeadingTrivia = leaderTrivia.ToFullString(),
-					Summary = GetSummay(leaderTrivia),
-					Name = propertyDeclaration.Identifier.Text,
-					Type = propertyDeclaration.Type.ToString(),
-					Modifiers = propertyDeclaration.Modifiers.ToString(),
-					Initializer = propertyDeclaration.Initializer?.ToString(),
-					Attributes = new(),
-					HasGet = get != null,
-					Get = get?.ExpressionBody?.ToFullString(),
-					HasSet = set != null,
-					Set = set?.ExpressionBody?.ToFullString(),
-					//Base = classDeclaration.BaseList?.Types.ToString(),
+					Name = item.Attributes[0].Name.ToString(),
+					Text = item.Attributes[0].ToString(),
+					ArgumentsText = item.Attributes[0].ArgumentList?.ToString(),
+					Arguments = item.Attributes[0].ArgumentList == null ? null : string.Join(", ", item.Attributes[0].ArgumentList?.Arguments.Select(x => x.ToString())!),
 				};
-
-				foreach (var item in member.AttributeLists)
-				{
-					AttributeDefinition attributeDefinition = new AttributeDefinition()
-					{
-						Name = item.Attributes[0].Name.ToString(),
-						Text = item.Attributes[0].ToString(),
-						ArgumentsText = item.Attributes[0].ArgumentList?.ToString(),
-						Arguments = item.Attributes[0].ArgumentList == null ? null : string.Join(", ", item.Attributes[0].ArgumentList?.Arguments.Select(x => x.ToString())!),
-					};
-					attributeDefinition.PropertyDefinition = result;
-					result.Attributes.Add(attributeDefinition);
-				}
-
-				return result;
+				attributeDefinition.PropertyDefinition = result;
+				result.Attributes.Add(attributeDefinition);
 			}
-			return null;
+			return result;
 		}
 
 		/// <summary>
@@ -415,9 +522,8 @@ namespace Api.Services
 		/// </summary>
 		/// <param name="trivias"></param>
 		/// <returns></returns>
-		public static string GetSummay(SyntaxTriviaList trivias)
+		private static string GetSummay(SyntaxTriviaList trivias)
 		{
-			//获取注释
 			StringBuilder summary = new StringBuilder();
 			foreach (var item in trivias)
 			{
@@ -435,15 +541,6 @@ namespace Api.Services
 				}
 			}
 			return summary.ToString();
-		}
-		/// <summary>
-		/// 格式化Using
-		/// </summary>
-		/// <param name="usingDirective"></param>
-		/// <returns></returns>
-		public static UsingDirectiveSyntax FormatUsing(UsingDirectiveSyntax usingDirective)
-		{
-			return UsingDirective(usingDirective.Name.WithLeadingTrivia(Whitespace(" ")).WithTrailingTrivia(Whitespace(""))).WithTrailingTrivia(EndOfLine("\r\n"));
 		}
 	}
 }

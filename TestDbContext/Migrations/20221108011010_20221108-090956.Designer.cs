@@ -3,6 +3,7 @@ using System;
 using MaidContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaidContexts.Migrations
 {
     [DbContext(typeof(MaidContext))]
-    partial class MaidContextModelSnapshot : ModelSnapshot
+    [Migration("20221108011010_20221108-090956")]
+    partial class _20221108090956
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,9 +157,6 @@ namespace MaidContexts.Migrations
 
                     b.Property<long>("ProjectId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Setting")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("SourcePath")
                         .IsRequired()

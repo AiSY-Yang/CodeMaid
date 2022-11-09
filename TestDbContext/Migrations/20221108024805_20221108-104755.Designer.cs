@@ -3,6 +3,7 @@ using System;
 using MaidContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaidContexts.Migrations
 {
     [DbContext(typeof(MaidContext))]
-    partial class MaidContextModelSnapshot : ModelSnapshot
+    [Migration("20221108024805_20221108-104755")]
+    partial class _20221108104755
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,6 +101,11 @@ namespace MaidContexts.Migrations
                         .HasColumnType("longtext")
                         .HasComment("命名空间");
 
+                    b.Property<string>("Setting")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasComment("序列化保存的设置");
+
                     b.Property<string>("Summary")
                         .HasColumnType("longtext")
                         .HasComment("注释");
@@ -155,9 +162,6 @@ namespace MaidContexts.Migrations
 
                     b.Property<long>("ProjectId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Setting")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("SourcePath")
                         .IsRequired()

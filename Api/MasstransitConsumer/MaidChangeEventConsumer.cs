@@ -38,7 +38,6 @@ namespace Api.MasstransitConsumer
 	}
 	public class MaidChangeEventConsumerDefinition : ConsumerDefinition<MaidChangeEventConsumer>
 	{
-
 		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<MaidChangeEventConsumer> consumerConfigurator)
 		{
 		}

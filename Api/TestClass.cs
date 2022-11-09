@@ -30,6 +30,7 @@ namespace Api
 				.ThenInclude(x => x.Attributes)
 				.First();
 			var maid = project.Maids.First();
+			return;
 			//生成数据库的数据模型
 			foreach (var file in Directory.GetFiles(maid.SourcePath, "*.cs", SearchOption.AllDirectories))
 			{

@@ -26,6 +26,10 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string? Base { get; set; } = null!;
 		/// <summary>
+		/// 类引用的命名空间
+		/// </summary>
+		public string Using { get; set; } = null!;
+		/// <summary>
 		/// 属性列表
 		/// </summary>
 		[AdaptIgnore]

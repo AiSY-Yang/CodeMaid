@@ -46,7 +46,6 @@ namespace Api.MasstransitConsumer
 	}
 	public class FileChangeEventConsumerDefinition : ConsumerDefinition<FileChangeEventConsumer>
 	{
-
 		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<FileChangeEventConsumer> consumerConfigurator)
 		{
 		}
