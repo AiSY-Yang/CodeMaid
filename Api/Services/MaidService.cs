@@ -15,6 +15,7 @@ using ServicesModels;
 using System.Linq.Expressions;
 using ExtensionMethods;
 using static ServicesModels.DtoSyncSetting;
+using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services
 {
@@ -46,6 +47,8 @@ namespace Api.Services
 					CreateClassEntity(classNode).Adapt(c);
 				}
 				c.Using = usingText;
+				//记录这个类现在有的属性
+				List<string> PropertytiList = new List<string>();
 				foreach (var item in classNode.Members)
 				{
 					if (item is not PropertyDeclarationSyntax propertyDeclaration) continue;
@@ -60,8 +63,11 @@ namespace Api.Services
 					{
 						CreatePropertyEntity(c, propertyDeclaration).Adapt(p);
 					}
+					PropertytiList.Add(p.Name);
 					p.Attributes = newP.Attributes;
 				}
+				//本次如果没有这个属性的话 则标记删除
+				c.Properties.Where(x => !PropertytiList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
 			}
 			return maid;
 		}
@@ -350,7 +356,10 @@ public class {DtoName}
 			var newC = c;
 			foreach (var item in classDefinition.Properties
 				.Where(setting.JustInclude.Count != 0, x => setting.JustInclude.Contains(x.Name))
-				.Where(x => !setting.ExcludePropertity.Contains(x.Name))
+				//精确的排除属性
+				//.Where(x => !setting.ExcludePropertity.Any(s => s == x.Name))
+				//模糊匹配的排除属性
+				.Where(x => !x.Name.Contains(setting.ExcludePropertity))
 				)
 			{
 				newC = AddOrUpdatePropertyDeclarationSyntax(newC, item);
@@ -365,33 +374,60 @@ public class {DtoName}
 						.Cast<PropertyDeclarationSyntax>()
 						.FirstOrDefault(x => x.Identifier.Text == property.Name);
 				var newNode = (PropertyDeclarationSyntax)ParseMemberDeclaration(property.FullText)!;
+				//如果这个属性被删除的话 则把映射出的对象也删除掉
+				if (property.IsDeleted == true)
+				{
+					if (node != null)
+					{
+						classDeclarationSyntax.RemoveNode(node, SyntaxRemoveOptions.KeepNoTrivia);
+					}
+					return classDeclarationSyntax;
+				}
+				//是否排除列表元素
 				if (setting.ExcludeList)
 				{
 					if (newNode.Type.ToString().StartsWith("List"))
 						return classDeclarationSyntax;
 				}
+				//是否排除复杂类型
+				if (setting.ExcludeComplexTypes)
+				{
+					if (!IsBaseType(newNode.Type.ToString()))
+						return classDeclarationSyntax;
+				}
+				//是否转换为可空类型
 				if (setting.ConvertToNullable)
 				{
 					if (!newNode.Type.ToString().EndsWith("?"))
-						newNode = newNode.WithType(ParseTypeName(property.Type + "?"));
+						newNode = newNode.WithType(ParseTypeName(property.Type + "?").WithTrailingTrivia(newNode.Type.GetTrailingTrivia()));
+					if (newNode.Initializer != null)
+					{
+						//移除初始化器
+						newNode = newNode.RemoveNode(newNode.Initializer, SyntaxRemoveOptions.KeepTrailingTrivia);
+						//初始化器后面有个分号 也要去掉
+						newNode = newNode!.WithSemicolonToken(Token(newNode.SemicolonToken.LeadingTrivia, SyntaxKind.None, newNode.SemicolonToken.TrailingTrivia));
+						//去掉分号会把行尾一起去掉 这里要把行尾恢复
+						var leadingTrivia = newNode.SemicolonToken.LeadingTrivia;
+						var trailingTrivia = newNode.SemicolonToken.TrailingTrivia;
+						SyntaxToken newToken = Token(leadingTrivia, SyntaxKind.None, trailingTrivia);
+						bool addNewline = newNode.GetTrailingTrivia().ToString() == " ";
+						if (addNewline)
+							newNode = newNode.WithTrailingTrivia(Whitespace(Environment.NewLine));
+					}
 				}
+				//新增的属性 原结点不存在这个属性 或者原结点有过这个属性但是被手动删除了
+				//判断如果更新时间在一分钟内 则当成新增的属性进行更新
 				if (node == null)
 				{
-					//新增的属性 原结点不存在这个属性 或者原结点有过这个属性但是被手动删除了
-					//判断如果更新时间在一分钟内 则当成新增的属性进行更新
 #if DEBUG
 #else
 					if (property.UpdateTime < DateTimeOffset.Now.AddMinutes(-1))
 #endif
 					{
-						classDeclarationSyntax = classDeclarationSyntax.AddMembers(newNode);
+						return classDeclarationSyntax.AddMembers(newNode);
 					}
 				}
-				else
-				{
-					classDeclarationSyntax = classDeclarationSyntax.ReplaceNode(node, newNode);
-				}
-				return classDeclarationSyntax;
+				return classDeclarationSyntax.ReplaceNode(node, newNode);
 			}
 		}
 		#endregion Dto

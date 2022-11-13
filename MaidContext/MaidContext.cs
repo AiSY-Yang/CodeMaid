@@ -32,11 +32,13 @@ namespace MaidContexts
 		}
 		public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
 		{
+			FakeDelete();
 			SetUpdateTime();
 			return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
 		}
 		public override int SaveChanges(bool acceptAllChangesOnSuccess)
 		{
+			FakeDelete();
 			SetUpdateTime();
 			return base.SaveChanges(acceptAllChangesOnSuccess);
 		}
@@ -48,6 +50,20 @@ namespace MaidContexts
 			foreach (var item in ChangeTracker.Entries().Where(x => x.State == EntityState.Modified).Select(x => x.Entity))
 			{
 				if (item is DatabaseEntity a) a.UpdateTime = DateTimeOffset.UtcNow;
+			}
+		}
+		/// <summary>
+		/// 全局伪删除
+		/// </summary>
+		private void FakeDelete()
+		{
+			foreach (var item in ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Where(x=>x.Entity is DatabaseEntity))
+			{
+				if (item.Entity is DatabaseEntity entity)
+				{
+					item.State = EntityState.Modified;
+					entity.IsDeleted = true;
+				}
 			}
 		}
 	}

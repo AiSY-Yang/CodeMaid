@@ -30,6 +30,10 @@ namespace ServicesModels
 			/// </summary>
 			public bool ExcludeList { get; set; }
 			/// <summary>
+			/// 排除复杂属性
+			/// </summary>
+			public bool ExcludeComplexTypes { get; set; }
+			/// <summary>
 			/// 转换为可为空属性 一般用于查询条件
 			/// </summary>
 			public bool ConvertToNullable { get; set; }
@@ -41,6 +45,10 @@ namespace ServicesModels
 			/// 仅包含属性
 			/// </summary>
 			public List<string> JustInclude { get; set; } = new List<string>();
+			/// <summary>
+			/// 需要扁平化映射的属性
+			/// </summary>
+			public List<string> FlatteningPropertity { get; set; } = new List<string>();
 		}
 	}
 }

@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServicesModels", "Models.Se
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repository", "Repository", "{3A844EA6-A54C-4FCC-9F7B-0A6EE4886CEE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MaidContexts", "TestDbContext\MaidContexts.csproj", "{92EAAB43-8546-4A4B-8FEA-9686841703CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MaidContexts", "MaidContext\MaidContexts.csproj", "{92EAAB43-8546-4A4B-8FEA-9686841703CA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reponsitory", "Reponsitory\Reponsitory.csproj", "{FFAD0052-BCB8-4BA2-8FA2-FB7CD7103A37}"
 EndProject
