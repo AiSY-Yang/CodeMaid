@@ -37,7 +37,13 @@ namespace Api
 			{
 				if (!Watchers.Any(x => x.Value.Id == item.Id))
 				{
-					FileSystemWatcher watcher = new FileSystemWatcher(item.SourcePath);
+					var path = Path.Combine(item.Project.Path, item.SourcePath);
+					if (!Path.Exists(path))
+					{
+						Log.Error("项目{project}的{func}的源路径{path}不存在", item.Project.Name, item.Name, path);
+						continue;
+					}
+					FileSystemWatcher watcher = new FileSystemWatcher(path);
 					//watcher.NotifyFilter = NotifyFilters.Attributes
 					//   | NotifyFilters.CreationTime
 					//   | NotifyFilters.DirectoryName
@@ -53,7 +59,7 @@ namespace Api
 					watcher.Changed += Watcher_Changed;
 					watcher.Renamed += Watcher_Renamed; ;
 					Watchers.TryAdd(watcher, item);
-					Log.Information("添加项目{project}的{func}监听器,路径为{path}", item.Project.Name, item.Name, item.SourcePath);
+					Log.Information("添加项目{project}的{func}监听器,路径为{path}", item.Project.Name, item.Name, path);
 				}
 			}
 		}
@@ -67,13 +73,18 @@ namespace Api
 		{
 			await FileChange(Watchers[(FileSystemWatcher)sender], e.FullPath);
 		}
+		/// <summary>
+		/// 变更筛选器 VS修改文件的时候可能使用的是创建 修改 重命名的操作 把中间文件排除掉
+		/// </summary>
+		/// <param name="maid"></param>
+		/// <param name="filePath"></param>
+		/// <returns></returns>
 		private static async Task FileChange(Maid maid, string filePath)
 		{
 			if (Path.GetExtension(filePath) != ".TMP")
 			{
 				var msg = new FileChangeEvent() { FilePath = filePath, MaidId = maid.Id };
 				using var scope = serviceProvider.CreateScope();
-				Console.WriteLine(msg);
 				await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(msg);
 			}
 		}

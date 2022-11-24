@@ -16,6 +16,7 @@ using System.Linq.Expressions;
 using ExtensionMethods;
 using static ServicesModels.DtoSyncSetting;
 using Microsoft.EntityFrameworkCore;
+using PluralizeService.Core;
 
 namespace Api.Services
 {
@@ -107,7 +108,7 @@ namespace Api.Services
 				.Where(x => baseClassNameList.Contains(x.Name) || x.Base == null).ToList();
 			foreach (var item in baseClassList)
 			{
-				string fileName = Path.Combine(maid.DestinationPath, $"{item.Name}Configuration.cs");
+				string fileName = Path.Combine(maid.Project.Path, maid.DestinationPath, $"{item.Name}Configuration.cs");
 				if (File.Exists(fileName))
 				{
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
@@ -125,7 +126,7 @@ namespace Api.Services
 				.Where(x => !baseClassNameList.Contains(x.Name)).ToList();
 			foreach (var item in derivedClassList)
 			{
-				string fileName = Path.Combine(maid.DestinationPath, $"{item.Name}Configuration.cs");
+				string fileName = Path.Combine(maid.Project.Path, maid.DestinationPath, $"{item.Name}Configuration.cs");
 				if (File.Exists(fileName))
 				{
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();

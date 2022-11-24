@@ -140,19 +140,28 @@ namespace Api
 				context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
 				await next();
 			});
-			//跨域配置
-			app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod());
 			//HTTPS重定向
 			//app.UseHttpsRedirection();
+			//添加静态文件支持
+			app.UseDefaultFiles();
+			app.UseStaticFiles();
+			//添加路由
 			app.UseRouting();
+			//本地化
+			//app.UseRequestLocalization();
+			//跨域配置
+			app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod());
+			//身份认证
+			app.UseAuthentication();
 			app.UseAuthorization();
+			//响应压缩
+			//app.UseResponseCompression();
+			//响应缓存
+			//app.UseResponseCaching();
 			//使用控制器
 			app.MapControllers();
 			//版本信息
 			app.MapGet("/version", () => $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
-			//添加静态文件支持
-			app.UseDefaultFiles();
-			app.UseStaticFiles();
 			Task.Run(() =>
 			{
 				var scope = app.Services.CreateScope();

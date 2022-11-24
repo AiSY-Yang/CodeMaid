@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MaidContext\MaidContexts.csproj" />
     <ProjectReference Include="..\Reponsitory\Reponsitory.csproj" />
-    <ProjectReference Include="..\TestDbContext\MaidContexts.csproj" />
   </ItemGroup>
 
 </Project>

@@ -16,22 +16,23 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+		<PackageReference Include="PluralizeService.Core" Version="1.2.21147.2" />
 		<PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-		<PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="1.0.3" />
+		<PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="2.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\MaidContext\MaidContexts.csproj" />
 		<ProjectReference Include="..\MaidReponsitory\MaidReponsitory.csproj" />
 		<ProjectReference Include="..\MasstransitModels\MasstransitModels.csproj" />
 		<ProjectReference Include="..\Models.Service\ServicesModels.csproj" />
-		<ProjectReference Include="..\TestDbContext\MaidContexts.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="ExtensionMethods">
-			<HintPath>..\..\ExtensionMethods\Output\net6.0\ExtensionMethods.dll</HintPath>
-		</Reference>
+	  <Reference Include="ExtensionMethods">
+	    <HintPath>..\..\ExtensionMethods\Output\net7.0\ExtensionMethods.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 	<ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="https://json.schemastore.org/appsettings.json" /></VisualStudio></ProjectExtensions>
