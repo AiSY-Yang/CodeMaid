@@ -458,7 +458,7 @@ public class {DtoName}
 		{
 			StringBuilder stringBuilder = new();
 			stringBuilder.Append($"{leader}builder.Property(x => x.{property.Name})");
-			if (property.Summary != null)
+			if (!property.Summary.IsNullOrWhiteSpace())
 				stringBuilder.Append($".HasComment(\"{property.Summary?.Replace("\"", "\\\"")}\")");
 			foreach (var attribute in property.Attributes)
 			{
@@ -467,12 +467,16 @@ public class {DtoName}
 					case "MaxLength":
 						stringBuilder.Append($".HasMaxLength({attribute.Arguments})");
 						break;
+					//常用于对decimal精度的指示
 					case "Column":
 						var match = Regex.Match(attribute.Arguments!, "\"(.*?)\\((\\d*),(\\d*)\\)\"");
 						stringBuilder.Append($".HasPrecision({match.Groups[2]}, {match.Groups[3]})");
 						break;
 					case "Unicode":
 						stringBuilder.Append($".IsUnicode({attribute.Arguments})");
+						break;
+					case "DefaultValue":
+						stringBuilder.Append($".HasDefaultValue({attribute.Arguments})");
 						break;
 					default:
 						break;
