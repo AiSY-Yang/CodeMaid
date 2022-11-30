@@ -336,7 +336,7 @@ namespace Api.Services
 		private static BlockSyntax UpdateOrInsertConfigurationStatement(BlockSyntax blockSyntax, PropertyDefinition property)
 		{
 			//更新属性信息
-			var propNameRegex = new Regex("Property\\(.*?\\.(.*?)\\)\\.");
+			var propNameRegex = new Regex("Property\\(.*?\\.(.*?)\\)[\\.|;]");
 			foreach (var item in blockSyntax.ChildNodes().Where(x => x is ExpressionStatementSyntax))
 			{
 				var match = propNameRegex.Match(item.ToFullString());
