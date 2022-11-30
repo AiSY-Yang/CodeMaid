@@ -16,7 +16,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 项目路径
 		/// </summary>
-		public string? Path { get; set; } = null!;
+		public string Path { get; set; } = null!;
 		[AdaptIgnore]
 		public List<Maid> Maids { get; set; } = null!;
 	}

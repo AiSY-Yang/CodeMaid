@@ -23,7 +23,21 @@ namespace Api.Services
 	public class MaidService
 	{
 		/// <summary>
-		/// 更新maid记录的信息
+		/// 按照目标路径更新maid
+		/// </summary>
+		/// <param name="maid"></param>
+		/// <returns></returns>
+		public static Maid Update(Maid maid)
+		{
+			var files = Directory.GetFiles(maid.DestinationPath);
+			foreach (var file in files)
+			{
+				Update(maid, file);
+			}
+			return maid;
+		}
+		/// <summary>
+		/// 按照指定文件更新maid记录的信息
 		/// </summary>
 		/// <param name="maid"></param>
 		/// <param name="compilationUnit"></param>
@@ -53,8 +67,7 @@ namespace Api.Services
 				foreach (var item in classNode.Members)
 				{
 					if (item is not PropertyDeclarationSyntax propertyDeclaration) continue;
-					var newP = CreatePropertyEntity(c, propertyDeclaration);
-					var p = c.Properties.FirstOrDefault(x => x.Name == newP.Name);
+					var p = c.Properties.FirstOrDefault(x => x.Name == propertyDeclaration.Identifier.Text);
 					if (p == null)
 					{
 						p = CreatePropertyEntity(c, propertyDeclaration);
@@ -65,7 +78,6 @@ namespace Api.Services
 						CreatePropertyEntity(c, propertyDeclaration).Adapt(p);
 					}
 					PropertytiList.Add(p.Name);
-					p.Attributes = newP.Attributes;
 				}
 				//本次如果没有这个属性的话 则标记删除
 				c.Properties.Where(x => !PropertytiList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
@@ -138,6 +150,38 @@ namespace Api.Services
 				{
 					var compilationUnit = CreateDerivedConfigurationNode(item);
 					await File.WriteAllTextAsync(fileName, compilationUnit.ToFullString());
+				}
+			}
+			//更新Context文件里的类
+			if (maid.Setting != null)
+			{
+				var setting = maid.Setting.AsJsonToObject<ConfigurationSyncSetting>();
+				if (setting.ContextPath != null)
+				{
+					string fileName = Path.Combine(maid.Project.Path, setting.ContextPath);
+					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
+					//取出第一个类 要求第一个类必须就是dbcontext
+					var firstClass = GetClassDeclarationSyntaxes(compilationUnit).First();
+					//做个用于修改的镜像
+					var newClass = firstClass;
+					foreach (var item in derivedClassList)
+					{
+						//取出最后一个属性 在之后做新属性的插入
+						var lastPropertity = newClass.Members.Where(x => x is PropertyDeclarationSyntax).LastOrDefault();
+						//如果一个属性都没有 则插入到最后一个构造函数后面
+						lastPropertity ??= newClass.Members.Where(x => x is ConstructorDeclarationSyntax).LastOrDefault();
+						//如果构造函数也没有 则插入到第一个方法后面
+						lastPropertity ??= newClass.Members.Where(x => x is MethodDeclarationSyntax).First();
+						var prop = newClass.Members.Where(x => x is PropertyDeclarationSyntax).Cast<PropertyDeclarationSyntax>().Where(x => x.Type.ToString() == $"DbSet<{item.Name}>").FirstOrDefault();
+						if (prop is null)
+						{
+							newClass = newClass.InsertNodesAfter(lastPropertity, new SyntaxNode[] {
+								(PropertyDeclarationSyntax)ParseMemberDeclaration($"{(item.LeadingTrivia==null?"\t":string.Join('\n',item.LeadingTrivia.Split('\n').Select(x=>"\t"+x)))}public virtual DbSet<{item.Name}> {PluralizationProvider.Pluralize(item.Name)} {{ get; set; }} = null!;")!
+								.WithTrailingTrivia(ParseTrailingTrivia(Environment.NewLine))! });
+						}
+					}
+					compilationUnit = compilationUnit.ReplaceNode(firstClass, newClass);
+					File.WriteAllText(fileName, compilationUnit.ToFullString());
 				}
 			}
 		}
@@ -512,6 +556,7 @@ public class {DtoName}
 				NameSpace = (classDeclaration.SyntaxTree.GetRoot().ChildNodes().FirstOrDefault(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax) as BaseNamespaceDeclarationSyntax)?.Name?.ToString(),
 				Name = classDeclaration.Identifier.Text,
 				Summary = GetSummay(classDeclaration.GetLeadingTrivia()),
+				LeadingTrivia = classDeclaration.GetLeadingTrivia().ToFullString(),
 				Base = classDeclaration.BaseList?.Types.ToString(),
 			};
 		}
@@ -545,7 +590,7 @@ public class {DtoName}
 
 			foreach (var item in propertyDeclaration.AttributeLists)
 			{
-				AttributeDefinition attributeDefinition = new AttributeDefinition()
+				AttributeDefinition attributeDefinition = new()
 				{
 					Name = item.Attributes[0].Name.ToString(),
 					Text = item.Attributes[0].ToString(),

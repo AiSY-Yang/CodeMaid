@@ -30,6 +30,10 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string Using { get; set; } = null!;
 		/// <summary>
+		/// 前导
+		/// </summary>
+		public string? LeadingTrivia { get; set; }
+		/// <summary>
 		/// 属性列表
 		/// </summary>
 		[AdaptIgnore]
