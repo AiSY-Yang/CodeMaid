@@ -46,7 +46,9 @@ namespace Api.Services
 		{
 			var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
 			var compilationUnit = tree.GetCompilationUnitRoot();
-			var classes = GetClassDeclarationSyntaxes(compilationUnit);
+			var classes = GetClassDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit);
+			//记录本次更新的类的名称
+			HashSet<string> classList = new();
 			//记录下文件的using
 			var usingText = compilationUnit.Usings.ToFullString();
 			foreach (var classNode in classes)
@@ -161,7 +163,7 @@ namespace Api.Services
 					string fileName = Path.Combine(maid.Project.Path, setting.ContextPath);
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
 					//取出第一个类 要求第一个类必须就是dbcontext
-					var firstClass = GetClassDeclarationSyntaxes(compilationUnit).First();
+					var firstClass = GetClassDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit).First();
 					//做个用于修改的镜像
 					var newClass = firstClass;
 					foreach (var item in derivedClassList)
@@ -296,7 +298,7 @@ namespace Api.Services
 		/// <returns></returns>
 		private static CompilationUnitSyntax UpdateConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
 		{
-			var classCode = GetClassDeclarationSyntaxes(source).First();
+			var classCode = GetClassDeclarationSyntaxes<ClassDeclarationSyntax>(source).First();
 			var methodCode = classCode.ChildNodes().First(x => x is MethodDeclarationSyntax);
 			//此处要保留原有块信息引用 以在后面可以替换节点
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
@@ -397,7 +399,7 @@ public class {DtoName}
 {{
 }}").GetCompilationUnitRoot();
 
-			var c = GetClassDeclarationSyntaxes(compilationUnit).First();
+			var c = GetClassDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit).First();
 			var newC = c;
 			foreach (var item in classDefinition.Properties
 				.Where(setting.JustInclude.Count != 0, x => setting.JustInclude.Contains(x.Name))
@@ -478,19 +480,19 @@ public class {DtoName}
 		#endregion Dto
 
 		/// <summary>
-		/// 获取编译单元下的所有类
+		/// 获取编译单元下的所有指定的类型对象
 		/// </summary>
 		/// <param name="compilationUnit"></param>
 		/// <returns></returns>
-		private static List<ClassDeclarationSyntax> GetClassDeclarationSyntaxes(CompilationUnitSyntax compilationUnit)
+		private static List<T> GetClassDeclarationSyntaxes<T>(CompilationUnitSyntax compilationUnit) where T : BaseTypeDeclarationSyntax
 		{
-			//自动生成的文件是没有命名空间的
-			var classCode = compilationUnit.ChildNodes().Where(x => x is ClassDeclarationSyntax).ToList();
-			//如果是原有的文件可能有命名空间 取命名空间下的配置类
-			var classCode2 = compilationUnit.ChildNodes()
+			//没有命名空间的类型
+			var declarationSyntax = compilationUnit.ChildNodes().Where(x => x is T).ToList();
+			//如果原有的文件有命名空间 取命名空间下的成员
+			var declarationSyntax2 = compilationUnit.ChildNodes()
 				.Where(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax).SelectMany(x => x.ChildNodes())
-					   .Where(x => x is ClassDeclarationSyntax).ToList();
-			return classCode.Union(classCode2).Select(x => x as ClassDeclarationSyntax).ToList()!;
+					   .Where(x => x is T).ToList();
+			return declarationSyntax.Union(declarationSyntax2).Select(x => x as T).ToList()!;
 		}
 
 		/// <summary>
