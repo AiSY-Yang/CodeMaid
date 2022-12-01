@@ -17,6 +17,13 @@ namespace Models.CodeMaid
 		/// 项目路径
 		/// </summary>
 		public string Path { get; set; } = null!;
+		/// <summary>
+		/// Git分支
+		/// </summary>
+		public string GitBranch { get; set; } = null!;
+		/// <summary>
+		/// 
+		/// </summary>
 		[AdaptIgnore]
 		public List<Maid> Maids { get; set; } = null!;
 	}

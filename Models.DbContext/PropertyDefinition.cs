@@ -39,7 +39,7 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string Type { get; set; } = null!;
 		/// <summary>
-		/// 是否可以Get
+		/// 是否包含Get
 		/// </summary>
 		public bool HasGet { get; set; }
 		/// <summary>
@@ -47,7 +47,7 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string? Get { get; set; } = null!;
 		/// <summary>
-		/// 是否可以Set
+		/// 是否包含Set
 		/// </summary>
 		public bool HasSet { get; set; }
 		/// <summary>

@@ -34,7 +34,7 @@ namespace Api
 			//生成数据库的数据模型
 			foreach (var file in Directory.GetFiles(maid.SourcePath, "*.cs", SearchOption.AllDirectories))
 			{
-				maid = Update(maid, file);
+				 Update(maid, file);
 			}
 			await context.SaveChangesAsync();
 

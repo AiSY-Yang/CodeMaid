@@ -29,11 +29,18 @@ namespace Api.Services
 		/// <returns></returns>
 		public static Maid Update(Maid maid)
 		{
-			var files = Directory.GetFiles(maid.DestinationPath);
+			var files = Directory.GetFiles(Path.Combine(maid.Project.Path, maid.SourcePath));
+			HashSet<string> classList = new();
 			foreach (var file in files)
 			{
-				Update(maid, file);
+				var list = Update(maid, file);
+				foreach (var item in list)
+				{
+					classList.Add(item);
+				}
 			}
+			//如果本次没有这个类则删除它
+			maid.Classes.Where(x => !classList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
 			return maid;
 		}
 		/// <summary>
@@ -42,7 +49,7 @@ namespace Api.Services
 		/// <param name="maid"></param>
 		/// <param name="compilationUnit"></param>
 		/// <returns></returns>
-		public static Maid Update(Maid maid, string path)
+		public static HashSet<string> Update(Maid maid, string path)
 		{
 			var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
 			var compilationUnit = tree.GetCompilationUnitRoot();
@@ -63,9 +70,10 @@ namespace Api.Services
 				{
 					CreateClassEntity(classNode).Adapt(c);
 				}
+				classList.Add(c.Name);
 				c.Using = usingText;
 				//记录这个类现在有的属性
-				List<string> PropertytiList = new List<string>();
+				HashSet<string> PropertityList = new();
 				foreach (var item in classNode.Members)
 				{
 					if (item is not PropertyDeclarationSyntax propertyDeclaration) continue;
@@ -79,12 +87,12 @@ namespace Api.Services
 					{
 						CreatePropertyEntity(c, propertyDeclaration).Adapt(p);
 					}
-					PropertytiList.Add(p.Name);
+					PropertityList.Add(p.Name);
 				}
 				//本次如果没有这个属性的话 则标记删除
-				c.Properties.Where(x => !PropertytiList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
+				c.Properties.Where(x => !PropertityList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
 			}
-			return maid;
+			return classList;
 		}
 
 		/// <summary>
@@ -621,10 +629,12 @@ public class {DtoName}
 					if (match.Success)
 					{
 						var comment = match.Groups[1].Value.Trim();
-						if (comment != "<summary>" && comment != "</summary>")
-						{
-							summary.Append(comment);
-						}
+						//忽略<example>等标签 会同时忽略掉summary标签
+						if (comment.StartsWith("<") && comment.EndsWith(">")) continue;
+						//if (comment != "<summary>" && comment != "</summary>")
+						//{
+						summary.Append(comment);
+						//}
 					}
 				}
 			}

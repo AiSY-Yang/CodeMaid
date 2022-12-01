@@ -21,5 +21,7 @@ internal class PropertyDefinitionConfiguration : DatabaseEntityConfiguration<Pro
 		builder.Property(x => x.Type).HasComment("数据类型");
 		builder.Property(x => x.Get).HasComment("Get方法体");
 		builder.Property(x => x.Set).HasComment("Set方法体");
+		builder.Property(x => x.HasGet).HasComment("是否包含Get");
+		builder.Property(x => x.HasSet).HasComment("是否包含Set");
 	}
 }
