@@ -15,6 +15,9 @@ namespace ServicesModels
 		/// 目录后缀
 		/// </summary>
 		public string DirectorySuffix { get; set; } = null!;
+		/// <summary>
+		/// Dto同步的设置
+		/// </summary>
 		public List<DtoSyncSettingItem> DtoSyncSettings { get; set; } = null!;
 		/// <summary>
 		/// Dto同步的设置

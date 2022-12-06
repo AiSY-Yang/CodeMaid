@@ -11,9 +11,10 @@ internal abstract class DatabaseEntityConfiguration<Entity> : IEntityTypeConfigu
 	public virtual void Configure(EntityTypeBuilder<Entity> builder)
 	{
 		builder.HasQueryFilter(x => !x.IsDeleted);
+		builder.HasKey(x => x.Id);
 		builder.Property(x => x.Id).HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
-		builder.Property(x => x.CreateTime).HasComment("<inheritdoc cref=\"IDatabaseEntity.CreateTime\"/>");
-		builder.Property(x => x.UpdateTime).HasComment("<inheritdoc cref=\"IDatabaseEntity.UpdateTime\"/>");
-		builder.Property(x => x.IsDeleted).HasComment("<inheritdoc cref=\"IDatabaseEntity.IsDeleted\"/>");
+		builder.Property(x => x.CreateTime);
+		builder.Property(x => x.UpdateTime);
+		builder.Property(x => x.IsDeleted);
 	}
 }

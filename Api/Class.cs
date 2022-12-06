@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 
 using MaidContexts;
 
@@ -8,10 +7,7 @@ using MassTransit;
 using MasstransitModels;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 using Models.CodeMaid;
 
@@ -22,7 +18,7 @@ namespace Api
 	class Maids
 	{
 		static IServiceProvider serviceProvider = null!;
-		volatile static ConcurrentDictionary<FileSystemWatcher, Maid> Watchers = new();
+		static readonly ConcurrentDictionary<FileSystemWatcher, Maid> Watchers = new();
 		/// <summary>
 		/// 初始化文件监听器
 		/// </summary>

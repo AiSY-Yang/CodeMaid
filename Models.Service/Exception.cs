@@ -8,7 +8,7 @@
 		/// <summary>
 		/// 业务异常结果
 		/// </summary>
-		public BusinessExceptionResult Result = new BusinessExceptionResult();
+		public BusinessExceptionResult Result = new();
 		/// <summary>
 		/// 业务异常返回的结果模型
 		/// </summary>
@@ -17,11 +17,11 @@
 			/// <summary>
 			/// HTTP错误码
 			/// </summary>
-			public int code { get; set; }
+			public int Code { get; set; }
 			/// <summary>
 			/// 异常消息
 			/// </summary>
-			public string msg { get; set; } = null!;
+			public string Msg { get; set; } = null!;
 
 		}
 		/// <summary>
@@ -30,8 +30,8 @@
 		/// <param name="s"></param>
 		public BusinessException(string s)
 		{
-			Result.code = 400;
-			Result.msg = s;
+			Result.Code = 400;
+			Result.Msg = s;
 		}
 		/// <summary>
 		/// 按照指定的错误码返回错误信息
@@ -40,8 +40,8 @@
 		/// <param name="s"></param>
 		public BusinessException(int code, string s)
 		{
-			Result.code = code;
-			Result.msg = s;
+			Result.Code = code;
+			Result.Msg = s;
 		}
 	}
 }

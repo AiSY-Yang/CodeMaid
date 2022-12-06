@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +9,7 @@ namespace Models.CodeMaid.Enum
 	/// <summary>
 	/// 性别
 	/// </summary>
+	/// <remarks>1-男,2-女,3-其他</remarks>
 	public enum Sex
 	{
 		/// <summary>

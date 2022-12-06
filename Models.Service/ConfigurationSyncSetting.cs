@@ -11,6 +11,9 @@ namespace ServicesModels
 	/// </summary>
 	public class ConfigurationSyncSetting
 	{
+		/// <summary>
+		/// DbContext文件的路径
+		/// </summary>
 		public string? ContextPath { get; set; }
 	}
 }
