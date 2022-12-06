@@ -3,6 +3,7 @@ using System;
 using MaidContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaidContexts.Migrations
 {
     [DbContext(typeof(MaidContext))]
-    partial class MaidContextModelSnapshot : ModelSnapshot
+    [Migration("20221206025139_20221206-105130")]
+    partial class _20221206105130
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -28,11 +30,11 @@ namespace MaidContexts.Migrations
 
                     b.Property<string>("Arguments")
                         .HasColumnType("longtext")
-                        .HasComment(" 参数  ");
+                        .HasComment("参数");
 
                     b.Property<string>("ArgumentsText")
                         .HasColumnType("longtext")
-                        .HasComment(" 参数文本  ");
+                        .HasComment("参数文本");
 
                     b.Property<DateTimeOffset>("CreateTime")
                         .HasColumnType("datetime(6)")
@@ -45,7 +47,7 @@ namespace MaidContexts.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" Attribute名称  ");
+                        .HasComment("Attribute名称");
 
                     b.Property<long>("PropertyDefinitionId")
                         .HasColumnType("bigint");
@@ -53,7 +55,7 @@ namespace MaidContexts.Migrations
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" Attribute文本  ");
+                        .HasComment("Attribute文本");
 
                     b.Property<DateTimeOffset>("UpdateTime")
                         .HasColumnType("datetime(6)")
@@ -65,7 +67,7 @@ namespace MaidContexts.Migrations
 
                     b.ToTable("AttributeDefinitions");
 
-                    b.HasComment(" 类定义  ");
+                    b.HasComment("类定义");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.ClassDefinition", b =>
@@ -77,7 +79,7 @@ namespace MaidContexts.Migrations
 
                     b.Property<string>("Base")
                         .HasColumnType("longtext")
-                        .HasComment(" 基类或者接口名称  ");
+                        .HasComment("基类或者接口名称");
 
                     b.Property<DateTimeOffset>("CreateTime")
                         .HasColumnType("datetime(6)")
@@ -89,7 +91,7 @@ namespace MaidContexts.Migrations
 
                     b.Property<string>("LeadingTrivia")
                         .HasColumnType("longtext")
-                        .HasComment(" 前导  ");
+                        .HasComment("前导");
 
                     b.Property<long?>("MaidId")
                         .HasColumnType("bigint");
@@ -97,15 +99,15 @@ namespace MaidContexts.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 类名  ");
+                        .HasComment("类名");
 
                     b.Property<string>("NameSpace")
                         .HasColumnType("longtext")
-                        .HasComment(" 命名空间  ");
+                        .HasComment("命名空间");
 
                     b.Property<string>("Summary")
                         .HasColumnType("longtext")
-                        .HasComment(" 注释  ");
+                        .HasComment("注释");
 
                     b.Property<DateTimeOffset>("UpdateTime")
                         .HasColumnType("datetime(6)")
@@ -114,7 +116,7 @@ namespace MaidContexts.Migrations
                     b.Property<string>("Using")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 类引用的命名空间  ");
+                        .HasComment("类引用的命名空间");
 
                     b.HasKey("Id");
 
@@ -122,7 +124,7 @@ namespace MaidContexts.Migrations
 
                     b.ToTable("ClassDefinitions");
 
-                    b.HasComment(" 类定义  ");
+                    b.HasComment("类定义");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.EnumDefinition", b =>
@@ -142,7 +144,7 @@ namespace MaidContexts.Migrations
 
                     b.Property<string>("LeadingTrivia")
                         .HasColumnType("longtext")
-                        .HasComment(" 前导  ");
+                        .HasComment("前导");
 
                     b.Property<long?>("MaidId")
                         .HasColumnType("bigint");
@@ -150,15 +152,19 @@ namespace MaidContexts.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 枚举名  ");
+                        .HasComment("枚举名");
 
                     b.Property<string>("NameSpace")
                         .HasColumnType("longtext")
-                        .HasComment(" 命名空间  ");
+                        .HasComment("命名空间");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("longtext")
+                        .HasComment("备注");
 
                     b.Property<string>("Summary")
                         .HasColumnType("longtext")
-                        .HasComment(" 注释  ");
+                        .HasComment("注释");
 
                     b.Property<DateTimeOffset>("UpdateTime")
                         .HasColumnType("datetime(6)")
@@ -170,7 +176,7 @@ namespace MaidContexts.Migrations
 
                     b.ToTable("EnumDefinitions");
 
-                    b.HasComment(" 枚举定义  ");
+                    b.HasComment("枚举定义");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.EnumMemberDefinition", b =>
@@ -230,7 +236,7 @@ namespace MaidContexts.Migrations
 
                     b.Property<bool>("Autonomous")
                         .HasColumnType("tinyint(1)")
-                        .HasComment(" 是否自动修复  ");
+                        .HasComment("是否自动修复");
 
                     b.Property<DateTimeOffset>("CreateTime")
                         .HasColumnType("datetime(6)")
@@ -239,7 +245,7 @@ namespace MaidContexts.Migrations
                     b.Property<string>("DestinationPath")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 目标路径  ");
+                        .HasComment("目标路径");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)")
@@ -251,19 +257,19 @@ namespace MaidContexts.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 名称  ");
+                        .HasComment("名称");
 
                     b.Property<long>("ProjectId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Setting")
                         .HasColumnType("longtext")
-                        .HasComment(" 序列化保存的设置  ");
+                        .HasComment("序列化保存的设置");
 
                     b.Property<string>("SourcePath")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 原路径  ");
+                        .HasComment("原路径");
 
                     b.Property<DateTimeOffset>("UpdateTime")
                         .HasColumnType("datetime(6)")
@@ -275,7 +281,7 @@ namespace MaidContexts.Migrations
 
                     b.ToTable("Maids");
 
-                    b.HasComment(" 功能  ");
+                    b.HasComment("功能");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.Project", b =>
@@ -292,7 +298,7 @@ namespace MaidContexts.Migrations
                     b.Property<string>("GitBranch")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" Git分支  ");
+                        .HasComment("Git分支");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)")
@@ -301,12 +307,12 @@ namespace MaidContexts.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 项目名  ");
+                        .HasComment("项目名");
 
                     b.Property<string>("Path")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 项目路径  ");
+                        .HasComment("项目路径");
 
                     b.Property<DateTimeOffset>("UpdateTime")
                         .HasColumnType("datetime(6)")
@@ -316,7 +322,7 @@ namespace MaidContexts.Migrations
 
                     b.ToTable("Projects");
 
-                    b.HasComment(" 项目定义  ");
+                    b.HasComment("项目定义");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
@@ -336,23 +342,23 @@ namespace MaidContexts.Migrations
                     b.Property<string>("FullText")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 完整文本内容  ");
+                        .HasComment("完整文本内容");
 
                     b.Property<string>("Get")
                         .HasColumnType("longtext")
-                        .HasComment(" Get方法体  ");
+                        .HasComment("Get方法体");
 
                     b.Property<bool>("HasGet")
                         .HasColumnType("tinyint(1)")
-                        .HasComment(" 是否包含Get  ");
+                        .HasComment("是否包含Get");
 
                     b.Property<bool>("HasSet")
                         .HasColumnType("tinyint(1)")
-                        .HasComment(" 是否包含Set  ");
+                        .HasComment("是否包含Set");
 
                     b.Property<string>("Initializer")
                         .HasColumnType("longtext")
-                        .HasComment(" 初始化器  ");
+                        .HasComment("初始化器");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)")
@@ -360,30 +366,30 @@ namespace MaidContexts.Migrations
 
                     b.Property<string>("LeadingTrivia")
                         .HasColumnType("longtext")
-                        .HasComment(" 前导  ");
+                        .HasComment("前导");
 
                     b.Property<string>("Modifiers")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 修饰符  ");
+                        .HasComment("修饰符");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 属性名称  ");
+                        .HasComment("属性名称");
 
                     b.Property<string>("Set")
                         .HasColumnType("longtext")
-                        .HasComment(" Set方法体  ");
+                        .HasComment("Set方法体");
 
                     b.Property<string>("Summary")
                         .HasColumnType("longtext")
-                        .HasComment(" 注释  ");
+                        .HasComment("注释");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasComment(" 数据类型  ");
+                        .HasComment("数据类型");
 
                     b.Property<DateTimeOffset>("UpdateTime")
                         .HasColumnType("datetime(6)")
@@ -395,7 +401,7 @@ namespace MaidContexts.Migrations
 
                     b.ToTable("PropertyDefinitions");
 
-                    b.HasComment(" 类定义  ");
+                    b.HasComment("类定义");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.AttributeDefinition", b =>

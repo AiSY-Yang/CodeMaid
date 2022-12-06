@@ -30,6 +30,8 @@ namespace Api.MasstransitConsumer
 			logger.LogInformation("maid{id}开始工作", context.Message.MaidId);
 			var maid = maidContext.Maids
 						.Include(x => x.Project)
+						.Include(x => x.Enums)
+						.ThenInclude(x => x.EnumMembers)
 						.Include(x => x.Classes)
 						.ThenInclude(x => x.Properties)
 						.ThenInclude(x => x.Attributes)

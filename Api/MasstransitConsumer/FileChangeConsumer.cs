@@ -34,6 +34,8 @@ namespace Api.MasstransitConsumer
 			logger.LogInformation("文件{path}改变,重新读取数据", context.Message.FilePath);
 			var maid = maidContext.Maids
 						.Include(x => x.Project)
+						.Include(x => x.Enums)
+						.ThenInclude(x => x.EnumMembers)
 						.Include(x => x.Classes)
 						.ThenInclude(x => x.Properties)
 						.ThenInclude(x => x.Attributes)
@@ -54,7 +56,9 @@ namespace Api.MasstransitConsumer
 			}
 			//检查更新
 			//2022-12-01更改为更新所有文件 因为暂时还没想好删除文件怎么做
+#if DEBUG
 			//MaidService.Update(maid, context.Message.FilePath);
+#endif
 			MaidService.Update(maid);
 			//如果有变化的话则发布变化事件
 			if (maidContext.ChangeTracker.Entries().Any())

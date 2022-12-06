@@ -9,6 +9,9 @@ namespace Models.CodeMaid
 	/// </summary>
 	public class PropertyDefinition : DatabaseEntity
 	{
+		/// <summary>
+		/// 所属类
+		/// </summary>
 		public ClassDefinition ClassDefinition { get; set; } = null!;
 		/// <summary>
 		/// 前导

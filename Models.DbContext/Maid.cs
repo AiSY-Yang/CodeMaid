@@ -13,6 +13,9 @@ namespace Models.CodeMaid
 		/// 名称
 		/// </summary>
 		public string Name { get; set; } = null!;
+		/// <summary>
+		/// 所属项目
+		/// </summary>
 		public Project Project { get; set; } = null!;
 		/// <summary>
 		/// 功能
@@ -34,7 +37,15 @@ namespace Models.CodeMaid
 		/// 序列化保存的设置
 		/// </summary>
 		public string? Setting { get; set; } = null!;
+		/// <summary>
+		/// 包含的类
+		/// </summary>
 		[AdaptIgnore]
 		public List<ClassDefinition> Classes { get; set; } = null!;
+		/// <summary>
+		/// 包含的枚举
+		/// </summary>
+		[AdaptIgnore]
+		public List<EnumDefinition> Enums { get; set; } = null!;
 	}
 }

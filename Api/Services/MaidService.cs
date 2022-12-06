@@ -16,7 +16,9 @@ using System.Linq.Expressions;
 using ExtensionMethods;
 using static ServicesModels.DtoSyncSetting;
 using Microsoft.EntityFrameworkCore;
-using PluralizeService.Core;
+using Humanizer;
+using System.IO;
+using Api.Tools;
 
 namespace Api.Services
 {
@@ -29,7 +31,7 @@ namespace Api.Services
 		/// <returns></returns>
 		public static Maid Update(Maid maid)
 		{
-			var files = Directory.GetFiles(Path.Combine(maid.Project.Path, maid.SourcePath));
+			var files = Directory.GetFiles(Path.Combine(maid.Project.Path, maid.SourcePath), "*.cs", SearchOption.AllDirectories);
 			HashSet<string> classList = new();
 			foreach (var file in files)
 			{
@@ -53,11 +55,12 @@ namespace Api.Services
 		{
 			var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
 			var compilationUnit = tree.GetCompilationUnitRoot();
-			var classes = GetClassDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit);
-			//记录本次更新的类的名称
-			HashSet<string> classList = new();
 			//记录下文件的using
 			var usingText = compilationUnit.Usings.ToFullString();
+			#region 更新类
+			var classes = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit);
+			//记录本次更新的类的名称
+			HashSet<string> classList = new();
 			foreach (var classNode in classes)
 			{
 				var c = maid.Classes.FirstOrDefault(x => x.Name == classNode.Identifier.ValueText);
@@ -92,6 +95,44 @@ namespace Api.Services
 				//本次如果没有这个属性的话 则标记删除
 				c.Properties.Where(x => !PropertityList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
 			}
+			#endregion
+			#region 更新枚举
+			var enums = GetDeclarationSyntaxes<EnumDeclarationSyntax>(compilationUnit);
+			foreach (var enumNode in enums)
+			{
+				var e = maid.Enums.FirstOrDefault(x => x.Name == enumNode.Identifier.ValueText);
+				if (e == null)
+				{
+					e = CreateEnumEntity(enumNode);
+					maid.Enums.Add(e);
+				}
+				else
+				{
+					CreateEnumEntity(enumNode).Adapt(e);
+				}
+				//记录这个枚举现在有的成员
+				HashSet<string> PropertityList = new();
+				//记录上次枚举的成员值到了多少 如果没有值的话上次值+1则为新的值
+				int lastValue = -1;
+				foreach (var item in enumNode.Members)
+				{
+					if (item is not EnumMemberDeclarationSyntax enumMemberDeclaration) continue;
+					var p = e.EnumMembers.FirstOrDefault(x => x.Name == enumMemberDeclaration.Identifier.Text);
+					if (p == null)
+					{
+						p = CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue);
+						e.EnumMembers.Add(p);
+					}
+					else
+					{
+						CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue).Adapt(p);
+					}
+					PropertityList.Add(p.Name);
+				}
+				//本次如果没有这个成员的话 则标记删除
+				e.EnumMembers.Where(x => !PropertityList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
+			}
+			#endregion
 			return classList;
 		}
 
@@ -109,6 +150,9 @@ namespace Api.Services
 					break;
 				case Models.CodeMaid.MaidWork.DtoSync:
 					await UpdateDto(maid);
+					break;
+				case Models.CodeMaid.MaidWork.EnumRemark:
+					await UpdateRemark(maid);
 					break;
 				default:
 					break;
@@ -134,8 +178,8 @@ namespace Api.Services
 				if (File.Exists(fileName))
 				{
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
-					compilationUnit = UpdateBaseConfigurationNode(compilationUnit, item);
-					await File.WriteAllTextAsync(fileName, compilationUnit.ToFullString());
+					var compilationUnitNew = UpdateBaseConfigurationNode(compilationUnit, item);
+					await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
 				}
 				else
 				{
@@ -152,8 +196,8 @@ namespace Api.Services
 				if (File.Exists(fileName))
 				{
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
-					compilationUnit = UpdateDerivedConfigurationNode(compilationUnit, item);
-					await File.WriteAllTextAsync(fileName, compilationUnit.ToFullString());
+					var compilationUnitNew = UpdateDerivedConfigurationNode(compilationUnit, item);
+					await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
 
 				}
 				else
@@ -171,7 +215,7 @@ namespace Api.Services
 					string fileName = Path.Combine(maid.Project.Path, setting.ContextPath);
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
 					//取出第一个类 要求第一个类必须就是dbcontext
-					var firstClass = GetClassDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit).First();
+					var firstClass = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit).First();
 					//做个用于修改的镜像
 					var newClass = firstClass;
 					foreach (var item in derivedClassList)
@@ -186,12 +230,12 @@ namespace Api.Services
 						if (prop is null)
 						{
 							newClass = newClass.InsertNodesAfter(lastPropertity, new SyntaxNode[] {
-								(PropertyDeclarationSyntax)ParseMemberDeclaration($"{(item.LeadingTrivia==null?"\t":string.Join('\n',item.LeadingTrivia.Split('\n').Select(x=>"\t"+x)))}public virtual DbSet<{item.Name}> {PluralizationProvider.Pluralize(item.Name)} {{ get; set; }} = null!;")!
+								(PropertyDeclarationSyntax)ParseMemberDeclaration($"{(item.LeadingTrivia==null?"\t":string.Join('\n',item.LeadingTrivia.Split('\n').Select(x=>"\t"+x)))}public virtual DbSet<{item.Name}> {item.Name.Pluralize(inputIsKnownToBeSingular: false)} {{ get; set; }} = null!;")!
 								.WithTrailingTrivia(ParseTrailingTrivia(Environment.NewLine))! });
 						}
 					}
-					compilationUnit = compilationUnit.ReplaceNode(firstClass, newClass);
-					File.WriteAllText(fileName, compilationUnit.ToFullString());
+					var compilationUnitNew = compilationUnit.ReplaceNode(firstClass, newClass);
+					await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
 				}
 			}
 		}
@@ -306,7 +350,7 @@ namespace Api.Services
 		/// <returns></returns>
 		private static CompilationUnitSyntax UpdateConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
 		{
-			var classCode = GetClassDeclarationSyntaxes<ClassDeclarationSyntax>(source).First();
+			var classCode = GetDeclarationSyntaxes<ClassDeclarationSyntax>(source).First();
 			var methodCode = classCode.ChildNodes().First(x => x is MethodDeclarationSyntax);
 			//此处要保留原有块信息引用 以在后面可以替换节点
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
@@ -367,7 +411,7 @@ namespace Api.Services
 			if (!Directory.Exists(maid.DestinationPath))
 				Directory.CreateDirectory(maid.DestinationPath);
 			//读取设置
-			DtoSyncSetting settings = maid.Setting!.AsJsonToObject<DtoSyncSetting>();
+			DtoSyncSetting settings = maid.Setting!.AsJsonToObject<DtoSyncSetting>() ?? new DtoSyncSetting();
 			//所有的类都进行更新
 			foreach (var item in maid.Classes)
 			{
@@ -379,7 +423,6 @@ namespace Api.Services
 				{
 					await UpdateDto(dirPath, item, setting);
 				}
-				Console.WriteLine(item.Name);
 			}
 		}
 		/// <summary>
@@ -392,10 +435,10 @@ namespace Api.Services
 		static async Task UpdateDto(string path, ClassDefinition classDefinition, DtoSyncSettingItem setting)
 		{
 			string DtoName = classDefinition.Name + setting.Suffix;
-			string filePath = Path.Combine(path, DtoName + ".cs");
+			string fileName = Path.Combine(path, DtoName + ".cs");
 			CompilationUnitSyntax compilationUnit;
-			if (File.Exists(filePath))
-				compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(filePath)).GetCompilationUnitRoot();
+			if (File.Exists(fileName))
+				compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
 			else
 				compilationUnit = CSharpSyntaxTree.ParseText(@$"using System.ComponentModel.DataAnnotations.Schema;
 {classDefinition.Using}using {classDefinition.NameSpace};
@@ -407,7 +450,7 @@ public class {DtoName}
 {{
 }}").GetCompilationUnitRoot();
 
-			var c = GetClassDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit).First();
+			var c = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit).First();
 			var newC = c;
 			foreach (var item in classDefinition.Properties
 				.Where(setting.JustInclude.Count != 0, x => setting.JustInclude.Contains(x.Name))
@@ -419,8 +462,8 @@ public class {DtoName}
 			{
 				newC = AddOrUpdatePropertyDeclarationSyntax(newC, item);
 			}
-			compilationUnit = compilationUnit.ReplaceNode(c, newC);
-			await File.WriteAllTextAsync(filePath, compilationUnit.ToFullString());
+			var compilationUnitNew = compilationUnit.ReplaceNode(c, newC);
+			await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
 
 			ClassDeclarationSyntax AddOrUpdatePropertyDeclarationSyntax(ClassDeclarationSyntax classDeclarationSyntax, PropertyDefinition property)
 			{
@@ -434,9 +477,8 @@ public class {DtoName}
 				{
 					if (node != null)
 					{
-						classDeclarationSyntax.RemoveNode(node, SyntaxRemoveOptions.KeepNoTrivia);
+						return classDeclarationSyntax.RemoveNode(node, SyntaxRemoveOptions.KeepNoTrivia);
 					}
-					return classDeclarationSyntax;
 				}
 				//是否排除列表元素
 				if (setting.ExcludeList)
@@ -486,13 +528,39 @@ public class {DtoName}
 			}
 		}
 		#endregion Dto
-
+		#region Remarks
+		public static async Task UpdateRemark(Maid maid)
+		{
+			foreach (var path in Directory.GetFiles(Path.Combine(maid.Project.Path, maid.SourcePath), "*.cs", SearchOption.AllDirectories))
+			{
+				var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
+				var compilationUnit = tree.GetCompilationUnitRoot();
+				var compilationUnitNew = compilationUnit;
+				var enums = GetDeclarationSyntaxes<EnumDeclarationSyntax>(compilationUnit);
+				if (enums.Count == 0)
+				{
+					continue;
+				}
+				foreach (var enumNode in enums)
+				{
+					var e = maid.Enums.FirstOrDefault(x => x.Name == enumNode.Identifier.Text);
+					if (e is null) continue;
+					if (GetRemark(enumNode.GetLeadingTrivia()) == e.Remark)
+						continue;
+					else
+						compilationUnitNew = compilationUnitNew.ReplaceNode(enumNode, ReplaceOrAddRemark(enumNode, e.Remark));
+				}
+				await FileTools.Write(path, compilationUnit, compilationUnitNew);
+			}
+			return;
+		}
+		#endregion
 		/// <summary>
 		/// 获取编译单元下的所有指定的类型对象
 		/// </summary>
 		/// <param name="compilationUnit"></param>
 		/// <returns></returns>
-		private static List<T> GetClassDeclarationSyntaxes<T>(CompilationUnitSyntax compilationUnit) where T : BaseTypeDeclarationSyntax
+		private static List<T> GetDeclarationSyntaxes<T>(CompilationUnitSyntax compilationUnit) where T : BaseTypeDeclarationSyntax
 		{
 			//没有命名空间的类型
 			var declarationSyntax = compilationUnit.ChildNodes().Where(x => x is T).ToList();
@@ -571,6 +639,22 @@ public class {DtoName}
 			};
 		}
 		/// <summary>
+		/// 创建枚举的实体
+		/// </summary>
+		/// <param name="nameSpace"></param>
+		/// <param name="classDeclaration"></param>
+		/// <returns></returns>
+		private static EnumDefinition CreateEnumEntity(EnumDeclarationSyntax classDeclaration)
+		{
+			return new EnumDefinition()
+			{
+				NameSpace = (classDeclaration.SyntaxTree.GetRoot().ChildNodes().FirstOrDefault(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax) as BaseNamespaceDeclarationSyntax)?.Name?.ToString(),
+				Name = classDeclaration.Identifier.Text,
+				Summary = GetSummay(classDeclaration.GetLeadingTrivia()),
+				LeadingTrivia = classDeclaration.GetLeadingTrivia().ToFullString(),
+			};
+		}
+		/// <summary>
 		/// 创建属性的实体
 		/// </summary>
 		/// <param name="nameSpace"></param>
@@ -612,33 +696,130 @@ public class {DtoName}
 			}
 			return result;
 		}
-
+		/// <summary>
+		/// 创建枚举成员的实体
+		/// </summary>
+		/// <param name="nameSpace"></param>
+		/// <param name="classDeclaration"></param>
+		/// <returns></returns>
+		private static EnumMemberDefinition CreateEnumMemberEntity(EnumMemberDeclarationSyntax enumMemberDeclarationSyntax, ref int lastValue)
+		{
+			//枚举成员是否指定的有值
+			if (enumMemberDeclarationSyntax.EqualsValue is null)
+			{
+				lastValue++;
+			}
+			else
+			{
+				lastValue = int.Parse(enumMemberDeclarationSyntax.EqualsValue.Value.ToFullString());
+			}
+			var desp = enumMemberDeclarationSyntax.AttributeLists.FirstOrDefault(x => x.Attributes[0].Name.ToString() == "Description")?.Attributes[0].ArgumentList?.Arguments.ToString().Trim('\"');
+			return new EnumMemberDefinition()
+			{
+				Name = enumMemberDeclarationSyntax.Identifier.Text,
+				Value = lastValue,
+				Description = desp,
+				Summary = GetSummay(enumMemberDeclarationSyntax.GetLeadingTrivia())
+			};
+		}
 		/// <summary>
 		/// 获取注释
 		/// </summary>
 		/// <param name="trivias"></param>
 		/// <returns></returns>
-		private static string GetSummay(SyntaxTriviaList trivias)
+		private static string? GetSummay(SyntaxTriviaList trivias)
 		{
-			StringBuilder summary = new StringBuilder();
-			foreach (var item in trivias)
+			var xml = trivias.Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
+			var remarkNode = xml?.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "summary");
+			var contentNode = remarkNode?.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
+			if (contentNode is null)
 			{
-				foreach (var line in item.ToFullString().Split('\n', StringSplitOptions.RemoveEmptyEntries))
+				return null;
+			}
+			return string.Join(' ', contentNode.TextTokens.Where(x => x.IsKind(SyntaxKind.XmlTextLiteralToken)).Select(x => x.Text.Trim()).Where(x => !x.IsNullOrWhiteSpace()).ToList());
+		}
+		/// <summary>
+		/// 获取备注
+		/// </summary>
+		/// <param name="trivias"></param>
+		/// <returns></returns>
+		/// <remarks>r1</remarks>
+		private static string? GetRemark(SyntaxTriviaList trivias)
+		{
+			var xml = trivias.Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
+			var remarkNode = xml?.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "remarks");
+			var contentNode = remarkNode?.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
+			return contentNode?.GetText().ToString();
+		}
+
+		private static EnumDeclarationSyntax AddRemark(EnumDeclarationSyntax enumDeclarationSyntax)
+		{
+			var dic = new Dictionary<int, List<string>>();
+			int lastValue = -1;
+			foreach (var item in enumDeclarationSyntax.Members)
+			{
+				if (item is not EnumMemberDeclarationSyntax enumMemberDeclaration) continue;
+				var desp = enumMemberDeclaration.AttributeLists.FirstOrDefault(x => x.Attributes[0].Name.ToString() == "Description")?.Attributes[0].ArgumentList?.Arguments.ToString().Trim('\"');
+				desp ??= GetSummay(enumMemberDeclaration.GetLeadingTrivia());
+				//desp ??=
+				if (item.EqualsValue is null)
 				{
-					var match = Regex.Match(line.Trim(), "///(.*)");
-					if (match.Success)
-					{
-						var comment = match.Groups[1].Value.Trim();
-						//忽略<example>等标签 会同时忽略掉summary标签
-						if (comment.StartsWith("<") && comment.EndsWith(">")) continue;
-						//if (comment != "<summary>" && comment != "</summary>")
-						//{
-						summary.Append(comment);
-						//}
-					}
+					lastValue++;
+				}
+				else
+				{
+					lastValue = int.Parse(item.EqualsValue.Value.ToFullString());
+				}
+				if (dic.TryGetValue(lastValue, out List<string> value))
+					value.Add(desp);
+				else
+					dic.Add(lastValue, new List<string> { desp });
+			}
+			var xml = enumDeclarationSyntax.GetLeadingTrivia().Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
+			var remarkNode = xml.ChildNodes().OfType<XmlElementSyntax>().First(x => x.StartTag.Name.ToString() == "remarks");
+			var contentNode = remarkNode.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
+			var newContentNode = XmlText($"<remarks>{string.Join(',', dic.Select(x => $"{x.Key}-{string.Join(',', x.Value)}"))}</remarks>");
+			//return enumDeclarationSyntax.ReplaceSyntax(xml, xml.ReplaceSyntax(remarkNode, remarkNode.ReplaceSyntax(contentNode)));
+			return null;
+		}
+		/// <summary>
+		/// 添加或者替换remarks标签
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="typeDeclarationSyntax"></param>
+		/// <param name="remark"></param>
+		/// <returns></returns>
+		private static T ReplaceOrAddRemark<T>(T typeDeclarationSyntax, string remark) where T : SyntaxNode
+		{
+			var xml = typeDeclarationSyntax.GetLeadingTrivia().Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
+			if (xml is null) return typeDeclarationSyntax;
+			var remarkNode = xml.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "remarks");
+			if (remarkNode is null)
+			{
+				//当原来没有注释的时候不添加新的内容
+				var summaryNode = xml.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "summary");
+				if (summaryNode is null)
+				{
+					return typeDeclarationSyntax;
+				}
+				else
+				{
+					var newXmlNode = new SyntaxNode[] {
+						XmlElement("remarks", new SyntaxList<XmlNodeSyntax> { XmlText(remark) })
+						.WithLeadingTrivia(SyntaxTrivia(SyntaxKind.EndOfLineTrivia,Environment.NewLine),
+						typeDeclarationSyntax.GetLeadingTrivia().Last(),
+						SyntaxTrivia(SyntaxKind.DocumentationCommentExteriorTrivia,"/// "))
+					};
+					return typeDeclarationSyntax.ReplaceNode(xml, xml.InsertNodesAfter(summaryNode, newXmlNode));
 				}
 			}
-			return summary.ToString();
+			var contentNode = remarkNode.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
+			if (contentNode is null)
+			{
+				return typeDeclarationSyntax.ReplaceNode(xml, xml.ReplaceNode(remarkNode, remarkNode.AddContent(XmlText(remark))));
+			}
+			var newContentNode = XmlText(remark);
+			return typeDeclarationSyntax.ReplaceNode(xml, xml.ReplaceNode(remarkNode, remarkNode.ReplaceNode(contentNode, newContentNode)));
 		}
 	}
 }

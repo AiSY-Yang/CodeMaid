@@ -25,6 +25,9 @@ namespace Models.CodeMaid
 		/// 参数
 		/// </summary>
 		public string? Arguments { get; set; } = null!;
+		/// <summary>
+		/// 包含的属性
+		/// </summary>
 		[AdaptIgnore]
 		public PropertyDefinition PropertyDefinition { get; set; } = null!;
 	}
