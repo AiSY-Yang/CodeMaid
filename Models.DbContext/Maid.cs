@@ -20,6 +20,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 功能
 		/// </summary>
+		/// <remarks>0-配置同步功能,1-DTO同步,2-枚举remarks标签同步</remarks>
 		public MaidWork MaidWork { get; set; }
 		/// <summary>
 		/// 原路径

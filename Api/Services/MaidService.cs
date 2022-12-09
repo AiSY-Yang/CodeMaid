@@ -77,7 +77,7 @@ namespace Api.Services
 				c.Using = usingText;
 				//记录这个类现在有的属性
 				HashSet<string> PropertityList = new();
-				foreach (var item in classNode.Members)
+				foreach (var propertyDeclaration in classNode.Members.OfType<PropertyDeclarationSyntax>())
 				{
 					if (item is not PropertyDeclarationSyntax propertyDeclaration) continue;
 					var p = c.Properties.FirstOrDefault(x => x.Name == propertyDeclaration.Identifier.Text);
@@ -114,7 +114,7 @@ namespace Api.Services
 				HashSet<string> PropertityList = new();
 				//记录上次枚举的成员值到了多少 如果没有值的话上次值+1则为新的值
 				int lastValue = -1;
-				foreach (var item in enumNode.Members)
+				foreach (var enumMemberDeclaration in enumNode.Members.OfType<EnumMemberDeclarationSyntax>())
 				{
 					if (item is not EnumMemberDeclarationSyntax enumMemberDeclaration) continue;
 					var p = e.EnumMembers.FirstOrDefault(x => x.Name == enumMemberDeclaration.Identifier.Text);
@@ -226,7 +226,8 @@ namespace Api.Services
 						lastPropertity ??= newClass.Members.Where(x => x is ConstructorDeclarationSyntax).LastOrDefault();
 						//如果构造函数也没有 则插入到第一个方法后面
 						lastPropertity ??= newClass.Members.Where(x => x is MethodDeclarationSyntax).First();
-						var prop = newClass.Members.Where(x => x is PropertyDeclarationSyntax).Cast<PropertyDeclarationSyntax>().Where(x => x.Type.ToString() == $"DbSet<{item.Name}>").FirstOrDefault();
+
+						var prop = newClass.Members.OfType<PropertyDeclarationSyntax>().Where(x => x.Type.ToString() == $"DbSet<{item.Name}>").FirstOrDefault();
 						if (prop is null)
 						{
 							newClass = newClass.InsertNodesAfter(lastPropertity, new SyntaxNode[] {
@@ -361,7 +362,7 @@ namespace Api.Services
 			}
 			//更新表名注释
 			var tableNameRegex = new Regex("builder\\.HasComment\\(\\\"(.*?)\\\"\\)");
-			foreach (var item in newBlockCode.ChildNodes().Where(x => x is ExpressionStatementSyntax))
+			foreach (var item in newBlockCode.ChildNodes().OfType<ExpressionStatementSyntax>())
 			{
 				var match = tableNameRegex.Match(item.ToFullString());
 				if (match.Success && match.Groups.Count == 2)
@@ -468,8 +469,7 @@ public class {DtoName}
 			ClassDeclarationSyntax AddOrUpdatePropertyDeclarationSyntax(ClassDeclarationSyntax classDeclarationSyntax, PropertyDefinition property)
 			{
 				var node = classDeclarationSyntax.ChildNodes()
-						.Where(x => x is PropertyDeclarationSyntax)
-						.Cast<PropertyDeclarationSyntax>()
+						.OfType<PropertyDeclarationSyntax>()
 						.FirstOrDefault(x => x.Identifier.Text == property.Name);
 				var newNode = (PropertyDeclarationSyntax)ParseMemberDeclaration(property.FullText)!;
 				//如果这个属性被删除的话 则把映射出的对象也删除掉
@@ -529,6 +529,11 @@ public class {DtoName}
 		}
 		#endregion Dto
 		#region Remarks
+		/// <summary>
+		/// 更新枚举的remark信息
+		/// </summary>
+		/// <param name="maid"></param>
+		/// <returns></returns>
 		public static async Task UpdateRemark(Maid maid)
 		{
 			foreach (var path in Directory.GetFiles(Path.Combine(maid.Project.Path, maid.SourcePath), "*.cs", SearchOption.AllDirectories))
@@ -536,11 +541,7 @@ public class {DtoName}
 				var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
 				var compilationUnit = tree.GetCompilationUnitRoot();
 				var compilationUnitNew = compilationUnit;
-				var enums = GetDeclarationSyntaxes<EnumDeclarationSyntax>(compilationUnit);
-				if (enums.Count == 0)
-				{
-					continue;
-				}
+				var enums = GetDeclarationSyntaxes<EnumDeclarationSyntax>(compilationUnitNew);
 				foreach (var enumNode in enums)
 				{
 					var e = maid.Enums.FirstOrDefault(x => x.Name == enumNode.Identifier.Text);
@@ -548,7 +549,28 @@ public class {DtoName}
 					if (GetRemark(enumNode.GetLeadingTrivia()) == e.Remark)
 						continue;
 					else
-						compilationUnitNew = compilationUnitNew.ReplaceNode(enumNode, ReplaceOrAddRemark(enumNode, e.Remark));
+						compilationUnitNew = compilationUnitNew.ReplaceNode(enumNode, AddOrReplaceRemark(enumNode, e.Remark));
+				}
+				var classes = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnitNew);
+				foreach (var classNode in classes)
+				{
+					var classNodeNew = classNode;
+					foreach (var prop in classNode.Members.OfType<PropertyDeclarationSyntax>())
+					{
+						var e = maid.Enums.FirstOrDefault(x => x.Name == prop.Type.ToString());
+						if (e == null)
+						{
+							continue;
+						}
+						else
+						{
+							if (GetRemark(prop.GetLeadingTrivia()) == e.Remark)
+								continue;
+							else
+								classNodeNew = classNodeNew.ReplaceNode(prop, AddOrReplaceRemark(prop, e.Remark));
+						}
+					}
+					compilationUnitNew = compilationUnitNew.ReplaceNode(classNode, classNodeNew);
 				}
 				await FileTools.Write(path, compilationUnit, compilationUnitNew);
 			}
@@ -789,14 +811,14 @@ public class {DtoName}
 		/// <param name="typeDeclarationSyntax"></param>
 		/// <param name="remark"></param>
 		/// <returns></returns>
-		private static T ReplaceOrAddRemark<T>(T typeDeclarationSyntax, string remark) where T : SyntaxNode
+		private static T AddOrReplaceRemark<T>(T typeDeclarationSyntax, string remark) where T : MemberDeclarationSyntax
 		{
 			var xml = typeDeclarationSyntax.GetLeadingTrivia().Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
 			if (xml is null) return typeDeclarationSyntax;
 			var remarkNode = xml.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "remarks");
 			if (remarkNode is null)
 			{
-				//当原来没有注释的时候不添加新的内容
+				//当原来没有注释的时候不添加新的内容 防止破坏警告信息
 				var summaryNode = xml.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "summary");
 				if (summaryNode is null)
 				{
