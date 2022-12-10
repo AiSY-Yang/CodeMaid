@@ -11,6 +11,7 @@ internal class PropertyDefinitionConfiguration : DatabaseEntityConfiguration<Pro
 	public override void Configure(EntityTypeBuilder<PropertyDefinition> builder)
 	{
 		base.Configure(builder);
+		builder.Metadata.SetComment("类定义");
 		builder.HasComment("类定义");
 		builder.Property(x => x.LeadingTrivia).HasComment("前导");
 		builder.Property(x => x.Summary).HasComment("注释");

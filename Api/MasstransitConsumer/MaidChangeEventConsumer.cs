@@ -27,7 +27,6 @@ namespace Api.MasstransitConsumer
 
 		public async Task Consume(ConsumeContext<MaidChangeEvent> context)
 		{
-			logger.LogInformation("maid{id}开始工作", context.Message.MaidId);
 			var maid = maidContext.Maids
 						.Include(x => x.Project)
 						.Include(x => x.Enums)
@@ -36,6 +35,7 @@ namespace Api.MasstransitConsumer
 						.ThenInclude(x => x.Properties)
 						.ThenInclude(x => x.Attributes)
 						.First(x => x.Id == context.Message.MaidId);
+			logger.LogInformation("项目{projectname}maid{maidname}开始工作", maid.Project.Name, maid.Name);
 			await MaidService.Work(maid);
 		}
 	}

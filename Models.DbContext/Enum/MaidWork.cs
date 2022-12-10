@@ -11,7 +11,7 @@ namespace Models.CodeMaid
 	public enum MaidWork
 	{
 		/// <summary>
-		/// 配置同步功能   
+		/// 配置同步功能
 		/// </summary>
 		[Description]
 		ConfigurationSync,

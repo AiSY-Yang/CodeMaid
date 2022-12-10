@@ -11,6 +11,7 @@ internal class EnumMemberDefinitionConfiguration : DatabaseEntityConfiguration<E
 	public override void Configure(EntityTypeBuilder<EnumMemberDefinition> builder)
 	{
 		base.Configure(builder);
+		builder.Metadata.SetComment("枚举成员定义");
 		builder.HasComment("枚举成员定义");
 		builder.Property(x => x.Name).HasComment("枚举名称");
 		builder.Property(x => x.Value).HasComment("枚举值");

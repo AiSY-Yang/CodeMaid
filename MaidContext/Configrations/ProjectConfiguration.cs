@@ -11,6 +11,7 @@ internal class ProjectConfiguration : DatabaseEntityConfiguration<Project>
 	public override void Configure(EntityTypeBuilder<Project> builder)
 	{
 		base.Configure(builder);
+		builder.Metadata.SetComment("项目定义");
 		builder.HasComment("项目定义");
 		builder.Property(x => x.Name).HasComment("项目名");
 		builder.Property(x => x.Path).HasComment("项目路径");

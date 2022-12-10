@@ -79,7 +79,6 @@ namespace Api.Services
 				HashSet<string> PropertityList = new();
 				foreach (var propertyDeclaration in classNode.Members.OfType<PropertyDeclarationSyntax>())
 				{
-					if (item is not PropertyDeclarationSyntax propertyDeclaration) continue;
 					var p = c.Properties.FirstOrDefault(x => x.Name == propertyDeclaration.Identifier.Text);
 					if (p == null)
 					{
@@ -116,7 +115,6 @@ namespace Api.Services
 				int lastValue = -1;
 				foreach (var enumMemberDeclaration in enumNode.Members.OfType<EnumMemberDeclarationSyntax>())
 				{
-					if (item is not EnumMemberDeclarationSyntax enumMemberDeclaration) continue;
 					var p = e.EnumMembers.FirstOrDefault(x => x.Name == enumMemberDeclaration.Identifier.Text);
 					if (p == null)
 					{
@@ -233,6 +231,10 @@ namespace Api.Services
 							newClass = newClass.InsertNodesAfter(lastPropertity, new SyntaxNode[] {
 								(PropertyDeclarationSyntax)ParseMemberDeclaration($"{(item.LeadingTrivia==null?"\t":string.Join('\n',item.LeadingTrivia.Split('\n').Select(x=>"\t"+x)))}public virtual DbSet<{item.Name}> {item.Name.Pluralize(inputIsKnownToBeSingular: false)} {{ get; set; }} = null!;")!
 								.WithTrailingTrivia(ParseTrailingTrivia(Environment.NewLine))! });
+						}
+						else
+						{
+							newClass = newClass.ReplaceNode(prop, AddOrReplaceSummary(prop, item.Summary));
 						}
 					}
 					var compilationUnitNew = compilationUnit.ReplaceNode(firstClass, newClass);
@@ -366,24 +368,24 @@ namespace Api.Services
 				var tableNameRegex = new Regex("builder\\.Metadata\\.SetComment\\(\\\"(.*?)\\\"\\)");
 				//记录是否匹配上了注释
 				var isMatch = false;
-			foreach (var item in newBlockCode.ChildNodes().OfType<ExpressionStatementSyntax>())
-			{
-				var match = tableNameRegex.Match(item.ToFullString());
-				if (match.Success && match.Groups.Count == 2)
+				foreach (var item in newBlockCode.ChildNodes().OfType<ExpressionStatementSyntax>())
 				{
+					var match = tableNameRegex.Match(item.ToFullString());
+					if (match.Success && match.Groups.Count == 2)
+					{
 						isMatch = true;
-					string tableName = match.Groups[1].Value;
-					if (tableName == classDefinition.Summary)
-					{
-						continue;
-					}
-					else
-					{
+						string tableName = match.Groups[1].Value;
+						if (tableName == classDefinition.Summary)
+						{
+							continue;
+						}
+						else
+						{
 							var expression = $"builder.Metadata.SetComment(\"{classDefinition.Summary}\");" + Environment.NewLine;
-						newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression).WithLeadingTrivia(item.GetLeadingTrivia()));
+							newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression).WithLeadingTrivia(item.GetLeadingTrivia()));
+						}
 					}
 				}
-			}
 				//如果没匹配上的话就新增
 				if (isMatch == false)
 				{
@@ -648,7 +650,7 @@ public class {DtoName}
 		/// <returns></returns>
 		private static bool IsBaseType(string type)
 		{
-			return new string[] { "int", "int?" , "short", "short?" , "long", "long?",
+			return new string[] { "int", "int?" , "short", "short?" , "long", "long?","decimal", "decimal?",
 				"string", "string?",
 				"bool", "bool?",
 				"Guid", "Guid?",
@@ -786,36 +788,6 @@ public class {DtoName}
 			return contentNode?.GetText().ToString();
 		}
 
-		private static EnumDeclarationSyntax AddRemark(EnumDeclarationSyntax enumDeclarationSyntax)
-		{
-			var dic = new Dictionary<int, List<string>>();
-			int lastValue = -1;
-			foreach (var item in enumDeclarationSyntax.Members)
-			{
-				if (item is not EnumMemberDeclarationSyntax enumMemberDeclaration) continue;
-				var desp = enumMemberDeclaration.AttributeLists.FirstOrDefault(x => x.Attributes[0].Name.ToString() == "Description")?.Attributes[0].ArgumentList?.Arguments.ToString().Trim('\"');
-				desp ??= GetSummay(enumMemberDeclaration.GetLeadingTrivia());
-				//desp ??=
-				if (item.EqualsValue is null)
-				{
-					lastValue++;
-				}
-				else
-				{
-					lastValue = int.Parse(item.EqualsValue.Value.ToFullString());
-				}
-				if (dic.TryGetValue(lastValue, out List<string> value))
-					value.Add(desp);
-				else
-					dic.Add(lastValue, new List<string> { desp });
-			}
-			var xml = enumDeclarationSyntax.GetLeadingTrivia().Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
-			var remarkNode = xml.ChildNodes().OfType<XmlElementSyntax>().First(x => x.StartTag.Name.ToString() == "remarks");
-			var contentNode = remarkNode.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
-			var newContentNode = XmlText($"<remarks>{string.Join(',', dic.Select(x => $"{x.Key}-{string.Join(',', x.Value)}"))}</remarks>");
-			//return enumDeclarationSyntax.ReplaceSyntax(xml, xml.ReplaceSyntax(remarkNode, remarkNode.ReplaceSyntax(contentNode)));
-			return null;
-		}
 		/// <summary>
 		/// 添加或者替换remarks标签
 		/// </summary>
@@ -825,35 +797,52 @@ public class {DtoName}
 		/// <returns></returns>
 		private static T AddOrReplaceRemark<T>(T typeDeclarationSyntax, string remark) where T : MemberDeclarationSyntax
 		{
-			var xml = typeDeclarationSyntax.GetLeadingTrivia().Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
-			if (xml is null) return typeDeclarationSyntax;
-			var remarkNode = xml.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "remarks");
-			if (remarkNode is null)
+			var remarkOld = typeDeclarationSyntax.GetRemark();
+			//当原来没有注释的时候不添加新的内容 防止破坏警告信息
+			var summary = typeDeclarationSyntax.GetSummay();
+			if (summary is null) return typeDeclarationSyntax;
+			return AddOrReplaceXmlContent(typeDeclarationSyntax, "remarks", remark);
+		}
+
+		/// <summary>
+		/// 添加或者替换summary标签
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="typeDeclarationSyntax"></param>
+		/// <param name="remark"></param>
+		/// <returns></returns>
+		private static T AddOrReplaceSummary<T>(T typeDeclarationSyntax, string? summary) where T : MemberDeclarationSyntax
+		{
+			var oldsummary = typeDeclarationSyntax.GetSummay();
+			if (oldsummary == summary || summary is null) return typeDeclarationSyntax;
+			return AddOrReplaceXmlContent(typeDeclarationSyntax, "summary", summary);
+		}
+		private static T AddOrReplaceXmlContent<T>(T typeDeclarationSyntax, string tagName, string text) where T : MemberDeclarationSyntax
+		{
+			//获取原来的缩进
+			var indentation = typeDeclarationSyntax.GetLeadingTrivia().Last();
+			//如果是summary 则内容要修改成多行的格式
+			var content = tagName == "summary" ? $"{Environment.NewLine}{indentation}/// {text}{Environment.NewLine}{indentation}/// " : text;
+			//拿到这个tag
+			var xml = typeDeclarationSyntax.GetLeadingTrivia()
+				.Select(x => x.GetStructure())
+				.OfType<DocumentationCommentTriviaSyntax>()
+				.FirstOrDefault()?.ChildNodes()
+				.OfType<XmlElementSyntax>()
+				.FirstOrDefault(x => x.StartTag.Name.ToString() == tagName);
+			if (xml is null)
 			{
-				//当原来没有注释的时候不添加新的内容 防止破坏警告信息
-				var summaryNode = xml.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "summary");
-				if (summaryNode is null)
-				{
-					return typeDeclarationSyntax;
-				}
-				else
-				{
-					var newXmlNode = new SyntaxNode[] {
-						XmlElement("remarks", new SyntaxList<XmlNodeSyntax> { XmlText(remark) })
-						.WithLeadingTrivia(SyntaxTrivia(SyntaxKind.EndOfLineTrivia,Environment.NewLine),
-						typeDeclarationSyntax.GetLeadingTrivia().Last(),
-						SyntaxTrivia(SyntaxKind.DocumentationCommentExteriorTrivia,"/// "))
-					};
-					return typeDeclarationSyntax.ReplaceNode(xml, xml.InsertNodesAfter(summaryNode, newXmlNode));
-				}
+				//新增标签 前面要有缩进 后面要有换行 且保留原来的trivia
+				var tag = $"{indentation}/// <{tagName}>{content}</{tagName}>{Environment.NewLine}";
+				return typeDeclarationSyntax.WithLeadingTrivia(SyntaxTriviaList.Create(SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, tag)).AddRange(typeDeclarationSyntax.GetLeadingTrivia()));
 			}
-			var contentNode = remarkNode.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
-			if (contentNode is null)
+			else
 			{
-				return typeDeclarationSyntax.ReplaceNode(xml, xml.ReplaceNode(remarkNode, remarkNode.AddContent(XmlText(remark))));
+				//替换标签
+				var contentNode = xml.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
+				var newContentNode = XmlText(content);
+				return typeDeclarationSyntax.ReplaceNode(xml, xml.ReplaceNode(contentNode, newContentNode));
 			}
-			var newContentNode = XmlText(remark);
-			return typeDeclarationSyntax.ReplaceNode(xml, xml.ReplaceNode(remarkNode, remarkNode.ReplaceNode(contentNode, newContentNode)));
 		}
 	}
 }

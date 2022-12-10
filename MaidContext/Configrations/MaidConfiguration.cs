@@ -11,6 +11,7 @@ internal class MaidConfiguration : DatabaseEntityConfiguration<Maid>
 	public override void Configure(EntityTypeBuilder<Maid> builder)
 	{
 		base.Configure(builder);
+		builder.Metadata.SetComment("功能");
 		builder.HasComment("功能");
 		builder.Property(x => x.Name).HasComment("名称");
 		builder.Property(x => x.SourcePath).HasComment("原路径");

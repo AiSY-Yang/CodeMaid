@@ -5,7 +5,7 @@ using Models.CodeMaid;
 namespace Models.CodeMaid
 {
 	/// <summary>
-	/// 类定义
+	/// 属性定义
 	/// </summary>
 	public class AttributeDefinition : DatabaseEntity
 	{

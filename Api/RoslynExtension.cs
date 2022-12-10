@@ -21,7 +21,7 @@ namespace Api
 			return contentNode?.GetText().ToString();
 		}
 		/// <summary>
-		/// 获取注释
+		/// 获取注释 如果是多行的话会合并成一行 中间空格隔开
 		/// </summary>
 		/// <param name="trivias"></param>
 		/// <returns></returns>

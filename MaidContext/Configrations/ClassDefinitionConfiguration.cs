@@ -11,6 +11,7 @@ internal class ClassDefinitionConfiguration : DatabaseEntityConfiguration<ClassD
 	public override void Configure(EntityTypeBuilder<ClassDefinition> builder)
 	{
 		base.Configure(builder);
+		builder.Metadata.SetComment("类定义");
 		builder.HasComment("类定义");
 		builder.Property(x => x.NameSpace).HasComment("命名空间");
 		builder.Property(x => x.Name).HasComment("类名");
