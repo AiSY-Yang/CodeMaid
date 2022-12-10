@@ -361,12 +361,17 @@ namespace Api.Services
 				newBlockCode = UpdateOrInsertConfigurationStatement(newBlockCode, item);
 			}
 			//更新表名注释
-			var tableNameRegex = new Regex("builder\\.HasComment\\(\\\"(.*?)\\\"\\)");
+			if (classDefinition.Summary is not null)
+			{
+				var tableNameRegex = new Regex("builder\\.Metadata\\.SetComment\\(\\\"(.*?)\\\"\\)");
+				//记录是否匹配上了注释
+				var isMatch = false;
 			foreach (var item in newBlockCode.ChildNodes().OfType<ExpressionStatementSyntax>())
 			{
 				var match = tableNameRegex.Match(item.ToFullString());
 				if (match.Success && match.Groups.Count == 2)
 				{
+						isMatch = true;
 					string tableName = match.Groups[1].Value;
 					if (tableName == classDefinition.Summary)
 					{
@@ -374,9 +379,16 @@ namespace Api.Services
 					}
 					else
 					{
-						var expression = $"builder.HasComment(\"{classDefinition.Summary}\");" + Environment.NewLine;
+							var expression = $"builder.Metadata.SetComment(\"{classDefinition.Summary}\");" + Environment.NewLine;
 						newBlockCode = newBlockCode.ReplaceNode(item, ParseStatement(expression).WithLeadingTrivia(item.GetLeadingTrivia()));
 					}
+				}
+			}
+				//如果没匹配上的话就新增
+				if (isMatch == false)
+				{
+					var expression = $"builder.Metadata.SetComment(\"{classDefinition.Summary}\");" + Environment.NewLine;
+					newBlockCode = newBlockCode.InsertNodesAfter(newBlockCode.ChildNodes().First(), new SyntaxNode[] { ParseStatement(expression).WithLeadingTrivia(newBlockCode.ChildNodes().First().GetLeadingTrivia()) });
 				}
 			}
 			return source.ReplaceNode(blockCode, newBlockCode);
