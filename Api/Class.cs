@@ -39,21 +39,23 @@ namespace Api
 						Log.Error("项目{project}的{func}的源路径{path}不存在", item.Project.Name, item.Name, path);
 						continue;
 					}
-					FileSystemWatcher watcher = new FileSystemWatcher(path);
-					//watcher.NotifyFilter = NotifyFilters.Attributes
-					//   | NotifyFilters.CreationTime
-					//   | NotifyFilters.DirectoryName
-					//   | NotifyFilters.FileName
-					//   | NotifyFilters.LastAccess
-					//   | NotifyFilters.LastWrite
-					//   | NotifyFilters.Security
-					//   | NotifyFilters.Size;
+					FileSystemWatcher watcher = new(path)
+					{
+						//NotifyFilter = NotifyFilters.Attributes
+						//   | NotifyFilters.CreationTime
+						//   | NotifyFilters.DirectoryName
+						//   | NotifyFilters.FileName
+						//   | NotifyFilters.LastAccess
+						//   | NotifyFilters.LastWrite
+						//   | NotifyFilters.Security
+						//   | NotifyFilters.Size;
 
-					watcher.Filter = "*.cs";
-					watcher.IncludeSubdirectories = true;
-					watcher.EnableRaisingEvents = true;
+						Filter = "*.cs",
+						IncludeSubdirectories = true,
+						EnableRaisingEvents = true
+					};
 					watcher.Changed += Watcher_Changed;
-					watcher.Renamed += Watcher_Renamed; ;
+					watcher.Renamed += Watcher_Renamed;
 					Watchers.TryAdd(watcher, item);
 					Log.Information("添加项目{project}的{func}监听器,路径为{path}", item.Project.Name, item.Name, path);
 				}

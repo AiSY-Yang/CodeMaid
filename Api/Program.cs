@@ -41,7 +41,7 @@ namespace Api
 				x.ListenAnyIP(5241);
 			});
 			//添加数据库
-			string conn = builder.Configuration.GetConnectionString("MaidContext");
+			string? conn = builder.Configuration.GetConnectionString("MaidContext");
 			builder.Services.AddDbContext<MaidContext>(x => x.UseMySql(conn, ServerVersion.AutoDetect(conn),
 				x => x.EnableRetryOnFailure(3).EnableIndexOptimizedBooleanColumns()).EnableSensitiveDataLogging());
 			//添加仓储
@@ -167,7 +167,6 @@ namespace Api
 				var scope = app.Services.CreateScope();
 				var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
 				Maids.Init(app.Services);
-				new TestClass(scope.ServiceProvider).Task();
 			});
 			//开始运行
 			app.Run();

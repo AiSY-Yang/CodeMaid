@@ -12,7 +12,6 @@ namespace Api
 		/// </summary>
 		/// <param name="trivias"></param>
 		/// <returns></returns>
-		/// <remarks>r1</remarks>
 		public static string? GetRemark(this MemberDeclarationSyntax memberDeclarationSyntax)
 		{
 			var xml = memberDeclarationSyntax.GetLeadingTrivia().Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
@@ -28,8 +27,8 @@ namespace Api
 		public static string? GetSummay(this MemberDeclarationSyntax memberDeclarationSyntax)
 		{
 			var xml = memberDeclarationSyntax.GetLeadingTrivia().Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
-			var remarkNode = xml?.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "summary");
-			var contentNode = remarkNode?.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
+			var summaryNode = xml?.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "summary");
+			var contentNode = summaryNode?.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
 			if (contentNode is null)
 			{
 				return null;

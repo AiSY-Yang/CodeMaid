@@ -22,6 +22,10 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string? Summary { get; set; }
 		/// <summary>
+		/// 备注
+		/// </summary>
+		public string? Remark { get; set; } = null!;
+		/// <summary>
 		/// 完整文本内容
 		/// </summary>
 		public string FullText { get; set; } = null!;
@@ -41,6 +45,10 @@ namespace Models.CodeMaid
 		/// 数据类型
 		/// </summary>
 		public string Type { get; set; } = null!;
+		/// <summary>
+		/// 是否是枚举
+		/// </summary>
+		public bool IsEnum { get; set; }
 		/// <summary>
 		/// 是否包含Get
 		/// </summary>

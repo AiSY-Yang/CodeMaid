@@ -33,9 +33,11 @@ public class EnumSchemaFilter : ISchemaFilter
 				foreach (var enumName in context.Type.GetEnumNames())
 				{
 					var fullName = "F:" + context.Type.FullName + "." + enumName;
-					var obj = new OpenApiObject();
-					obj.Add("name", new OpenApiString(enumName));
-					obj.Add("summary", new OpenApiString(context.Type.Assembly.GetXMLMember().FirstOrDefault(x => x.ID == fullName)?.Summary));
+					var obj = new OpenApiObject
+					{
+						{ "name", new OpenApiString(enumName) },
+						{ "summary", new OpenApiString(context.Type.Assembly.GetXMLMember().FirstOrDefault(x => x.ID == fullName)?.Summary) }
+					};
 					desp.Add(obj);
 				}
 				model.Extensions.Add("x-enumSummarys", desp);

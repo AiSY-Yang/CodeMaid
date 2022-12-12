@@ -4,7 +4,7 @@ namespace MasstransitModels
 {
 	public record FileChangeEvent
 	{
-		public string FilePath { get; set; }
-		public long MaidId { get; set; }
+		public required string FilePath { get; set; }
+		public required long MaidId { get; set; }
 	}
 }

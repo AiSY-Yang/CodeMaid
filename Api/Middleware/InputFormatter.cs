@@ -22,7 +22,6 @@ namespace Api.Middleware
 		public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
 		{
 			var httpContext = context.HttpContext;
-			var serviceProvider = httpContext.RequestServices;
 			using var reader = new StreamReader(httpContext.Request.Body, encoding);
 
 			try

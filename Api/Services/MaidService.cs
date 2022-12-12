@@ -57,6 +57,42 @@ namespace Api.Services
 			var compilationUnit = tree.GetCompilationUnitRoot();
 			//记录下文件的using
 			var usingText = compilationUnit.Usings.ToFullString();
+			#region 更新枚举
+			var enums = GetDeclarationSyntaxes<EnumDeclarationSyntax>(compilationUnit);
+			foreach (var enumNode in enums)
+			{
+				var e = maid.Enums.FirstOrDefault(x => x.Name == enumNode.Identifier.ValueText);
+				if (e == null)
+				{
+					e = CreateEnumEntity(enumNode);
+					maid.Enums.Add(e);
+				}
+				else
+				{
+					CreateEnumEntity(enumNode).Adapt(e);
+				}
+				//记录这个枚举现在有的成员
+				HashSet<string> MemberList = new();
+				//记录上次枚举的成员值到了多少 如果没有值的话上次值+1则为新的值
+				int lastValue = -1;
+				foreach (var enumMemberDeclaration in enumNode.Members.OfType<EnumMemberDeclarationSyntax>())
+				{
+					var p = e.EnumMembers.FirstOrDefault(x => x.Name == enumMemberDeclaration.Identifier.Text);
+					if (p == null)
+					{
+						p = CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue);
+						e.EnumMembers.Add(p);
+					}
+					else
+					{
+						CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue).Adapt(p);
+					}
+					MemberList.Add(p.Name);
+				}
+				//本次如果没有这个成员的话 则标记删除
+				e.EnumMembers.Where(x => !MemberList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
+			}
+			#endregion
 			#region 更新类
 			var classes = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit);
 			//记录本次更新的类的名称
@@ -89,46 +125,11 @@ namespace Api.Services
 					{
 						CreatePropertyEntity(c, propertyDeclaration).Adapt(p);
 					}
+					p.IsEnum = maid.Enums.Any(x => x.Name == p.Type);
 					PropertityList.Add(p.Name);
 				}
 				//本次如果没有这个属性的话 则标记删除
 				c.Properties.Where(x => !PropertityList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
-			}
-			#endregion
-			#region 更新枚举
-			var enums = GetDeclarationSyntaxes<EnumDeclarationSyntax>(compilationUnit);
-			foreach (var enumNode in enums)
-			{
-				var e = maid.Enums.FirstOrDefault(x => x.Name == enumNode.Identifier.ValueText);
-				if (e == null)
-				{
-					e = CreateEnumEntity(enumNode);
-					maid.Enums.Add(e);
-				}
-				else
-				{
-					CreateEnumEntity(enumNode).Adapt(e);
-				}
-				//记录这个枚举现在有的成员
-				HashSet<string> PropertityList = new();
-				//记录上次枚举的成员值到了多少 如果没有值的话上次值+1则为新的值
-				int lastValue = -1;
-				foreach (var enumMemberDeclaration in enumNode.Members.OfType<EnumMemberDeclarationSyntax>())
-				{
-					var p = e.EnumMembers.FirstOrDefault(x => x.Name == enumMemberDeclaration.Identifier.Text);
-					if (p == null)
-					{
-						p = CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue);
-						e.EnumMembers.Add(p);
-					}
-					else
-					{
-						CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue).Adapt(p);
-					}
-					PropertityList.Add(p.Name);
-				}
-				//本次如果没有这个成员的话 则标记删除
-				e.EnumMembers.Where(x => !PropertityList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
 			}
 			#endregion
 			return classList;
@@ -207,7 +208,7 @@ namespace Api.Services
 			//更新Context文件里的类
 			if (maid.Setting != null)
 			{
-				var setting = maid.Setting.AsJsonToObject<ConfigurationSyncSetting>();
+				var setting = maid.Setting.AsJsonToObject<ConfigurationSyncSetting>() ?? new ConfigurationSyncSetting();
 				if (setting.ContextPath != null)
 				{
 					string fileName = Path.Combine(maid.Project.Path, setting.ContextPath);
@@ -251,7 +252,7 @@ namespace Api.Services
 		/// <returns></returns>
 		private static CompilationUnitSyntax CreateBaseConfigurationNode(ClassDefinition classDefinition)
 		{
-			StringBuilder stringBuilder = new StringBuilder();
+			StringBuilder stringBuilder = new();
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore;");
 			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore.Metadata.Builders;");
 			stringBuilder.AppendLine($"");
@@ -297,7 +298,7 @@ namespace Api.Services
 			stringBuilder.AppendLine($"\t\tbuilder.HasComment(\"{classDefinition.Summary}\");");
 			foreach (var item in classDefinition.Properties)
 			{
-				if (IsBaseType(item.Type) && item.HasSet)
+				if ((IsBaseType(item.Type) || item.IsEnum) && item.HasSet)
 					stringBuilder.AppendLine(CreateBuilderStatement(item));
 			}
 			stringBuilder.AppendLine($"\t}}");
@@ -358,7 +359,7 @@ namespace Api.Services
 			//此处要保留原有块信息引用 以在后面可以替换节点
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
 			var newBlockCode = (BlockSyntax)blockCode;
-			foreach (var item in classDefinition.Properties.Where(x => IsBaseType(x.Type) && x.HasSet))
+			foreach (var item in classDefinition.Properties.Where(x => (IsBaseType(x.Type) || x.IsEnum) && x.HasSet))
 			{
 				newBlockCode = UpdateOrInsertConfigurationStatement(newBlockCode, item);
 			}
@@ -560,7 +561,7 @@ public class {DtoName}
 				{
 					var e = maid.Enums.FirstOrDefault(x => x.Name == enumNode.Identifier.Text);
 					if (e is null) continue;
-					if (GetRemark(enumNode.GetLeadingTrivia()) == e.Remark)
+					if (enumNode.GetRemark() == e.Remark)
 						continue;
 					else
 						compilationUnitNew = compilationUnitNew.ReplaceNode(enumNode, AddOrReplaceRemark(enumNode, e.Remark));
@@ -578,7 +579,7 @@ public class {DtoName}
 						}
 						else
 						{
-							if (GetRemark(prop.GetLeadingTrivia()) == e.Remark)
+							if (prop.GetRemark() == e.Remark)
 								continue;
 							else
 								classNodeNew = classNodeNew.ReplaceNode(prop, AddOrReplaceRemark(prop, e.Remark));
@@ -616,8 +617,8 @@ public class {DtoName}
 		{
 			StringBuilder stringBuilder = new();
 			stringBuilder.Append($"{leader}builder.Property(x => x.{property.Name})");
-			if (!property.Summary.IsNullOrWhiteSpace())
-				stringBuilder.Append($".HasComment(\"{property.Summary?.Replace("\"", "\\\"")}\")");
+			if (!property.Summary.IsNullOrWhiteSpace() || !property.Remark.IsNullOrWhiteSpace())
+				stringBuilder.Append($".HasComment(\"{property.Summary?.Replace("\"", "\\\"")}{(property.Remark is null ? null : $"({property.Remark})")}\")");
 			foreach (var attribute in property.Attributes)
 			{
 				switch (attribute.Name)
@@ -669,7 +670,7 @@ public class {DtoName}
 			{
 				NameSpace = (classDeclaration.SyntaxTree.GetRoot().ChildNodes().FirstOrDefault(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax) as BaseNamespaceDeclarationSyntax)?.Name?.ToString(),
 				Name = classDeclaration.Identifier.Text,
-				Summary = GetSummay(classDeclaration.GetLeadingTrivia()),
+				Summary = classDeclaration.GetSummay(),
 				LeadingTrivia = classDeclaration.GetLeadingTrivia().ToFullString(),
 				Base = classDeclaration.BaseList?.Types.ToString(),
 			};
@@ -686,10 +687,11 @@ public class {DtoName}
 			{
 				NameSpace = (classDeclaration.SyntaxTree.GetRoot().ChildNodes().FirstOrDefault(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax) as BaseNamespaceDeclarationSyntax)?.Name?.ToString(),
 				Name = classDeclaration.Identifier.Text,
-				Summary = GetSummay(classDeclaration.GetLeadingTrivia()),
+				Summary = classDeclaration.GetSummay(),
 				LeadingTrivia = classDeclaration.GetLeadingTrivia().ToFullString(),
 			};
 		}
+
 		/// <summary>
 		/// 创建属性的实体
 		/// </summary>
@@ -706,7 +708,8 @@ public class {DtoName}
 				ClassDefinition = owner,
 				FullText = propertyDeclaration.ToFullString(),
 				LeadingTrivia = leaderTrivia.ToFullString(),
-				Summary = GetSummay(leaderTrivia),
+				Summary = propertyDeclaration.GetSummay(),
+				Remark = propertyDeclaration.GetRemark(),
 				Name = propertyDeclaration.Identifier.Text,
 				Type = propertyDeclaration.Type.ToString(),
 				Modifiers = propertyDeclaration.Modifiers.ToString(),
@@ -726,8 +729,8 @@ public class {DtoName}
 					Text = item.Attributes[0].ToString(),
 					ArgumentsText = item.Attributes[0].ArgumentList?.ToString(),
 					Arguments = item.Attributes[0].ArgumentList == null ? null : string.Join(", ", item.Attributes[0].ArgumentList?.Arguments.Select(x => x.ToString())!),
+					PropertyDefinition = result
 				};
-				attributeDefinition.PropertyDefinition = result;
 				result.Attributes.Add(attributeDefinition);
 			}
 			return result;
@@ -755,37 +758,8 @@ public class {DtoName}
 				Name = enumMemberDeclarationSyntax.Identifier.Text,
 				Value = lastValue,
 				Description = desp,
-				Summary = GetSummay(enumMemberDeclarationSyntax.GetLeadingTrivia())
+				Summary = enumMemberDeclarationSyntax.GetSummay(),
 			};
-		}
-		/// <summary>
-		/// 获取注释
-		/// </summary>
-		/// <param name="trivias"></param>
-		/// <returns></returns>
-		private static string? GetSummay(SyntaxTriviaList trivias)
-		{
-			var xml = trivias.Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
-			var remarkNode = xml?.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "summary");
-			var contentNode = remarkNode?.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
-			if (contentNode is null)
-			{
-				return null;
-			}
-			return string.Join(' ', contentNode.TextTokens.Where(x => x.IsKind(SyntaxKind.XmlTextLiteralToken)).Select(x => x.Text.Trim()).Where(x => !x.IsNullOrWhiteSpace()).ToList());
-		}
-		/// <summary>
-		/// 获取备注
-		/// </summary>
-		/// <param name="trivias"></param>
-		/// <returns></returns>
-		/// <remarks>r1</remarks>
-		private static string? GetRemark(SyntaxTriviaList trivias)
-		{
-			var xml = trivias.Select(x => x.GetStructure()).OfType<DocumentationCommentTriviaSyntax>().FirstOrDefault();
-			var remarkNode = xml?.ChildNodes().OfType<XmlElementSyntax>().FirstOrDefault(x => x.StartTag.Name.ToString() == "remarks");
-			var contentNode = remarkNode?.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
-			return contentNode?.GetText().ToString();
 		}
 
 		/// <summary>
@@ -797,7 +771,6 @@ public class {DtoName}
 		/// <returns></returns>
 		private static T AddOrReplaceRemark<T>(T typeDeclarationSyntax, string remark) where T : MemberDeclarationSyntax
 		{
-			var remarkOld = typeDeclarationSyntax.GetRemark();
 			//当原来没有注释的时候不添加新的内容 防止破坏警告信息
 			var summary = typeDeclarationSyntax.GetSummay();
 			if (summary is null) return typeDeclarationSyntax;
@@ -817,6 +790,14 @@ public class {DtoName}
 			if (oldsummary == summary || summary is null) return typeDeclarationSyntax;
 			return AddOrReplaceXmlContent(typeDeclarationSyntax, "summary", summary);
 		}
+		/// <summary>
+		/// 添加或者替换XML节点内容
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="typeDeclarationSyntax"></param>
+		/// <param name="tagName"></param>
+		/// <param name="text"></param>
+		/// <returns></returns>
 		private static T AddOrReplaceXmlContent<T>(T typeDeclarationSyntax, string tagName, string text) where T : MemberDeclarationSyntax
 		{
 			//获取原来的缩进
