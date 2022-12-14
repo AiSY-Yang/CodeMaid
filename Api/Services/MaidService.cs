@@ -2,18 +2,27 @@
 using Microsoft.CodeAnalysis;
 using System.Text.RegularExpressions;
 using System.Text;
+using System.Text.RegularExpressions;
 
+using Api.Tools;
+
+using ExtensionMethods;
+
+using Humanizer;
+
+using Mapster;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Models.CodeMaid;
 
 using Serilog;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using Mapster;
-using static ExtensionMethods.AssemblyExtension;
+
 using ServicesModels;
-using System.Linq.Expressions;
-using ExtensionMethods;
+
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static ServicesModels.DtoSyncSetting;
 using Microsoft.EntityFrameworkCore;
 using Humanizer;
@@ -295,7 +304,7 @@ namespace Api.Services
 			stringBuilder.AppendLine($"\tpublic override void Configure(EntityTypeBuilder<{classDefinition.Name}> builder)");
 			stringBuilder.AppendLine($"\t{{");
 			stringBuilder.AppendLine($"\t\tbase.Configure(builder);");
-			stringBuilder.AppendLine($"\t\tbuilder.HasComment(\"{classDefinition.Summary}\");");
+			stringBuilder.AppendLine($"\t\tbuilder.Metadata.SetComment(\"{classDefinition.Summary}\");");
 			foreach (var item in classDefinition.Properties)
 			{
 				if ((IsBaseType(item.Type) || item.IsEnum) && item.HasSet)
@@ -391,7 +400,7 @@ namespace Api.Services
 				if (isMatch == false)
 				{
 					var expression = $"builder.Metadata.SetComment(\"{classDefinition.Summary}\");" + Environment.NewLine;
-					newBlockCode = newBlockCode.InsertNodesAfter(newBlockCode.ChildNodes().First(), new SyntaxNode[] { ParseStatement(expression).WithLeadingTrivia(newBlockCode.ChildNodes().First().GetLeadingTrivia()) });
+					newBlockCode = newBlockCode.InsertNodesAfter(newBlockCode.ChildNodes().First(), new SyntaxNode[] { ParseStatement(expression).WithLeadingTrivia(newBlockCode.ChildNodes().First().GetLeadingTrivia().Last()) });
 				}
 			}
 			return source.ReplaceNode(blockCode, newBlockCode);
