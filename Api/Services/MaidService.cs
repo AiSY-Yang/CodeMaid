@@ -1,7 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis;
-using System.Text.RegularExpressions;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 using Api.Tools;
@@ -24,10 +21,6 @@ using ServicesModels;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static ServicesModels.DtoSyncSetting;
-using Microsoft.EntityFrameworkCore;
-using Humanizer;
-using System.IO;
-using Api.Tools;
 
 namespace Api.Services
 {
@@ -432,16 +425,18 @@ namespace Api.Services
 		#region Dto
 		static async Task UpdateDto(Maid maid)
 		{
+			var sourcePath = Path.Combine(maid.Project.Path, maid.SourcePath);
+			var destPath = Path.Combine(maid.Project.Path, maid.DestinationPath);
 			//确认目标路径的存在
-			if (!Directory.Exists(maid.DestinationPath))
-				Directory.CreateDirectory(maid.DestinationPath);
+			if (!Directory.Exists(destPath))
+				Directory.CreateDirectory(destPath);
 			//读取设置
 			DtoSyncSetting settings = maid.Setting!.AsJsonToObject<DtoSyncSetting>() ?? new DtoSyncSetting();
 			//所有的类都进行更新
 			foreach (var item in maid.Classes)
 			{
 				//生成Dto的目录
-				string dirPath = Path.Combine(maid.DestinationPath, item.Name + settings.DirectorySuffix);
+				string dirPath = Path.Combine(destPath, item.Name + settings.DirectorySuffix);
 				if (!Directory.Exists(dirPath))
 					Directory.CreateDirectory(dirPath);
 				foreach (var setting in settings.DtoSyncSettings)
@@ -449,7 +444,90 @@ namespace Api.Services
 					await UpdateDto(dirPath, item, setting);
 				}
 			}
+			#region 同步注释的功能
+			foreach (var file in Directory.GetFiles(destPath, "*.cs", SearchOption.AllDirectories))
+			{
+				var compilationUnit = CSharpSyntaxTree.ParseText(await File.ReadAllTextAsync(file)).GetCompilationUnitRoot();
+				var cs = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit);
+				var compilationUnitNew = compilationUnit.ReplaceNodes(cs,
+					   (c, r) => c.ReplaceNodes(c.ChildNodes().OfType<PropertyDeclarationSyntax>(),
+						(source, reWrite) => { return SyncPropertity(c, source, maid); }));
+				await FileTools.Write(file, compilationUnit, compilationUnitNew);
+			}
+			#endregion
 		}
+		/// <summary>
+		/// 同步属性
+		/// </summary>
+		/// <param name="classdeclaration">需要同步的类</param>
+		/// <param name="source">需要同步的属性</param>
+		/// <param name="maid">保存好所有关联对象的maid</param>
+		/// <returns></returns>
+		static PropertyDeclarationSyntax SyncPropertity(ClassDeclarationSyntax classdeclaration, PropertyDeclarationSyntax source, Maid maid)
+		{
+			//先找到这个类对应的数据库中源数据的类
+			var c = maid.Classes.Where(x => classdeclaration.Identifier.Text.StartsWith(x.Name)).OrderByDescending(x => x.Name.Length).FirstOrDefault();
+			//如果没找到类则不对属性进行更改
+			if (c is null) return source;
+			//如果这个属性是这个类的属性 则不进行修改
+			if (c.Properties.Any(x => x.Name == source.Identifier.Text)) return source;
+			var x = GetClassesFromFlatteningClassName(maid, c, source.Identifier.Text);
+			if (x.Count == 0) return source;
+			var summary = string.Join("->", x.Select(x => x.Summary));
+			if (summary.IsNullOrWhiteSpace())
+			{
+				return source;
+			}
+			return AddOrReplaceSummary(source, summary);
+		}
+		/// <summary>
+		/// 根据属性名称找到可以组合成这个名称的一组属性
+		/// </summary>
+		/// <param name="maid">保存好所有关联对象的maid</param>
+		/// <param name="c">原来的类</param>
+		/// <param name="name">属性的名称</param>
+		/// <returns></returns>
+		static List<PropertyDefinition> GetClassesFromFlatteningClassName(Maid maid, ClassDefinition c, string name)
+		{
+			//直接在类本身里寻找这个属性 如果有的话就返回这个属性
+			var absoluteProps = c.Properties.Where(x => name == x.Name).ToList();
+			if (absoluteProps.Count > 0)
+			{
+				return absoluteProps;
+			}
+			//在基类中找可能的属性 因为如果属于基类的话 则也属于这个类 应该直接返回对应的属性
+			var baseProps = maid.Classes.Where(x => x.Name == c.Base).SelectMany(x => x.Properties).Where(x => name.StartsWith(x.Name)).ToList();
+			if (baseProps.Count > 0)
+			{
+				return baseProps;
+			}
+			var res = new List<PropertyDefinition>();
+			//在这个类里找可能的属性
+			var props = c.Properties.Where(x => name.StartsWith(x.Name)).ToList();
+			//props Room
+			//根据类型查出来对应的类
+			var classes = maid.Classes.Join(props, x => x.Name, x => x.Type.TrimEnd('?'), (c, p) => new { c, p });
+			foreach (var item in classes)
+			{
+				//去掉类名后当作下一个要查找的名称
+				var nextName = name.TrimStart(item.p.Name);
+				if (nextName == "")
+				{
+					res.Add(item.p);
+				}
+				else
+				{
+					var next = GetClassesFromFlatteningClassName(maid, item.c, nextName);
+					if (next.Count > 0)
+					{
+						res.Add(item.p);
+						res.AddRange(next);
+					}
+				}
+			}
+			return res;
+		}
+
 		/// <summary>
 		/// 更新Dto
 		/// </summary>
@@ -542,7 +620,7 @@ public class {DtoName}
 				{
 #if DEBUG
 #else
-					if (property.UpdateTime < DateTimeOffset.Now.AddMinutes(-1))
+					if (property.CreateTime < DateTimeOffset.Now.AddMinutes(-2))
 #endif
 					{
 						return classDeclarationSyntax.AddMembers(newNode);
@@ -660,11 +738,13 @@ public class {DtoName}
 		/// <returns></returns>
 		private static bool IsBaseType(string type)
 		{
-			return new string[] { "int", "int?" , "short", "short?" , "long", "long?","decimal", "decimal?",
+			return new string[] { "int", "int?" , "short", "short?" , "long", "long?","decimal", "decimal?","float", "float?","double", "double?",
 				"string", "string?",
 				"bool", "bool?",
 				"Guid", "Guid?",
-				"DateTime", "DateTime?", "DateTimeOffset", "DateTimeOffset?" }.Contains(type);
+				"DateTime", "DateTime?", "DateTimeOffset", "DateTimeOffset?",
+				"DateOnly", "DateOnly?", "TimeOnly", "TimeOnly?",
+			}.Contains(type);
 		}
 
 		/// <summary>
@@ -809,8 +889,15 @@ public class {DtoName}
 		/// <returns></returns>
 		private static T AddOrReplaceXmlContent<T>(T typeDeclarationSyntax, string tagName, string text) where T : MemberDeclarationSyntax
 		{
+			//是否是顶级的元素
+			var isTop = true;
 			//获取原来的缩进
-			var indentation = typeDeclarationSyntax.GetLeadingTrivia().Last();
+			var indentation = typeDeclarationSyntax.GetLeadingTrivia().Last().ToString();
+			if (!indentation.IsNullOrWhiteSpace())
+			{
+				isTop = false;
+				indentation = "";
+			}
 			//如果是summary 则内容要修改成多行的格式
 			var content = tagName == "summary" ? $"{Environment.NewLine}{indentation}/// {text}{Environment.NewLine}{indentation}/// " : text;
 			//拿到这个tag
@@ -823,8 +910,16 @@ public class {DtoName}
 			if (xml is null)
 			{
 				//新增标签 前面要有缩进 后面要有换行 且保留原来的trivia
-				var tag = $"{indentation}/// <{tagName}>{content}</{tagName}>{Environment.NewLine}";
-				return typeDeclarationSyntax.WithLeadingTrivia(SyntaxTriviaList.Create(SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, tag)).AddRange(typeDeclarationSyntax.GetLeadingTrivia()));
+				var tag = string.Empty;
+				if (isTop)
+				{
+					tag = $"/// <{tagName}>{content}</{tagName}>{Environment.NewLine}";
+				}
+				else
+				{
+					tag = $"{indentation}/// <{tagName}>{content}</{tagName}>{Environment.NewLine}{indentation}";
+				}
+				return typeDeclarationSyntax.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia().AddRange(SyntaxTriviaList.Create(SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, tag))));
 			}
 			else
 			{
