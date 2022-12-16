@@ -790,8 +790,8 @@ public class {DtoName}
 		private static PropertyDefinition CreatePropertyEntity(ClassDefinition owner, PropertyDeclarationSyntax propertyDeclaration)
 		{
 			var leaderTrivia = propertyDeclaration.GetLeadingTrivia();
-			var get = propertyDeclaration.AccessorList!.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.GetAccessorDeclaration));
-			var set = propertyDeclaration.AccessorList.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.SetAccessorDeclaration));
+			var get = propertyDeclaration.AccessorList?.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.GetAccessorDeclaration));
+			var set = propertyDeclaration.AccessorList?.Accessors.FirstOrDefault(x => x.IsKind(SyntaxKind.SetAccessorDeclaration));
 			var result = new PropertyDefinition()
 			{
 				ClassDefinition = owner,
@@ -893,10 +893,9 @@ public class {DtoName}
 			var isTop = true;
 			//获取原来的缩进
 			var indentation = typeDeclarationSyntax.GetLeadingTrivia().Last().ToString();
-			if (!indentation.IsNullOrWhiteSpace())
+			if (indentation.IsNullOrWhiteSpace())
 			{
 				isTop = false;
-				indentation = "";
 			}
 			//如果是summary 则内容要修改成多行的格式
 			var content = tagName == "summary" ? $"{Environment.NewLine}{indentation}/// {text}{Environment.NewLine}{indentation}/// " : text;
@@ -917,9 +916,12 @@ public class {DtoName}
 				}
 				else
 				{
-					tag = $"{indentation}/// <{tagName}>{content}</{tagName}>{Environment.NewLine}{indentation}";
+					tag = $"/// <{tagName}>{content}</{tagName}>{Environment.NewLine}{indentation}";
 				}
-				return typeDeclarationSyntax.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia().AddRange(SyntaxTriviaList.Create(SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, tag))));
+				return typeDeclarationSyntax.WithLeadingTrivia(
+					typeDeclarationSyntax.GetLeadingTrivia()
+					.AddRange(SyntaxTriviaList.Create(SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, tag)))
+					);
 			}
 			else
 			{
