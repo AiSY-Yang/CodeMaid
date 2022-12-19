@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using Mapster;
+
 using Models.CodeMaid;
 
 namespace Models.CodeMaid
@@ -68,6 +70,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 属性列表
 		/// </summary>
+		[AdaptIgnore]
 		public List<AttributeDefinition> Attributes { get; set; } = null!;
 	}
 }

@@ -125,7 +125,22 @@ namespace Api.Services
 					}
 					else
 					{
-						CreatePropertyEntity(c, propertyDeclaration).Adapt(p);
+						var newp = CreatePropertyEntity(c, propertyDeclaration);
+						newp.Adapt(p);
+						//删除所有已删除的属性
+						p.Attributes.RemoveAll(x => !newp.Attributes.Select(x => x.Name).Contains(x.Name));
+						foreach (var attrNew in newp.Attributes)
+						{
+							var attr = p.Attributes.FirstOrDefault();
+							if (attr is null)
+							{
+								p.Attributes.Add(attrNew);
+					}
+							else
+							{
+								attrNew.Adapt(attr);
+							}
+						}
 					}
 					p.IsEnum = maid.Enums.Any(x => x.Name == p.Type);
 					PropertityList.Add(p.Name);
@@ -625,6 +640,10 @@ public class {DtoName}
 					{
 						return classDeclarationSyntax.AddMembers(newNode);
 					}
+					else
+					{
+						return classDeclarationSyntax;
+				}
 				}
 				return classDeclarationSyntax.ReplaceNode(node, newNode);
 			}
@@ -710,9 +729,10 @@ public class {DtoName}
 			{
 				switch (attribute.Name)
 				{
-					case "MaxLength":
-						stringBuilder.Append($".HasMaxLength({attribute.Arguments})");
-						break;
+					//如果有人使用工具 有人没有使用工具 会造成修改实体的maxlength后 配置文件里没有变化 而迁移会以fluentApi为准 会导致长度约束不生效 所以移除maxlength的支持
+					//case "MaxLength":
+					//	stringBuilder.Append($".HasMaxLength({attribute.Arguments})");
+					//	break;
 					//常用于对decimal精度的指示
 					case "Column":
 						var match = Regex.Match(attribute.Arguments!, "\"(.*?)\\((\\d*),(\\d*)\\)\"");
