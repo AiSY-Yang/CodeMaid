@@ -61,7 +61,7 @@ namespace Api.MasstransitConsumer
 #endif
 			MaidService.Update(maid);
 			//如果有变化的话则发布变化事件
-			if (maidContext.ChangeTracker.Entries().Any())
+			if (maidContext.ChangeTracker.Entries().Where(x => x.State != EntityState.Unchanged).Any())
 			{
 				await maidContext.SaveChangesAsync();
 				await context.Publish(new MaidChangeEvent() { MaidId = maid.Id });
