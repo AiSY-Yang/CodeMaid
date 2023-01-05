@@ -447,6 +447,11 @@ namespace Api.Services
 		}
 		#endregion
 		#region Dto
+		/// <summary>
+		/// 更新DTO的功能
+		/// </summary>
+		/// <param name="maid"></param>
+		/// <returns></returns>
 		static async Task UpdateDto(Maid maid)
 		{
 			var sourcePath = Path.Combine(maid.Project.Path, maid.SourcePath);
@@ -496,8 +501,9 @@ namespace Api.Services
 			var c = maid.Classes.Where(x => classdeclaration.Identifier.Text.StartsWith(x.Name)).OrderByDescending(x => x.Name.Length).FirstOrDefault();
 			//如果没找到类则不对属性进行更改
 			if (c is null) return source;
+			string propName = source.GetAttributeArguments("AdaptMember")?.Trim('\"') ?? source.Identifier.Text;
 			//如果这个属性是这个类的属性 则不进行修改
-			var prop = c.Properties.FirstOrDefault(x => x.Name == source.Identifier.Text);
+			var prop = c.Properties.FirstOrDefault(x => x.Name == propName);
 			if (prop != null)
 			{
 				foreach (var attr in prop.Attributes)
@@ -506,7 +512,8 @@ namespace Api.Services
 				}
 				return source;
 			}
-			var x = GetClassesFromFlatteningClassName(maid, c, source.Identifier.Text);
+			//如果这个类是属性的属性 则同步内容
+			var x = GetClassesFromFlatteningClassName(maid, c, propName);
 			if (x.Count == 0) return source;
 			//同步Attribute
 			foreach (var attribute in x.Last().Attributes)
@@ -514,7 +521,7 @@ namespace Api.Services
 				source = AddOrReplaceAttribute(source, attribute);
 			}
 			//同步summary
-			var summary = string.Join("::", x.Where(x => x.Summary.IsNullOrWhiteSpace()).Select(x => x.Summary));
+			var summary = string.Join("::", x.Where(x => !x.Summary.IsNullOrWhiteSpace()).Select(x => x.Summary));
 			if (summary.IsNullOrWhiteSpace())
 			{
 				return source;
@@ -547,7 +554,7 @@ namespace Api.Services
 			var props = c.Properties.Where(x => name.StartsWith(x.Name)).ToList();
 			//props Room
 			//根据类型查出来对应的类
-			var classes = maid.Classes.Join(props, x => x.Name, x => x.Type.TrimEnd('?'), (c, p) => new { c, p });
+			var classes = maid.Classes.Join(props, x => x.Name, x => x.Type.TrimEnd('?'), (c, p) => new { c, p }).ToList();
 			foreach (var item in classes)
 			{
 				//去掉类名后当作下一个要查找的名称
@@ -955,8 +962,8 @@ public class {DtoName}
 				//是否是顶级的元素
 				var isTop = true;
 				//获取原来的缩进
-				var indentation = typeDeclarationSyntax.GetLeadingTrivia().Last().ToString();
-				if (indentation.IsNullOrWhiteSpace())
+				var indentation = typeDeclarationSyntax.GetLeadingTrivia().Last();
+				if (indentation.ToString().IsNullOrWhiteSpace())
 				{
 					isTop = false;
 				}
@@ -970,10 +977,27 @@ public class {DtoName}
 				else
 				{
 					//如果不是顶级元素的话 需要在member前面加上缩进和换行
-					return (T)typeDeclarationSyntax.WithoutLeadingTrivia()
-						.WithLeadingTrivia(SyntaxTrivia(SyntaxKind.EndOfLineTrivia, Environment.NewLine), typeDeclarationSyntax.GetLeadingTrivia().Last())
-				.AddAttributeLists(AttributeList().AddAttributes(SyntaxFactory.Attribute(name, arguments)))
-				.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia())
+					if (typeDeclarationSyntax.AttributeLists.Any())
+					{
+						//当有Attribute的时候 新增的Attribute需要
+						return (T)typeDeclarationSyntax.WithoutLeadingTrivia()
+							.AddAttributeLists(AttributeList()
+													.AddAttributes(SyntaxFactory.Attribute(name, arguments))
+													.WithLeadingTrivia(indentation)
+													.WithTrailingTrivia(SyntaxTrivia(SyntaxKind.EndOfLineTrivia, Environment.NewLine))
+													)
+							.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia());
+					}
+					else
+					{
+						return (T)typeDeclarationSyntax
+							.WithoutLeadingTrivia()
+							.WithLeadingTrivia(SyntaxTrivia(SyntaxKind.EndOfLineTrivia, Environment.NewLine), typeDeclarationSyntax.GetLeadingTrivia().Last())
+							.AddAttributeLists(AttributeList().AddAttributes(SyntaxFactory.Attribute(name, arguments)))
+							.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia())
+							;
+
+					}
 				;
 				}
 			}
