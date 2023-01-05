@@ -22,7 +22,11 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string GitBranch { get; set; } = null!;
 		/// <summary>
-		/// 
+		/// 是否添加枚举的remark信息
+		/// </summary>
+		public bool AddEnumRemark { get; set; }
+		/// <summary>
+		/// maid集合
 		/// </summary>
 		[AdaptIgnore]
 		public List<Maid> Maids { get; set; } = null!;

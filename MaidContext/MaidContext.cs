@@ -17,7 +17,7 @@ namespace MaidContexts
 		/// <summary>
 		/// 类定义
 		/// </summary>
-		public DbSet<ClassDefinition> ClassDefinitions { get; set; } 
+		public DbSet<ClassDefinition> ClassDefinitions { get; set; } = null!;
 		/// <summary>
 		/// 类定义
 		/// </summary>
@@ -75,7 +75,7 @@ namespace MaidContexts
 		/// </summary>
 		private void FakeDelete()
 		{
-			foreach (var item in ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Where(x=>x.Entity is DatabaseEntity))
+			foreach (var item in ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Where(x => x.Entity is DatabaseEntity))
 			{
 				if (item.Entity is DatabaseEntity entity)
 				{

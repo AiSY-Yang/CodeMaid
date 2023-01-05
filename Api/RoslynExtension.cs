@@ -10,7 +10,7 @@ namespace Api
 		/// <summary>
 		/// 获取备注
 		/// </summary>
-		/// <param name="trivias"></param>
+		/// <param name="memberDeclarationSyntax"></param>
 		/// <returns></returns>
 		public static string? GetRemark(this MemberDeclarationSyntax memberDeclarationSyntax)
 		{
@@ -22,7 +22,7 @@ namespace Api
 		/// <summary>
 		/// 获取注释 如果是多行的话会合并成一行 中间空格隔开
 		/// </summary>
-		/// <param name="trivias"></param>
+		/// <param name="memberDeclarationSyntax"></param>
 		/// <returns></returns>
 		public static string? GetSummay(this MemberDeclarationSyntax memberDeclarationSyntax)
 		{

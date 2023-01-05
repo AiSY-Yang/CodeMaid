@@ -54,8 +54,6 @@ namespace Api
 				x.Filters.Add<HttpResponseExceptionFilter>();
 				//支持从body直接接收string参数
 				x.InputFormatters.Add(new TextFormatter());
-				//添加DataOnly和TimeOnly的字符串支持
-				x.UseDateOnlyTimeOnlyStringConverters();
 			})
 				//配置json解析
 				.AddJsonOptions(options =>
@@ -65,8 +63,6 @@ namespace Api
 					//options.JsonSerializerOptions.Converters.Add(new Core.Converter.NullableDateOnlyJsonConverter());
 					options.JsonSerializerOptions.ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip;
 					options.JsonSerializerOptions.AllowTrailingCommas = true;
-					//添加DataOnly和TimeOnly的字符串支持
-					options.UseDateOnlyTimeOnlyStringConverters();
 				});
 #if DEBUG
 			//调试环境下跳过授权
@@ -80,6 +76,8 @@ namespace Api
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen(x =>
 			{
+				//支持可空引用类型
+				x.SupportNonNullableReferenceTypes();
 				//自定义schema名称 rapiDoc不支持使用带+号的schemaName
 				x.CustomSchemaIds((x) => x.FullName!.Replace("+", "_"));
 				//自定义唯一ID
@@ -166,7 +164,7 @@ namespace Api
 			{
 				var scope = app.Services.CreateScope();
 				var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-				Maids.Init(app.Services);
+				InitServices.Init(app.Services);
 			});
 			//开始运行
 			app.Run();

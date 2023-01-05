@@ -27,17 +27,17 @@ namespace Api.Services
 	public class MaidService
 	{
 		/// <summary>
-		/// 按照目标路径更新maid
+		/// 对miad全量更新
 		/// </summary>
 		/// <param name="maid"></param>
 		/// <returns></returns>
-		public static Maid Update(Maid maid)
+		public static async Task<Maid> Update(Maid maid)
 		{
 			var files = Directory.GetFiles(Path.Combine(maid.Project.Path, maid.SourcePath), "*.cs", SearchOption.AllDirectories);
 			HashSet<string> classList = new();
 			foreach (var file in files)
 			{
-				var list = Update(maid, file);
+				var list = await Update(maid, file);
 				foreach (var item in list)
 				{
 					classList.Add(item);
@@ -48,12 +48,12 @@ namespace Api.Services
 			return maid;
 		}
 		/// <summary>
-		/// 按照指定文件更新maid记录的信息
+		/// 指定文件更新maid信息
 		/// </summary>
 		/// <param name="maid"></param>
-		/// <param name="compilationUnit"></param>
+		/// <param name="path">文件路径</param>
 		/// <returns></returns>
-		public static HashSet<string> Update(Maid maid, string path)
+		public static async Task<HashSet<string>> Update(Maid maid, string path)
 		{
 			var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
 			var compilationUnit = tree.GetCompilationUnitRoot();
@@ -93,6 +93,18 @@ namespace Api.Services
 				}
 				//本次如果没有这个成员的话 则标记删除
 				e.EnumMembers.Where(x => !MemberList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
+			}
+			//如果需要给枚举增加remark信息的话 在更新的时候就加上
+			if (maid.Project.AddEnumRemark)
+			{
+				var compilationUnitNew = compilationUnit.ReplaceNodes(enums,
+					  (x, y) =>
+					  {
+						  var remark = maid.Enums.FirstOrDefault(e => e.Name == x.Identifier.ValueText)?.Remark;
+						  if (remark is not null) return AddOrReplaceRemark(x, remark);
+						  else return x;
+					  });
+				await FileTools.Write(path, compilationUnit, compilationUnitNew);
 			}
 			#endregion
 			#region 更新类
@@ -135,7 +147,7 @@ namespace Api.Services
 							if (attr is null)
 							{
 								p.Attributes.Add(attrNew);
-					}
+							}
 							else
 							{
 								attrNew.Adapt(attr);
@@ -166,9 +178,6 @@ namespace Api.Services
 					break;
 				case Models.CodeMaid.MaidWork.DtoSync:
 					await UpdateDto(maid);
-					break;
-				case Models.CodeMaid.MaidWork.EnumRemark:
-					await UpdateRemark(maid);
 					break;
 				default:
 					break;
@@ -445,21 +454,24 @@ namespace Api.Services
 			//确认目标路径的存在
 			if (!Directory.Exists(destPath))
 				Directory.CreateDirectory(destPath);
-			//读取设置
-			DtoSyncSetting settings = maid.Setting!.AsJsonToObject<DtoSyncSetting>() ?? new DtoSyncSetting();
-			//所有的类都进行更新
-			foreach (var item in maid.Classes)
+			if (maid.Setting != null)
 			{
-				//生成Dto的目录
-				string dirPath = Path.Combine(destPath, item.Name + settings.DirectorySuffix);
-				if (!Directory.Exists(dirPath))
-					Directory.CreateDirectory(dirPath);
-				foreach (var setting in settings.DtoSyncSettings)
+				//读取设置
+				DtoSyncSetting settings = maid.Setting!.AsJsonToObject<DtoSyncSetting>() ?? new DtoSyncSetting();
+				//所有的类都进行更新
+				foreach (var item in maid.Classes)
 				{
-					await UpdateDto(dirPath, item, setting);
+					//生成Dto的目录
+					string dirPath = Path.Combine(destPath, item.Name + settings.DirectorySuffix);
+					if (!Directory.Exists(dirPath))
+						Directory.CreateDirectory(dirPath);
+					foreach (var setting in settings.DtoSyncSettings)
+					{
+						await UpdateDto(dirPath, item, setting);
+					}
 				}
 			}
-			#region 同步注释的功能
+			#region 同步属性注释的功能
 			foreach (var file in Directory.GetFiles(destPath, "*.cs", SearchOption.AllDirectories))
 			{
 				var compilationUnit = CSharpSyntaxTree.ParseText(await File.ReadAllTextAsync(file)).GetCompilationUnitRoot();
@@ -485,10 +497,24 @@ namespace Api.Services
 			//如果没找到类则不对属性进行更改
 			if (c is null) return source;
 			//如果这个属性是这个类的属性 则不进行修改
-			if (c.Properties.Any(x => x.Name == source.Identifier.Text)) return source;
+			var prop = c.Properties.FirstOrDefault(x => x.Name == source.Identifier.Text);
+			if (prop != null)
+			{
+				foreach (var attr in prop.Attributes)
+				{
+					source = AddOrReplaceAttribute(source, attr);
+				}
+				return source;
+			}
 			var x = GetClassesFromFlatteningClassName(maid, c, source.Identifier.Text);
 			if (x.Count == 0) return source;
-			var summary = string.Join("->", x.Select(x => x.Summary));
+			//同步Attribute
+			foreach (var attribute in x.Last().Attributes)
+			{
+				source = AddOrReplaceAttribute(source, attribute);
+			}
+			//同步summary
+			var summary = string.Join("::", x.Where(x => x.Summary.IsNullOrWhiteSpace()).Select(x => x.Summary));
 			if (summary.IsNullOrWhiteSpace())
 			{
 				return source;
@@ -594,7 +620,7 @@ public class {DtoName}
 				{
 					if (node != null)
 					{
-						return classDeclarationSyntax.RemoveNode(node, SyntaxRemoveOptions.KeepNoTrivia);
+						return classDeclarationSyntax.RemoveNode(node, SyntaxRemoveOptions.KeepNoTrivia)!;
 					}
 				}
 				//是否排除列表元素
@@ -634,6 +660,7 @@ public class {DtoName}
 				if (node == null)
 				{
 #if DEBUG
+					if (property.CreateTime < DateTimeOffset.Now.AddMinutes(-2))
 #else
 					if (property.CreateTime < DateTimeOffset.Now.AddMinutes(-2))
 #endif
@@ -643,61 +670,12 @@ public class {DtoName}
 					else
 					{
 						return classDeclarationSyntax;
-				}
+					}
 				}
 				return classDeclarationSyntax.ReplaceNode(node, newNode);
 			}
 		}
 		#endregion Dto
-		#region Remarks
-		/// <summary>
-		/// 更新枚举的remark信息
-		/// </summary>
-		/// <param name="maid"></param>
-		/// <returns></returns>
-		public static async Task UpdateRemark(Maid maid)
-		{
-			foreach (var path in Directory.GetFiles(Path.Combine(maid.Project.Path, maid.SourcePath), "*.cs", SearchOption.AllDirectories))
-			{
-				var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
-				var compilationUnit = tree.GetCompilationUnitRoot();
-				var compilationUnitNew = compilationUnit;
-				var enums = GetDeclarationSyntaxes<EnumDeclarationSyntax>(compilationUnitNew);
-				foreach (var enumNode in enums)
-				{
-					var e = maid.Enums.FirstOrDefault(x => x.Name == enumNode.Identifier.Text);
-					if (e is null) continue;
-					if (enumNode.GetRemark() == e.Remark)
-						continue;
-					else
-						compilationUnitNew = compilationUnitNew.ReplaceNode(enumNode, AddOrReplaceRemark(enumNode, e.Remark));
-				}
-				var classes = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnitNew);
-				foreach (var classNode in classes)
-				{
-					var classNodeNew = classNode;
-					foreach (var prop in classNode.Members.OfType<PropertyDeclarationSyntax>())
-					{
-						var e = maid.Enums.FirstOrDefault(x => x.Name == prop.Type.ToString());
-						if (e == null)
-						{
-							continue;
-						}
-						else
-						{
-							if (prop.GetRemark() == e.Remark)
-								continue;
-							else
-								classNodeNew = classNodeNew.ReplaceNode(prop, AddOrReplaceRemark(prop, e.Remark));
-						}
-					}
-					compilationUnitNew = compilationUnitNew.ReplaceNode(classNode, classNodeNew);
-				}
-				await FileTools.Write(path, compilationUnit, compilationUnitNew);
-			}
-			return;
-		}
-		#endregion
 		/// <summary>
 		/// 获取编译单元下的所有指定的类型对象
 		/// </summary>
@@ -717,7 +695,7 @@ public class {DtoName}
 		/// <summary>
 		/// 生成属性的builder语句
 		/// </summary>
-		/// <param name="property"></param>
+		/// <param name="leader">前导空白</param>
 		/// <returns></returns>
 		private static string CreateBuilderStatement(PropertyDefinition property, string leader = "\t\t")
 		{
@@ -770,7 +748,6 @@ public class {DtoName}
 		/// <summary>
 		/// 创建类的实体
 		/// </summary>
-		/// <param name="nameSpace"></param>
 		/// <param name="classDeclaration"></param>
 		/// <returns></returns>
 		private static ClassDefinition CreateClassEntity(ClassDeclarationSyntax classDeclaration)
@@ -787,7 +764,6 @@ public class {DtoName}
 		/// <summary>
 		/// 创建枚举的实体
 		/// </summary>
-		/// <param name="nameSpace"></param>
 		/// <param name="classDeclaration"></param>
 		/// <returns></returns>
 		private static EnumDefinition CreateEnumEntity(EnumDeclarationSyntax classDeclaration)
@@ -804,8 +780,8 @@ public class {DtoName}
 		/// <summary>
 		/// 创建属性的实体
 		/// </summary>
-		/// <param name="nameSpace"></param>
-		/// <param name="classDeclaration"></param>
+		/// <param name="owner">拥有这个属性的类</param>
+		/// <param name="propertyDeclaration"></param>
 		/// <returns></returns>
 		private static PropertyDefinition CreatePropertyEntity(ClassDefinition owner, PropertyDeclarationSyntax propertyDeclaration)
 		{
@@ -847,8 +823,8 @@ public class {DtoName}
 		/// <summary>
 		/// 创建枚举成员的实体
 		/// </summary>
-		/// <param name="nameSpace"></param>
-		/// <param name="classDeclaration"></param>
+		/// <param name="enumMemberDeclarationSyntax"></param>
+		/// <param name="lastValue">上一个枚举成员的值</param>
 		/// <returns></returns>
 		private static EnumMemberDefinition CreateEnumMemberEntity(EnumMemberDeclarationSyntax enumMemberDeclarationSyntax, ref int lastValue)
 		{
@@ -891,7 +867,7 @@ public class {DtoName}
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="typeDeclarationSyntax"></param>
-		/// <param name="remark"></param>
+		/// <param name="summary">注释</param>
 		/// <returns></returns>
 		private static T AddOrReplaceSummary<T>(T typeDeclarationSyntax, string? summary) where T : MemberDeclarationSyntax
 		{
@@ -950,6 +926,58 @@ public class {DtoName}
 				var newContentNode = XmlText(content);
 				return typeDeclarationSyntax.ReplaceNode(xml, xml.ReplaceNode(contentNode, newContentNode));
 			}
+		}
+		/// <summary>
+		/// 添加或者替换属性
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="typeDeclarationSyntax"></param>
+		/// <param name="attribute"></param>
+		/// <returns></returns>
+		private static T AddOrReplaceAttribute<T>(T typeDeclarationSyntax, AttributeDefinition attribute) where T : MemberDeclarationSyntax
+		{
+			var attr = typeDeclarationSyntax.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault(x => x.Name.ToString() == attribute.Name);
+			if (attr != null)
+			{
+				if (attribute.ArgumentsText is null)
+				{
+					return typeDeclarationSyntax;
+				}
+				else
+				{
+					return typeDeclarationSyntax.ReplaceNode(attr, attr.WithArgumentList(SyntaxFactory.ParseAttributeArgumentList(attribute.ArgumentsText)));
+				}
+			}
+			else
+			{
+				var name = SyntaxFactory.ParseName(attribute.Name);
+				var arguments = attribute.ArgumentsText is null ? null : SyntaxFactory.ParseAttributeArgumentList(attribute.ArgumentsText);
+				//是否是顶级的元素
+				var isTop = true;
+				//获取原来的缩进
+				var indentation = typeDeclarationSyntax.GetLeadingTrivia().Last().ToString();
+				if (indentation.IsNullOrWhiteSpace())
+				{
+					isTop = false;
+				}
+				if (isTop)
+				{
+					return (T)typeDeclarationSyntax.WithoutLeadingTrivia()
+						.AddAttributeLists(AttributeList().AddAttributes(SyntaxFactory.Attribute(name, arguments)))
+						.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia())
+						;
+				}
+				else
+				{
+					//如果不是顶级元素的话 需要在member前面加上缩进和换行
+					return (T)typeDeclarationSyntax.WithoutLeadingTrivia()
+						.WithLeadingTrivia(SyntaxTrivia(SyntaxKind.EndOfLineTrivia, Environment.NewLine), typeDeclarationSyntax.GetLeadingTrivia().Last())
+				.AddAttributeLists(AttributeList().AddAttributes(SyntaxFactory.Attribute(name, arguments)))
+				.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia())
+				;
+				}
+			}
+
 		}
 	}
 }

@@ -15,7 +15,7 @@ using Serilog;
 
 namespace Api
 {
-	class Maids
+	class InitServices
 	{
 		static IServiceProvider serviceProvider = null!;
 		static readonly ConcurrentDictionary<FileSystemWatcher, Maid> Watchers = new();
@@ -25,7 +25,7 @@ namespace Api
 		/// <param name="serviceProvider"></param>
 		public static async void Init(IServiceProvider serviceProvider)
 		{
-			Maids.serviceProvider = serviceProvider;
+			InitServices.serviceProvider = serviceProvider;
 			var scope = serviceProvider.CreateScope();
 			MaidContext context = scope.ServiceProvider.GetRequiredService<MaidContext>();
 			var maids = await context.Maids.Include(x => x.Project).ToListAsync();
@@ -56,20 +56,26 @@ namespace Api
 					};
 					watcher.Changed += Watcher_Changed;
 					watcher.Renamed += Watcher_Renamed;
+					watcher.Deleted += Watcher_Deleted;
 					Watchers.TryAdd(watcher, item);
 					Log.Information("添加项目{project}的{func}监听器,路径为{path}", item.Project.Name, item.Name, path);
 				}
 			}
 		}
 
+		private static async void Watcher_Deleted(object sender, FileSystemEventArgs e)
+		{
+			await FileChange(Watchers[(FileSystemWatcher)sender], e.FullPath, true);
+		}
+
 		private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
 		{
-			await FileChange(Watchers[(FileSystemWatcher)sender], e.FullPath);
+			await FileChange(Watchers[(FileSystemWatcher)sender], e.FullPath, false);
 		}
 
 		private static async void Watcher_Changed(object sender, FileSystemEventArgs e)
 		{
-			await FileChange(Watchers[(FileSystemWatcher)sender], e.FullPath);
+			await FileChange(Watchers[(FileSystemWatcher)sender], e.FullPath, false);
 		}
 		/// <summary>
 		/// 变更筛选器 VS修改文件的时候可能使用的是创建 修改 重命名的操作 把中间文件排除掉
@@ -77,11 +83,11 @@ namespace Api
 		/// <param name="maid"></param>
 		/// <param name="filePath"></param>
 		/// <returns></returns>
-		private static async Task FileChange(Maid maid, string filePath)
+		private static async Task FileChange(Maid maid, string filePath, bool isDelete)
 		{
 			if (Path.GetExtension(filePath) != ".TMP")
 			{
-				var msg = new FileChangeEvent() { FilePath = filePath, MaidId = maid.Id };
+				var msg = new FileChangeEvent() { FilePath = filePath, MaidId = maid.Id, IsDelete = isDelete };
 				using var scope = serviceProvider.CreateScope();
 				await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(msg);
 			}
