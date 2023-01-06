@@ -751,6 +751,16 @@ public class {DtoName}
 				"DateOnly", "DateOnly?", "TimeOnly", "TimeOnly?",
 			}.Contains(type);
 		}
+		/// <summary>
+		/// 类型是否可以有maxlength限制
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		private static bool IsCanHaveMaxLength(string type)
+		{
+			return new string[] { "string", "string?", }.Contains(type)
+				|| type.StartsWith("List<");
+		}
 
 		/// <summary>
 		/// 创建类的实体
@@ -815,9 +825,15 @@ public class {DtoName}
 
 			foreach (var item in propertyDeclaration.AttributeLists)
 			{
+				var name = item.Attributes[0].Name.ToString();
+				if (!IsCanHaveMaxLength(result.Type))
+				{
+					Log.Error("类{className}属性{propName}的类型为{type}不能有maxlength限制", owner.Name, result.Name, result.Type);
+					continue;
+				}
 				AttributeDefinition attributeDefinition = new()
 				{
-					Name = item.Attributes[0].Name.ToString(),
+					Name = name,
 					Text = item.Attributes[0].ToString(),
 					ArgumentsText = item.Attributes[0].ArgumentList?.ToString(),
 					Arguments = item.Attributes[0].ArgumentList == null ? null : string.Join(", ", item.Attributes[0].ArgumentList?.Arguments.Select(x => x.ToString())!),
@@ -842,7 +858,7 @@ public class {DtoName}
 			}
 			else
 			{
-				lastValue = int.Parse(enumMemberDeclarationSyntax.EqualsValue.Value.ToFullString());
+				lastValue = int.Parse(enumMemberDeclarationSyntax.EqualsValue.Value.ToFullString().Replace("_", ""));
 			}
 			var desp = enumMemberDeclarationSyntax.AttributeLists.FirstOrDefault(x => x.Attributes[0].Name.ToString() == "Description")?.Attributes[0].ArgumentList?.Arguments.ToString().Trim('\"');
 			return new EnumMemberDefinition()
