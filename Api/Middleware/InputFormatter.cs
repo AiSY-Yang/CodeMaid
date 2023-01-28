@@ -9,16 +9,19 @@ namespace Api.Middleware
 	/// </summary>
 	public class TextFormatter : TextInputFormatter
 	{
+		/// <inheritdoc/>
 		public TextFormatter()
 		{
 			SupportedMediaTypes.Add("text/plain");
 			SupportedEncodings.Add(Encoding.UTF8);
 			SupportedEncodings.Add(Encoding.Unicode);
 		}
+		/// <inheritdoc/>
 		protected override bool CanReadType(Type type)
 		{
 			return type == typeof(string);
 		}
+		/// <inheritdoc/>
 		public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
 		{
 			var httpContext = context.HttpContext;

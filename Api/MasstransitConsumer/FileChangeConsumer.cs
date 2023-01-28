@@ -2,8 +2,6 @@
 
 using ExtensionMethods;
 
-using GreenPipes;
-
 using MaidContexts;
 
 using MassTransit;
@@ -13,8 +11,6 @@ using MassTransit.Definition;
 using MasstransitModels;
 
 using Microsoft.EntityFrameworkCore;
-
-using Serilog;
 
 namespace Api.MasstransitConsumer
 {
@@ -31,7 +27,6 @@ namespace Api.MasstransitConsumer
 
 		public async Task Consume(ConsumeContext<FileChangeEvent> context)
 		{
-			logger.LogInformation("文件{path}改变,重新读取数据", context.Message.FilePath);
 			var maid = maidContext.Maids
 						.Include(x => x.Project)
 						.Include(x => x.Enums)
@@ -55,11 +50,16 @@ namespace Api.MasstransitConsumer
 				}
 			}
 			//检查更新
-			//2022-12-01更改为更新所有文件 因为暂时还没想好删除文件怎么做
-#if DEBUG
-			//MaidService.Update(maid, context.Message.FilePath);
-#endif
-			MaidService.Update(maid);
+			if (context.Message.IsDelete)
+			{
+				logger.LogInformation("文件{path}删除,全量更新数据", context.Message.FilePath);
+				await MaidService.Update(maid);
+			}
+			else
+			{
+				logger.LogInformation("文件{path}改变,重新读取数据", context.Message.FilePath);
+				await MaidService.Update(maid, context.Message.FilePath);
+			}
 			//如果有变化的话则发布变化事件
 			if (maidContext.ChangeTracker.Entries().Where(x => x.State != EntityState.Unchanged).Any())
 			{

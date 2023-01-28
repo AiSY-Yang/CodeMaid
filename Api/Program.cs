@@ -24,7 +24,14 @@ namespace Api
 	/// </summary>
 	public class Program
 	{
+		/// <summary>
+		/// ServiceProvider
+		/// </summary>
 		public static IServiceProvider Services = null!;
+		/// <summary>
+		/// main函数
+		/// </summary>
+		/// <param name="args"></param>
 		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);

@@ -2,9 +2,13 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ExtensionMethods;
+using System;
 
 namespace Api
 {
+	/// <summary>
+	/// roslyn扩展
+	/// </summary>
 	public static class RoslynExtension
 	{
 		/// <summary>
@@ -34,6 +38,28 @@ namespace Api
 				return null;
 			}
 			return string.Join(' ', contentNode.TextTokens.Where(x => x.IsKind(SyntaxKind.XmlTextLiteralToken)).Select(x => x.Text.Trim()).Where(x => !x.IsNullOrWhiteSpace()).ToList());
+		}
+		/// <summary>
+		/// 获取Attribute
+		/// </summary>
+		/// <param name="memberDeclarationSyntax"></param>
+		/// <param name="attributeName"></param>
+		/// <returns></returns>
+		public static AttributeSyntax? GetAttribute(this MemberDeclarationSyntax memberDeclarationSyntax, string attributeName)
+		{
+			return memberDeclarationSyntax.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault(x => x.Name.ToString() == attributeName);
+		}
+		/// <summary>
+		/// 获取Attribute
+		/// </summary>
+		/// <param name="memberDeclarationSyntax"></param>
+		/// <param name="attributeName"></param>
+		/// <returns></returns>
+		public static string? GetAttributeArguments(this MemberDeclarationSyntax memberDeclarationSyntax, string attributeName)
+		{
+			var attr = memberDeclarationSyntax.GetAttribute(attributeName);
+			if (attr?.ArgumentList == null) return null;
+			return string.Join(", ", attr.ArgumentList.Arguments.Select(x => x.ToString()));
 		}
 	}
 }

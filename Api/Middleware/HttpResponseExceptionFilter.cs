@@ -1,4 +1,4 @@
-﻿using Models.Service;
+﻿using ServicesModels.Exceptions;
 
 namespace Api.Middleware
 {
@@ -7,9 +7,9 @@ namespace Api.Middleware
 	{
 		public void OnException(Microsoft.AspNetCore.Mvc.Filters.ExceptionContext context)
 		{
-			if (context.Exception is BusinessException ex)
+			if (context.Exception is ResultException ex)
 			{
-				context.Result = new Microsoft.AspNetCore.Mvc.ObjectResult(ex.Result);
+				context.Result = new Microsoft.AspNetCore.Mvc.ObjectResult(ex as IExceptionResult);
 				context.ExceptionHandled = true;
 			}
 			else

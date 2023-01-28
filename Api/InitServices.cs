@@ -78,10 +78,11 @@ namespace Api
 			await FileChange(Watchers[(FileSystemWatcher)sender], e.FullPath, false);
 		}
 		/// <summary>
-		/// 变更筛选器 VS修改文件的时候可能使用的是创建 修改 重命名的操作 把中间文件排除掉
+		/// 变更筛选器 VS修改文件的时候可能使用的是创建 修改 重命名的操作 要把中间文件排除掉
 		/// </summary>
 		/// <param name="maid"></param>
-		/// <param name="filePath"></param>
+		/// <param name="filePath">文件路径</param>
+		/// <param name="isDelete">是否是删除文件</param>
 		/// <returns></returns>
 		private static async Task FileChange(Maid maid, string filePath, bool isDelete)
 		{

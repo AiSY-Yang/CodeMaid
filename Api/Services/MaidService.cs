@@ -24,6 +24,9 @@ using static ServicesModels.DtoSyncSetting;
 
 namespace Api.Services
 {
+	/// <summary>
+	/// maid服务
+	/// </summary>
 	public class MaidService
 	{
 		/// <summary>
@@ -702,6 +705,7 @@ public class {DtoName}
 		/// <summary>
 		/// 生成属性的builder语句
 		/// </summary>
+		/// <param name="property">属性</param>
 		/// <param name="leader">前导空白</param>
 		/// <returns></returns>
 		private static string CreateBuilderStatement(PropertyDefinition property, string leader = "\t\t")
@@ -947,7 +951,7 @@ public class {DtoName}
 				//替换标签
 				var contentNode = xml.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
 				var newContentNode = XmlText(content);
-				return typeDeclarationSyntax.ReplaceNode(xml, xml.ReplaceNode(contentNode, newContentNode));
+				return typeDeclarationSyntax.ReplaceNode(xml, xml.ReplaceNode(contentNode!, newContentNode));
 			}
 		}
 		/// <summary>
@@ -1012,7 +1016,6 @@ public class {DtoName}
 							.AddAttributeLists(AttributeList().AddAttributes(SyntaxFactory.Attribute(name, arguments)))
 							.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia())
 							;
-
 					}
 				;
 				}

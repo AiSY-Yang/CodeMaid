@@ -15,6 +15,7 @@ namespace Api.Controllers
 			_logger = logger;
 		}
 
+		[HttpGet("Dict")]
 		public void GetDict()
 		{
 			throw new NotImplementedException();

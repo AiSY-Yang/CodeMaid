@@ -3,21 +3,20 @@
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
-using Models.Service;
+using ServicesModels.Exceptions;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
-
+namespace Microsoft.Extensions.DependencyInjection;
 /// <summary>
 /// 增加枚举的字符串表示和注释信息 字符串为x-enumNames 注释为x-enumSummarys
 /// </summary>
 public class EnumSchemaFilter : ISchemaFilter
 {
+	/// <inheritdoc/>
 	public void Apply(OpenApiSchema model, SchemaFilterContext context)
 	{
 		if (context.Type.IsEnum)
 		{
-			//model.Enum.Clear();
-			//model.Description = "desp";
 			var name = new Microsoft.OpenApi.Any.OpenApiArray();
 			Enum.GetNames(context.Type)
 				.ToList()
@@ -54,6 +53,7 @@ public class EnumSchemaFilter : ISchemaFilter
 /// </summary>
 public class InheritInterfaceXmlCommentSchemaFilter : ISchemaFilter
 {
+	/// <inheritdoc/>
 	public void Apply(OpenApiSchema model, SchemaFilterContext context)
 	{
 		switch (model.Type)
@@ -92,7 +92,7 @@ public class BusinessExceptionFilter : IOperationFilter
 	///<inheritdoc cref="IOperationFilter.Apply(OpenApiOperation, OperationFilterContext)"/>
 	public void Apply(OpenApiOperation operation, OperationFilterContext context)
 	{
-		var schema = context.SchemaGenerator.GenerateSchema(typeof(BusinessException.BusinessExceptionResult), context.SchemaRepository);
+		var schema = context.SchemaGenerator.GenerateSchema(typeof(IExceptionResult), context.SchemaRepository);
 		operation.Responses.Add("400", new OpenApiResponse
 		{
 			Description = "业务异常",
