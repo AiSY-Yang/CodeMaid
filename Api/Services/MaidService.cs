@@ -830,7 +830,7 @@ public class {DtoName}
 			foreach (var item in propertyDeclaration.AttributeLists)
 			{
 				var name = item.Attributes[0].Name.ToString();
-				if (!IsCanHaveMaxLength(result.Type))
+				if (name == "MaxLength" && !IsCanHaveMaxLength(result.Type))
 				{
 					Log.Error("类{className}属性{propName}的类型为{type}不能有maxlength限制", owner.Name, result.Name, result.Type);
 					continue;

@@ -12,7 +12,6 @@ namespace ServicesModels.Exceptions
 	/// </summary>
 	public class BusinessException : ResultException
 	{
-
 		/// <inheritdoc/>
 		public BusinessException(string msg) : base(msg)
 		{
