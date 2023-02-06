@@ -68,6 +68,10 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string? Set { get; set; } = null!;
 		/// <summary>
+		/// 属性的枚举
+		/// </summary>
+		public EnumDefinition? EnumDefinition { get; set; }
+		/// <summary>
 		/// 属性列表
 		/// </summary>
 		[AdaptIgnore]

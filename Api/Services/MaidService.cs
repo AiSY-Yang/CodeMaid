@@ -157,7 +157,17 @@ namespace Api.Services
 							}
 						}
 					}
-					p.IsEnum = maid.Enums.Any(x => x.Name == p.Type);
+					var e = maid.Enums.FirstOrDefault(x => x.Name == p.Type);
+					if (e is not null)
+					{
+						p.IsEnum = true;
+						p.EnumDefinition = e;
+					}
+					else
+					{
+						p.IsEnum = false;
+						p.EnumDefinition = null;
+					}
 					PropertityList.Add(p.Name);
 				}
 				//本次如果没有这个属性的话 则标记删除
@@ -388,6 +398,7 @@ namespace Api.Services
 			//此处要保留原有块信息引用 以在后面可以替换节点
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
 			var newBlockCode = (BlockSyntax)blockCode;
+			//只有映射到数据库的字段才会更新配置
 			foreach (var item in classDefinition.Properties.Where(x => (IsBaseType(x.Type) || x.IsEnum) && x.HasSet))
 			{
 				newBlockCode = UpdateOrInsertConfigurationStatement(newBlockCode, item);
@@ -436,7 +447,7 @@ namespace Api.Services
 		{
 			//更新属性信息
 			var propNameRegex = new Regex("Property\\(.*?\\.(.*?)\\)[\\.|;]");
-			foreach (var item in blockSyntax.ChildNodes().Where(x => x is ExpressionStatementSyntax))
+			foreach (var item in blockSyntax.ChildNodes().OfType<ExpressionStatementSyntax>())
 			{
 				var match = propNameRegex.Match(item.ToFullString());
 				if (match.Success && match.Groups.Count == 2 && match.Groups[1].Value == property.Name)
@@ -713,7 +724,7 @@ public class {DtoName}
 			StringBuilder stringBuilder = new();
 			stringBuilder.Append($"{leader}builder.Property(x => x.{property.Name})");
 			if (!property.Summary.IsNullOrWhiteSpace() || !property.Remark.IsNullOrWhiteSpace())
-				stringBuilder.Append($".HasComment(\"{property.Summary?.Replace("\"", "\\\"")}{(property.Remark is null ? null : $"({property.Remark})")}\")");
+				stringBuilder.Append($".HasComment(\"{property.Summary?.Replace("\"", "\\\"")}{(property.EnumDefinition != null ? $"({property.EnumDefinition.Remark})" : "")}\")");
 			foreach (var attribute in property.Attributes)
 			{
 				switch (attribute.Name)
