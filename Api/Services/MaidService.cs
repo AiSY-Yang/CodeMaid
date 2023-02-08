@@ -356,7 +356,8 @@ namespace Api.Services
 		{
 			try
 			{
-				source = UpdateConfigurationNode(source, classDefinition);
+				var classNode = GetDeclarationSyntaxes<ClassDeclarationSyntax>(source).First();
+				source = source.ReplaceNode(classNode, UpdateConfigurationNode(classNode, classDefinition));
 			}
 			catch (Exception ex)
 			{
@@ -375,7 +376,21 @@ namespace Api.Services
 		{
 			try
 			{
-				source = UpdateConfigurationNode(source, classDefinition);
+				var classNode = GetDeclarationSyntaxes<ClassDeclarationSyntax>(source).First();
+				var classNodeNew = classNode;
+				//当基类改变的时候 要自动更新继承关系
+				var baselistString = $": {classDefinition.Base}Configuration<{classDefinition.Name}>";
+				if (baselistString != classNode.BaseList!.ToString())
+				{
+					var baselist = BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(
+					   GenericName(Identifier($"{classDefinition.Base}Configuration"))
+					   .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName(classDefinition.Name))))
+					   )));
+					baselist = baselist.ReplaceToken(baselist.ColonToken, baselist.ColonToken.WithTrailingTrivia(classNode.BaseList.ColonToken.TrailingTrivia));
+					;
+					classNodeNew = classNodeNew.WithBaseList(baselist.WithTrailingTrivia(classNode.BaseList.GetTrailingTrivia()));
+			}
+				source = source.ReplaceNode(classNode, UpdateConfigurationNode(classNodeNew, classDefinition));
 			}
 			catch (Exception ex)
 			{
@@ -388,13 +403,12 @@ namespace Api.Services
 		/// <summary>
 		/// 更新配置的编译单元
 		/// </summary>
-		/// <param name="source"></param>
+		/// <param name="classNode"></param>
 		/// <param name="classDefinition"></param>
 		/// <returns></returns>
-		private static CompilationUnitSyntax UpdateConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
+		private static ClassDeclarationSyntax UpdateConfigurationNode(ClassDeclarationSyntax classNode, ClassDefinition classDefinition)
 		{
-			var classCode = GetDeclarationSyntaxes<ClassDeclarationSyntax>(source).First();
-			var methodCode = classCode.ChildNodes().First(x => x is MethodDeclarationSyntax);
+			var methodCode = classNode.ChildNodes().First(x => x is MethodDeclarationSyntax);
 			//此处要保留原有块信息引用 以在后面可以替换节点
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
 			var newBlockCode = (BlockSyntax)blockCode;
@@ -434,7 +448,7 @@ namespace Api.Services
 					newBlockCode = newBlockCode.InsertNodesAfter(newBlockCode.ChildNodes().First(), new SyntaxNode[] { ParseStatement(expression).WithLeadingTrivia(newBlockCode.ChildNodes().First().GetLeadingTrivia().Last()) });
 				}
 			}
-			return source.ReplaceNode(blockCode, newBlockCode);
+			return classNode.ReplaceNode(blockCode, newBlockCode);
 		}
 
 		/// <summary>
