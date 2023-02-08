@@ -35,6 +35,10 @@ namespace Api.MasstransitConsumer
 						.Include(x => x.Classes)
 						.ThenInclude(x => x.Properties)
 						.ThenInclude(x => x.Attributes)
+						.Include(x => x.Classes)
+						.ThenInclude(x => x.Properties)
+						.ThenInclude(x => x.EnumDefinition)
+						.ThenInclude(x => x!.EnumMembers)
 						.First(x => x.Id == context.Message.MaidId);
 			logger.LogInformation("项目{projectname}maid{maidname}开始工作", maid.Project.Name, maid.Name);
 			await MaidService.Work(maid);
