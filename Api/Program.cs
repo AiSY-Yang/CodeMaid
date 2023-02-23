@@ -1,8 +1,5 @@
-using System.Reflection;
 using System.Text.Json.Serialization;
 
-using Api.Controllers;
-using Api.MasstransitConsumer;
 using Api.Middleware;
 
 using MaidContexts;
@@ -120,7 +117,7 @@ namespace Api
 			builder.Services.AddMassTransit(x =>
 			{
 				//添加所有消费者
-				x.AddConsumers(Assembly.GetExecutingAssembly());
+				x.AddConsumers(System.Reflection.Assembly.GetExecutingAssembly());
 				//使用内存队列
 				x.UsingInMemory((context, cfg) =>
 				{

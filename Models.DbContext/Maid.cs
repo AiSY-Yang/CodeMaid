@@ -1,6 +1,6 @@
-using Mapster;
+using System.Diagnostics.CodeAnalysis;
 
-using Models.CodeMaid;
+using Mapster;
 
 namespace Models.CodeMaid
 {
@@ -37,6 +37,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 序列化保存的设置
 		/// </summary>
+		[StringSyntax(StringSyntaxAttribute.Json)]
 		public string? Setting { get; set; } = null!;
 		/// <summary>
 		/// 包含的类

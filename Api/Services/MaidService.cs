@@ -413,7 +413,7 @@ namespace Api.Services
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
 			var newBlockCode = (BlockSyntax)blockCode;
 			//只有映射到数据库的字段才会更新配置
-			foreach (var item in classDefinition.Properties.Where(x => (IsBaseType(x.Type) || x.IsEnum) && x.HasSet))
+			foreach (var item in classDefinition.Properties.Where(x => (IsBaseType(x.Type) || x.IsEnum) && x.HasSet || !x.Attributes.Any(x => x.Name == "NotMapped")))
 			{
 				newBlockCode = UpdateOrInsertConfigurationStatement(newBlockCode, item);
 			}
@@ -504,7 +504,7 @@ namespace Api.Services
 					}
 				}
 			}
-			#region 同步属性注释的功能
+			#region 同步属性的功能
 			foreach (var file in Directory.GetFiles(destPath, "*.cs", SearchOption.AllDirectories))
 			{
 				var compilationUnit = CSharpSyntaxTree.ParseText(await File.ReadAllTextAsync(file)).GetCompilationUnitRoot();
@@ -572,7 +572,7 @@ namespace Api.Services
 				return absoluteProps;
 			}
 			//在基类中找可能的属性 因为如果属于基类的话 则也属于这个类 应该直接返回对应的属性
-			var baseProps = maid.Classes.Where(x => x.Name == c.Base).SelectMany(x => x.Properties).Where(x => name.StartsWith(x.Name)).ToList();
+			var baseProps = maid.Classes.Where(x => x.Name == c.Base).SelectMany(x => x.Properties).Where(x => name == x.Name).ToList();
 			if (baseProps.Count > 0)
 			{
 				return baseProps;
