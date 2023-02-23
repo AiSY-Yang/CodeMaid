@@ -389,7 +389,7 @@ namespace Api.Services
 					baselist = baselist.ReplaceToken(baselist.ColonToken, baselist.ColonToken.WithTrailingTrivia(classNode.BaseList.ColonToken.TrailingTrivia));
 					;
 					classNodeNew = classNodeNew.WithBaseList(baselist.WithTrailingTrivia(classNode.BaseList.GetTrailingTrivia()));
-			}
+				}
 				source = source.ReplaceNode(classNode, UpdateConfigurationNode(classNodeNew, classDefinition));
 			}
 			catch (Exception ex)
@@ -413,7 +413,7 @@ namespace Api.Services
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
 			var newBlockCode = (BlockSyntax)blockCode;
 			//只有映射到数据库的字段才会更新配置
-			foreach (var item in classDefinition.Properties.Where(x => (IsBaseType(x.Type) || x.IsEnum) && x.HasSet || !x.Attributes.Any(x => x.Name == "NotMapped")))
+			foreach (var item in classDefinition.Properties.Where(x => (IsBaseType(x.Type) || x.IsEnum) && x.HasSet && !x.Attributes.Any(x => x.Name == "NotMapped")))
 			{
 				newBlockCode = UpdateOrInsertConfigurationStatement(newBlockCode, item);
 			}
@@ -529,24 +529,28 @@ namespace Api.Services
 			var c = maid.Classes.Where(x => classdeclaration.Identifier.Text.StartsWith(x.Name)).OrderByDescending(x => x.Name.Length).FirstOrDefault();
 			//如果没找到类则不对属性进行更改
 			if (c is null) return source;
+			//适配Mapster的对象映射
 			string propName = source.GetAttributeArguments("AdaptMember")?.Trim('\"') ?? source.Identifier.Text;
-			//如果这个属性是这个类的属性 则不进行修改
-			var prop = c.Properties.FirstOrDefault(x => x.Name == propName);
-			if (prop != null)
-			{
-				foreach (var attr in prop.Attributes)
-				{
-					source = AddOrReplaceAttribute(source, attr);
-				}
-				return source;
-			}
-			//如果这个类是属性的属性 则同步内容
+			//同步属性的相关内容
 			var x = GetClassesFromFlatteningClassName(maid, c, propName);
 			if (x.Count == 0) return source;
 			//同步Attribute
 			foreach (var attribute in x.Last().Attributes)
 			{
-				source = AddOrReplaceAttribute(source, attribute);
+				//个别Dto用不上的属性不添加
+				if (new string[] { "Column", "DefaultValue", "NotMapped" }.Contains(attribute.Name))
+				{
+					continue;
+				}
+				//当原类型有Required Attribute  但是dto里面没有 则不添加此Attribute 常见于查询条件
+				if (source.Type.ToString().EndsWith("?") && attribute.Name == "Required")
+				{
+					continue;
+				}
+				else
+				{
+					source = AddOrReplaceAttribute(source, attribute);
+				}
 			}
 			//同步summary
 			var summary = string.Join("::", x.Where(x => !x.Summary.IsNullOrWhiteSpace()).Select(x => x.Summary));
@@ -554,6 +558,10 @@ namespace Api.Services
 			{
 				return source;
 			}
+			//同步Type
+			var type = x.Last().Type;
+			if (IsBaseType(type) && source.Type.ToString().Trim('?') != type.Trim('?'))
+				source = source.WithType(ParseTypeName(type + (source.Type.ToString().EndsWith('?') ? "? " : " ")));
 			return AddOrReplaceSummary(source, summary);
 		}
 		/// <summary>
