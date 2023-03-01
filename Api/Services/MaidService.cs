@@ -531,6 +531,13 @@ namespace Api.Services
 			if (c is null) return source;
 			//适配Mapster的对象映射
 			string propName = source.GetAttributeArguments("AdaptMember")?.Trim('\"') ?? source.Identifier.Text;
+			if (propName.StartsWith("nameof") || propName.StartsWith("$"))
+			{
+				//常见形式
+				//[AdaptMember(nameof(ProjectSampleSet.CreateUser) + nameof(ProjectSampleSet.CreateUser.DisplayName))]
+				//[AdaptMember($"{nameof(ProjectSampleSet.CreateUser)}{nameof(ProjectSampleSet.CreateUser.DisplayName)}")]
+				propName = string.Join("", Regex.Matches(propName, "\\.([_0-9\\w]*)\\)").Select(a => a.Groups[1]).ToList());
+			}
 			//同步属性的相关内容
 			var x = GetClassesFromFlatteningClassName(maid, c, propName);
 			if (x.Count == 0) return source;
@@ -538,7 +545,7 @@ namespace Api.Services
 			foreach (var attribute in x.Last().Attributes)
 			{
 				//个别Dto用不上的属性不添加
-				if (new string[] { "Column", "DefaultValue", "NotMapped" }.Contains(attribute.Name))
+				if (new string[] { "Column", "DefaultValue", "NotMapped", "AdaptMember" }.Contains(attribute.Name))
 				{
 					continue;
 				}

@@ -44,11 +44,15 @@ public class SystemController : ControllerBase
 		foreach (var type in typeof(Sex).Assembly.GetTypes().Where(x => x.IsEnum))
 		{
 			var array = new JsonArray();
-			foreach (var item in Enum.GetValues(type))
+			foreach (var item in type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+				.Where(x => x.GetCustomAttribute<System.Text.Json.Serialization.JsonIgnoreAttribute>() == null))
+			{
 				array.Add(new JsonObject(new Dictionary<string, JsonNode?>{
-					{ "description",JsonValue.Create((item as Enum)!.GetDescription()) },
-					{ "value",JsonValue.Create( item) },
+					{ "description",JsonValue.Create((item.GetValue(type) as Enum)!.GetDescription()) },
+					{ "value",JsonValue.Create( item.GetValue(type)) },
 				}));
+			}
+			//小驼峰命名
 			result.Add(string.Concat(char.ToLower(type.Name[0]), type.Name[1..]), array);
 		}
 		return new JsonObject(result.AsEnumerable());
