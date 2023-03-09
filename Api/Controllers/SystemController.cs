@@ -61,7 +61,8 @@ public class SystemController : ControllerBase
 	/// <summary>
 	/// 查询Controller下所有Action，方法名和参数名、参数类型
 	/// </summary>
-	public List<ControllerInfo> GetControllers()
+	[HttpGet("[action]")]
+	public List<ControllerInfo>? GetControllers()
 	{
 		var assembly = Assembly.GetExecutingAssembly();
 		Type[] types = assembly.GetTypes();
@@ -121,6 +122,8 @@ public class SystemController : ControllerBase
 	/// 回显请求信息
 	/// </summary>
 	/// <returns></returns>
+	[HttpGet("[action]")]
+	[HttpPost("[action]")]
 	public async Task<object> Echo()
 	{
 		var body = Encoding.UTF8.GetString((await HttpContext.Request.BodyReader.ReadAsync()).Buffer);

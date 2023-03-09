@@ -63,7 +63,7 @@ namespace Api.Services
 			//记录下文件的using
 			var usingText = compilationUnit.Usings.ToFullString();
 			#region 更新枚举
-			var enums = GetDeclarationSyntaxes<EnumDeclarationSyntax>(compilationUnit);
+			var enums = compilationUnit.GetDeclarationSyntaxes<EnumDeclarationSyntax>();
 			foreach (var enumNode in enums)
 			{
 				var e = maid.Enums.FirstOrDefault(x => x.Name == enumNode.Identifier.ValueText);
@@ -111,7 +111,7 @@ namespace Api.Services
 			}
 			#endregion
 			#region 更新类
-			var classes = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit);
+			var classes = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>();
 			//记录本次更新的类的名称
 			HashSet<string> classList = new();
 			foreach (var classNode in classes)
@@ -253,7 +253,7 @@ namespace Api.Services
 					string fileName = Path.Combine(maid.Project.Path, setting.ContextPath);
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
 					//取出第一个类 要求第一个类必须就是dbcontext
-					var firstClass = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit).First();
+					var firstClass = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 					//做个用于修改的镜像
 					var newClass = firstClass;
 					foreach (var item in derivedClassList)
@@ -356,7 +356,7 @@ namespace Api.Services
 		{
 			try
 			{
-				var classNode = GetDeclarationSyntaxes<ClassDeclarationSyntax>(source).First();
+				var classNode = source.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 				source = source.ReplaceNode(classNode, UpdateConfigurationNode(classNode, classDefinition));
 			}
 			catch (Exception ex)
@@ -376,7 +376,7 @@ namespace Api.Services
 		{
 			try
 			{
-				var classNode = GetDeclarationSyntaxes<ClassDeclarationSyntax>(source).First();
+				var classNode = source.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 				var classNodeNew = classNode;
 				//当基类改变的时候 要自动更新继承关系
 				var baselistString = $": {classDefinition.Base}Configuration<{classDefinition.Name}>";
@@ -508,7 +508,7 @@ namespace Api.Services
 			foreach (var file in Directory.GetFiles(destPath, "*.cs", SearchOption.AllDirectories))
 			{
 				var compilationUnit = CSharpSyntaxTree.ParseText(await File.ReadAllTextAsync(file)).GetCompilationUnitRoot();
-				var cs = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit);
+				var cs = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>();
 				var compilationUnitNew = compilationUnit.ReplaceNodes(cs,
 					   (c, r) => c.ReplaceNodes(c.ChildNodes().OfType<PropertyDeclarationSyntax>(),
 						(source, reWrite) => { return SyncPropertity(c, source, maid); }));
@@ -644,7 +644,7 @@ public class {DtoName}
 {{
 }}").GetCompilationUnitRoot();
 
-			var c = GetDeclarationSyntaxes<ClassDeclarationSyntax>(compilationUnit).First();
+			var c = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 			var newC = c;
 			foreach (var item in classDefinition.Properties
 				.Where(setting.JustInclude.Count != 0, x => setting.JustInclude.Contains(x.Name))
@@ -726,21 +726,6 @@ public class {DtoName}
 			}
 		}
 		#endregion Dto
-		/// <summary>
-		/// 获取编译单元下的所有指定的类型对象
-		/// </summary>
-		/// <param name="compilationUnit"></param>
-		/// <returns></returns>
-		private static List<T> GetDeclarationSyntaxes<T>(CompilationUnitSyntax compilationUnit) where T : BaseTypeDeclarationSyntax
-		{
-			//没有命名空间的类型
-			var declarationSyntax = compilationUnit.ChildNodes().Where(x => x is T).ToList();
-			//如果原有的文件有命名空间 取命名空间下的成员
-			var declarationSyntax2 = compilationUnit.ChildNodes()
-				.Where(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax).SelectMany(x => x.ChildNodes())
-					   .Where(x => x is T).ToList();
-			return declarationSyntax.Union(declarationSyntax2).Select(x => x as T).ToList()!;
-		}
 
 		/// <summary>
 		/// 生成属性的builder语句

@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 
 using Api.Middleware;
+using Api.Worker;
 
 using MaidContexts;
 
@@ -124,6 +125,8 @@ namespace Api
 					cfg.ConfigureEndpoints(context);
 				});
 			});
+			//添加后台服务
+			builder.Services.AddHostedService<TimedHostedService>();
 
 			var app = builder.Build();
 

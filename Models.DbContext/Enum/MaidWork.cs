@@ -19,5 +19,9 @@ namespace Models.CodeMaid
 		/// DTO同步
 		/// </summary>      
 		DtoSync,
+		/// <summary>
+		/// DTO同步
+		/// </summary>      
+		HttpClientSync,
 	}
 }
