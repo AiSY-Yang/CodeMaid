@@ -1,5 +1,7 @@
 ﻿using Api.Job;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace Api.Worker
 {
 	/// <summary>
@@ -35,12 +37,15 @@ namespace Api.Worker
 		{
 			try
 			{
-				var context = services.GetRequiredService<MaidContexts.MaidContext>();
-				//var maids = context.Maids.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync);
-				//foreach (var item in maids)
-				//{
-					await new HttpClientGenerator().ExecuteAsync();
-				//}
+				using var scope = services.CreateScope();
+				var context = scope.ServiceProvider.GetRequiredService<MaidContexts.MaidContext>();
+				var maids = context.Maids
+					.Include(x => x.Project)
+					.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync);
+				foreach (var maid in maids)
+				{
+					await new HttpClientGenerator().ExecuteAsync(maid);
+				}
 			}
 			catch (Exception ex)
 			{

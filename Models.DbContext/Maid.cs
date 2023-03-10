@@ -16,7 +16,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 所属项目
 		/// </summary>
-		public Project Project { get; set; } = null!;
+		public required Project Project { get; set; }
 		/// <summary>
 		/// 功能
 		/// </summary>

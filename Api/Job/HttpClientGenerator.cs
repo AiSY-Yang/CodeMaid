@@ -7,26 +7,40 @@ using System.Text.Encodings.Web;
 using System.Text;
 using Api.Tools;
 using Microsoft.CodeAnalysis;
+using Models.CodeMaid;
+using System.Text.Json;
+using ServicesModels.Settings;
+using System.Collections.Concurrent;
 
 namespace Api.Job
 {
+	/// <summary>
+	/// Http客户端生成器
+	/// </summary>
 	public class HttpClientGenerator
 	{
-		public async Task ExecuteAsync()
+		static readonly ConcurrentDictionary<string, string> Md5s = new();
+		/// <summary>
+		/// 生成Http客户端
+		/// </summary>
+		/// <param name="maid">maid信息</param>
+		/// <returns></returns>
+		public async Task ExecuteAsync(Maid maid)
 		{
-			HttpClient httpClient = new HttpClient() { BaseAddress = new Uri("http://localhost:5000/swagger/v1/swagger.json") };
+			HttpClient httpClient = new HttpClient() { BaseAddress = new Uri(maid.SourcePath) };
 			var json = await httpClient.GetStringAsync("");
 			var md5 = json.Hash(HashOption.MD5_32);
-			if (md5 == "")
+			if (Md5s.TryGetValue(maid.SourcePath, out string? lastMd5) && lastMd5 == md5)
 			{
 				return;
 			}
 			else
 			{
+				Md5s[maid.SourcePath] = md5;
 				await Console.Out.WriteLineAsync("生成");
 			}
 			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out _);
-			var PATH = "D:\\Work\\A\\src\\Share\\Services\\SnakeCharmer.cs";
+			var PATH = Path.Combine(maid.Project.Path, maid.DestinationPath, openApiDocument.Info.Title + ".cs");
 			CompilationUnitSyntax unit;
 			if (File.Exists(PATH))
 			{

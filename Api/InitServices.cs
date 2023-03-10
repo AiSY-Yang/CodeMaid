@@ -28,7 +28,10 @@ namespace Api
 			InitServices.serviceProvider = serviceProvider;
 			var scope = serviceProvider.CreateScope();
 			MaidContext context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-			var maids = await context.Maids.Include(x => x.Project).ToListAsync();
+			var maids = await context.Maids
+				.Include(x => x.Project)
+				.Where(x => x.MaidWork != MaidWork.HttpClientSync)
+				.ToListAsync();
 			foreach (var item in maids)
 			{
 				if (!Watchers.Any(x => x.Value.Id == item.Id))

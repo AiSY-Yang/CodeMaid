@@ -16,18 +16,16 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Models.CodeMaid;
 
 using Serilog;
-
-using ServicesModels;
-
+using ServicesModels.Settings;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static ServicesModels.DtoSyncSetting;
+using static ServicesModels.Settings.DtoSyncSetting;
 
 namespace Api.Services
 {
-	/// <summary>
-	/// maid服务
-	/// </summary>
-	public class MaidService
+    /// <summary>
+    /// maid服务
+    /// </summary>
+    public class MaidService
 	{
 		/// <summary>
 		/// 对miad全量更新
