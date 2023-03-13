@@ -3,6 +3,7 @@ using System;
 using MaidContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MaidContexts.Migrations
 {
     [DbContext(typeof(MaidContext))]
-    partial class MaidContextModelSnapshot : ModelSnapshot
+    [Migration("20230310084517_20230310-164509")]
+    partial class _20230310164509
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,8 +116,7 @@ namespace MaidContexts.Migrations
 
                     b.HasIndex("MaidId");
 
-                    b.HasIndex("Name", "MaidId")
-                        .IsUnique();
+                    b.HasIndex("Name", "MaidId");
 
                     b.ToTable("ClassDefinitions");
 
@@ -364,7 +365,7 @@ namespace MaidContexts.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(255)")
+                        .HasColumnType("longtext")
                         .HasComment("属性名称");
 
                     b.Property<string>("Remark")
@@ -392,9 +393,6 @@ namespace MaidContexts.Migrations
                     b.HasIndex("ClassDefinitionId");
 
                     b.HasIndex("EnumDefinitionId");
-
-                    b.HasIndex("Name", "ClassDefinitionId")
-                        .IsUnique();
 
                     b.ToTable("PropertyDefinitions");
 

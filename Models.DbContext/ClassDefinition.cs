@@ -10,6 +10,14 @@ namespace Models.CodeMaid
 	public class ClassDefinition : DatabaseEntity
 	{
 		/// <summary>
+		/// Maid对象
+		/// </summary>
+		public Maid Maid { get; set; } = null!;
+		/// <summary>
+		/// Maid对象Id
+		/// </summary>
+		public long MaidId { get; set; }
+		/// <summary>
 		/// 命名空间
 		/// </summary>
 		public string? NameSpace { get; set; } = null!;

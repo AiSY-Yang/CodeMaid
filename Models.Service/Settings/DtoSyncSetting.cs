@@ -43,7 +43,7 @@ namespace ServicesModels.Settings
             /// <summary>
             /// 排除属性
             /// </summary>
-            public List<string> ExcludePropertity { get; set; } = new List<string>();
+            public List<string> ExcludeProperties { get; set; } = new List<string>();
             /// <summary>
             /// 仅包含属性
             /// </summary>
@@ -51,7 +51,7 @@ namespace ServicesModels.Settings
             /// <summary>
             /// 需要扁平化映射的属性
             /// </summary>
-            public List<string> FlatteningPropertity { get; set; } = new List<string>();
+            public List<string> FlatteningProperties { get; set; } = new List<string>();
         }
     }
 }

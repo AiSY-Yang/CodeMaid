@@ -16,6 +16,10 @@ namespace Models.CodeMaid
 		/// </summary>
 		public ClassDefinition ClassDefinition { get; set; } = null!;
 		/// <summary>
+		/// 所属类Id
+		/// </summary>
+		public long ClassDefinitionId { get; set; }
+		/// <summary>
 		/// 前导
 		/// </summary>
 		public string? LeadingTrivia { get; set; }

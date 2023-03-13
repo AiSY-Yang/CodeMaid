@@ -16,16 +16,18 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Models.CodeMaid;
 
 using Serilog;
+
 using ServicesModels.Settings;
+
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static ServicesModels.Settings.DtoSyncSetting;
 
 namespace Api.Services
 {
-    /// <summary>
-    /// maid服务
-    /// </summary>
-    public class MaidService
+	/// <summary>
+	/// maid服务
+	/// </summary>
+	public class MaidService
 	{
 		/// <summary>
 		/// 对miad全量更新
@@ -98,8 +100,7 @@ namespace Api.Services
 			//如果需要给枚举增加remark信息的话 在更新的时候就加上
 			if (maid.Project.AddEnumRemark)
 			{
-				var compilationUnitNew = compilationUnit.ReplaceNodes(enums,
-					  (x, y) =>
+				var compilationUnitNew = compilationUnit.ReplaceNodes(enums, (x, y) =>
 					  {
 						  var remark = maid.Enums.FirstOrDefault(e => e.Name == x.Identifier.ValueText)?.Remark;
 						  if (remark is not null) return AddOrReplaceRemark(x, remark);
@@ -126,8 +127,9 @@ namespace Api.Services
 				}
 				classList.Add(c.Name);
 				c.Using = usingText;
+				c.MaidId = maid.Id;
 				//记录这个类现在有的属性
-				HashSet<string> PropertityList = new();
+				HashSet<string> Properties = new();
 				foreach (var propertyDeclaration in classNode.Members.OfType<PropertyDeclarationSyntax>())
 				{
 					var p = c.Properties.FirstOrDefault(x => x.Name == propertyDeclaration.Identifier.Text);
@@ -155,6 +157,7 @@ namespace Api.Services
 							}
 						}
 					}
+					p.ClassDefinitionId = c.Id;
 					var e = maid.Enums.FirstOrDefault(x => x.Name == p.Type);
 					if (e is not null)
 					{
@@ -166,10 +169,10 @@ namespace Api.Services
 						p.IsEnum = false;
 						p.EnumDefinition = null;
 					}
-					PropertityList.Add(p.Name);
+					Properties.Add(p.Name);
 				}
 				//本次如果没有这个属性的话 则标记删除
-				c.Properties.Where(x => !PropertityList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
+				c.Properties.Where(x => !Properties.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
 			}
 			#endregion
 			return classList;
@@ -207,7 +210,9 @@ namespace Api.Services
 			var baseClassNameList = maid.Classes.Select(x => x.Base).Distinct();
 			//先生成基类的配置
 			var baseClassList = maid.Classes
-				.Where(x => baseClassNameList.Contains(x.Name) || x.Base == null).ToList();
+				.Where(x => !x.IsDeleted)
+				.Where(x => baseClassNameList.Contains(x.Name) || x.Base == null)
+				.ToList();
 			foreach (var item in baseClassList)
 			{
 				string fileName = Path.Combine(maid.Project.Path, maid.DestinationPath, $"{item.Name}Configuration.cs");
@@ -225,7 +230,9 @@ namespace Api.Services
 			}
 			//再生成派生类的配置
 			var derivedClassList = maid.Classes
-				.Where(x => !baseClassNameList.Contains(x.Name)).ToList();
+				.Where(x => !x.IsDeleted)
+				.Where(x => !baseClassNameList.Contains(x.Name))
+				.ToList();
 			foreach (var item in derivedClassList)
 			{
 				string fileName = Path.Combine(maid.Project.Path, maid.DestinationPath, $"{item.Name}Configuration.cs");
@@ -377,16 +384,16 @@ namespace Api.Services
 				var classNode = source.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 				var classNodeNew = classNode;
 				//当基类改变的时候 要自动更新继承关系
-				var baselistString = $": {classDefinition.Base}Configuration<{classDefinition.Name}>";
-				if (baselistString != classNode.BaseList!.ToString())
+				var baseListString = $": {classDefinition.Base}Configuration<{classDefinition.Name}>";
+				if (baseListString != classNode.BaseList!.ToString())
 				{
-					var baselist = BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(
+					var baseList = BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(
 					   GenericName(Identifier($"{classDefinition.Base}Configuration"))
 					   .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName(classDefinition.Name))))
 					   )));
-					baselist = baselist.ReplaceToken(baselist.ColonToken, baselist.ColonToken.WithTrailingTrivia(classNode.BaseList.ColonToken.TrailingTrivia));
+					baseList = baseList.ReplaceToken(baseList.ColonToken, baseList.ColonToken.WithTrailingTrivia(classNode.BaseList.ColonToken.TrailingTrivia));
 					;
-					classNodeNew = classNodeNew.WithBaseList(baselist.WithTrailingTrivia(classNode.BaseList.GetTrailingTrivia()));
+					classNodeNew = classNodeNew.WithBaseList(baseList.WithTrailingTrivia(classNode.BaseList.GetTrailingTrivia()));
 				}
 				source = source.ReplaceNode(classNode, UpdateConfigurationNode(classNodeNew, classDefinition));
 			}
@@ -411,7 +418,12 @@ namespace Api.Services
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
 			var newBlockCode = (BlockSyntax)blockCode;
 			//只有映射到数据库的字段才会更新配置
-			foreach (var item in classDefinition.Properties.Where(x => (IsBaseType(x.Type) || x.IsEnum) && x.HasSet && !x.Attributes.Any(x => x.Name == "NotMapped")))
+			foreach (var item in classDefinition.Properties
+				.Where(x => (IsBaseType(x.Type) || x.IsEnum))
+				.Where(x => x.HasSet)
+				.Where(x => !x.IsDeleted)
+				.Where(x => !x.Attributes.Any(x => x.Name == "NotMapped")
+				))
 			{
 				newBlockCode = UpdateOrInsertConfigurationStatement(newBlockCode, item);
 			}
@@ -517,14 +529,14 @@ namespace Api.Services
 		/// <summary>
 		/// 同步属性
 		/// </summary>
-		/// <param name="classdeclaration">需要同步的类</param>
+		/// <param name="classDeclaration">需要同步的类</param>
 		/// <param name="source">需要同步的属性</param>
 		/// <param name="maid">保存好所有关联对象的maid</param>
 		/// <returns></returns>
-		static PropertyDeclarationSyntax SyncPropertity(ClassDeclarationSyntax classdeclaration, PropertyDeclarationSyntax source, Maid maid)
+		static PropertyDeclarationSyntax SyncPropertity(ClassDeclarationSyntax classDeclaration, PropertyDeclarationSyntax source, Maid maid)
 		{
 			//先找到这个类对应的数据库中源数据的类
-			var c = maid.Classes.Where(x => classdeclaration.Identifier.Text.StartsWith(x.Name)).OrderByDescending(x => x.Name.Length).FirstOrDefault();
+			var c = maid.Classes.Where(x => classDeclaration.Identifier.Text.StartsWith(x.Name)).OrderByDescending(x => x.Name.Length).FirstOrDefault();
 			//如果没找到类则不对属性进行更改
 			if (c is null) return source;
 			//适配Mapster的对象映射
@@ -540,7 +552,7 @@ namespace Api.Services
 			var x = GetClassesFromFlatteningClassName(maid, c, propName);
 			if (x.Count == 0) return source;
 			//同步Attribute
-			foreach (var attribute in x.Last().Attributes)
+			foreach (var attribute in x.Last().Attributes.Where(x => !x.IsDeleted))
 			{
 				//个别Dto用不上的属性不添加
 				if (new string[] { "Column", "DefaultValue", "NotMapped", "AdaptMember" }.Contains(attribute.Name))
@@ -579,7 +591,7 @@ namespace Api.Services
 		static List<PropertyDefinition> GetClassesFromFlatteningClassName(Maid maid, ClassDefinition c, string name)
 		{
 			//直接在类本身里寻找这个属性 如果有的话就返回这个属性
-			var absoluteProps = c.Properties.Where(x => name == x.Name).ToList();
+			var absoluteProps = c.Properties.Where(x => !x.IsDeleted).Where(x => name == x.Name).ToList();
 			if (absoluteProps.Count > 0)
 			{
 				return absoluteProps;
@@ -592,7 +604,7 @@ namespace Api.Services
 			}
 			var res = new List<PropertyDefinition>();
 			//在这个类里找可能的属性
-			var props = c.Properties.Where(x => name.StartsWith(x.Name)).ToList();
+			var props = c.Properties.Where(x => !x.IsDeleted).Where(x => name.StartsWith(x.Name)).ToList();
 			//props Room
 			//根据类型查出来对应的类
 			var classes = maid.Classes.Join(props, x => x.Name, x => x.Type.TrimEnd('?'), (c, p) => new { c, p }).ToList();
@@ -647,9 +659,9 @@ public class {DtoName}
 			foreach (var item in classDefinition.Properties
 				.Where(setting.JustInclude.Count != 0, x => setting.JustInclude.Contains(x.Name))
 				//精确的排除属性
-				//.Where(x => !setting.ExcludePropertity.Any(s => s == x.Name))
+				//.Where(x => !setting.ExcludeProperties.Any(s => s == x.Name))
 				//模糊匹配的排除属性
-				.Where(x => !x.Name.Contains(setting.ExcludePropertity))
+				.Where(x => !x.Name.Contains(setting.ExcludeProperties))
 				)
 			{
 				newC = AddOrUpdatePropertyDeclarationSyntax(newC, item);
