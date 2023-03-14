@@ -12,10 +12,12 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// Maid对象
 		/// </summary>
+		[AdaptIgnore]
 		public Maid Maid { get; set; } = null!;
 		/// <summary>
 		/// Maid对象Id
 		/// </summary>
+		[AdaptIgnore]
 		public long MaidId { get; set; }
 		/// <summary>
 		/// 命名空间

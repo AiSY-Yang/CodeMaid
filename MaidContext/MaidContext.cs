@@ -65,9 +65,9 @@ namespace MaidContexts
 		/// </summary>
 		private void SetUpdateTime()
 		{
-			foreach (var item in ChangeTracker.Entries().Where(x => x.State == EntityState.Modified).Select(x => x.Entity))
+			foreach (var item in ChangeTracker.Entries<DatabaseEntity>().Where(x => x.State == EntityState.Modified))
 			{
-				if (item is DatabaseEntity a) a.UpdateTime = DateTimeOffset.UtcNow;
+				item.Entity.UpdateTime = DateTimeOffset.UtcNow;
 			}
 		}
 		/// <summary>
@@ -75,13 +75,10 @@ namespace MaidContexts
 		/// </summary>
 		private void FakeDelete()
 		{
-			foreach (var item in ChangeTracker.Entries().Where(x => x.State == EntityState.Deleted).Where(x => x.Entity is DatabaseEntity))
+			foreach (var item in ChangeTracker.Entries<DatabaseEntity>().Where(x => x.State == EntityState.Deleted))
 			{
-				if (item.Entity is DatabaseEntity entity)
-				{
-					item.State = EntityState.Modified;
-					entity.IsDeleted = true;
-				}
+				item.State = EntityState.Modified;
+				item.Entity.IsDeleted = true;
 			}
 		}
 	}

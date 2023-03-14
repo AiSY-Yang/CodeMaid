@@ -14,10 +14,12 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 所属类
 		/// </summary>
+		[AdaptIgnore]
 		public ClassDefinition ClassDefinition { get; set; } = null!;
 		/// <summary>
 		/// 所属类Id
 		/// </summary>
+		[AdaptIgnore]
 		public long ClassDefinitionId { get; set; }
 		/// <summary>
 		/// 前导

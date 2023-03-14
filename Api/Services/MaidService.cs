@@ -127,7 +127,6 @@ namespace Api.Services
 				}
 				classList.Add(c.Name);
 				c.Using = usingText;
-				c.MaidId = maid.Id;
 				//记录这个类现在有的属性
 				HashSet<string> Properties = new();
 				foreach (var propertyDeclaration in classNode.Members.OfType<PropertyDeclarationSyntax>())
@@ -815,6 +814,7 @@ public class {DtoName}
 				Summary = classDeclaration.GetSummay(),
 				LeadingTrivia = classDeclaration.GetLeadingTrivia().ToFullString(),
 				Base = classDeclaration.BaseList?.Types.ToString(),
+				IsDeleted=false,
 			};
 		}
 		/// <summary>
@@ -860,6 +860,7 @@ public class {DtoName}
 				Get = get?.ExpressionBody?.ToFullString(),
 				HasSet = set != null,
 				Set = set?.ExpressionBody?.ToFullString(),
+				IsDeleted=false,
 			};
 
 			foreach (var item in propertyDeclaration.AttributeLists)
