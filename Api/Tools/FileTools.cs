@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System.Diagnostics;
+
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Api.Tools
 {
@@ -16,7 +18,7 @@ namespace Api.Tools
 		/// <returns></returns>
 		public static async Task Write(string path, CompilationUnitSyntax oldCompilationUnitSyntax, CompilationUnitSyntax newCompilationUnitSyntax)
 		{
-			if (oldCompilationUnitSyntax.ToFullString() != newCompilationUnitSyntax.ToFullString())
+			if (oldCompilationUnitSyntax.FullSpan.CompareTo(newCompilationUnitSyntax.FullSpan) != 0)
 			{
 				await File.WriteAllTextAsync(path, newCompilationUnitSyntax.ToFullString());
 			}

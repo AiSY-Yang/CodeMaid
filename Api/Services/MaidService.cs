@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
+using Api.Extensions;
 using Api.Tools;
 
 using ExtensionMethods;
@@ -30,7 +31,7 @@ namespace Api.Services
 	public class MaidService
 	{
 		/// <summary>
-		/// 对miad全量更新
+		/// 对maid全量更新
 		/// </summary>
 		/// <param name="maid"></param>
 		/// <returns></returns>
@@ -103,7 +104,7 @@ namespace Api.Services
 				var compilationUnitNew = compilationUnit.ReplaceNodes(enums, (x, y) =>
 					  {
 						  var remark = maid.Enums.FirstOrDefault(e => e.Name == x.Identifier.ValueText)?.Remark;
-						  if (remark is not null) return AddOrReplaceRemark(x, remark);
+						  if (remark is not null) return x.AddOrReplaceRemark(remark);
 						  else return x;
 					  });
 				await FileTools.Write(path, compilationUnit, compilationUnitNew);
@@ -139,20 +140,20 @@ namespace Api.Services
 					}
 					else
 					{
-						var newp = CreatePropertyEntity(c, propertyDeclaration);
-						newp.Adapt(p);
+						var pNew = CreatePropertyEntity(c, propertyDeclaration);
+						pNew.Adapt(p);
 						//删除所有已删除的属性
-						p.Attributes.RemoveAll(x => !newp.Attributes.Select(x => x.Name).Contains(x.Name));
-						foreach (var attrNew in newp.Attributes)
+						p.Attributes.RemoveAll(x => !pNew.Attributes.Select(x => x.Name).Contains(x.Name));
+						foreach (var attributeNew in pNew.Attributes)
 						{
 							var attr = p.Attributes.FirstOrDefault();
 							if (attr is null)
 							{
-								p.Attributes.Add(attrNew);
+								p.Attributes.Add(attributeNew);
 							}
 							else
 							{
-								attrNew.Adapt(attr);
+								attributeNew.Adapt(attr);
 							}
 						}
 					}
@@ -223,7 +224,7 @@ namespace Api.Services
 				}
 				else
 				{
-					var compilationUnit = CreateBaseConfigurationNode(item);
+					var compilationUnit = CreateConfigurationNode(item, true);
 					await File.WriteAllTextAsync(fileName, compilationUnit.ToFullString());
 				}
 			}
@@ -244,7 +245,7 @@ namespace Api.Services
 				}
 				else
 				{
-					var compilationUnit = CreateDerivedConfigurationNode(item);
+					var compilationUnit = CreateConfigurationNode(item, false);
 					await File.WriteAllTextAsync(fileName, compilationUnit.ToFullString());
 				}
 			}
@@ -256,29 +257,29 @@ namespace Api.Services
 				{
 					string fileName = Path.Combine(maid.Project.Path, setting.ContextPath);
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
-					//取出第一个类 要求第一个类必须就是dbcontext
+					//取出第一个类 要求第一个类必须就是dbContext
 					var firstClass = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 					//做个用于修改的镜像
 					var newClass = firstClass;
 					foreach (var item in derivedClassList)
 					{
 						//取出最后一个属性 在之后做新属性的插入
-						var lastPropertity = newClass.Members.Where(x => x is PropertyDeclarationSyntax).LastOrDefault();
+						var lastProperty = newClass.Members.Where(x => x is PropertyDeclarationSyntax).LastOrDefault();
 						//如果一个属性都没有 则插入到最后一个构造函数后面
-						lastPropertity ??= newClass.Members.Where(x => x is ConstructorDeclarationSyntax).LastOrDefault();
+						lastProperty ??= newClass.Members.Where(x => x is ConstructorDeclarationSyntax).LastOrDefault();
 						//如果构造函数也没有 则插入到第一个方法后面
-						lastPropertity ??= newClass.Members.Where(x => x is MethodDeclarationSyntax).First();
+						lastProperty ??= newClass.Members.Where(x => x is MethodDeclarationSyntax).First();
 
 						var prop = newClass.Members.OfType<PropertyDeclarationSyntax>().Where(x => x.Type.ToString() == $"DbSet<{item.Name}>").FirstOrDefault();
 						if (prop is null)
 						{
-							newClass = newClass.InsertNodesAfter(lastPropertity, new SyntaxNode[] {
+							newClass = newClass.InsertNodesAfter(lastProperty, new SyntaxNode[] {
 								(PropertyDeclarationSyntax)ParseMemberDeclaration($"{(item.LeadingTrivia==null?"\t":string.Join('\n',item.LeadingTrivia.Split('\n').Select(x=>"\t"+x)))}public virtual DbSet<{item.Name}> {item.Name.Pluralize(inputIsKnownToBeSingular: false)} {{ get; set; }} = null!;")!
 								.WithTrailingTrivia(ParseTrailingTrivia(Environment.NewLine))! });
 						}
 						else
 						{
-							newClass = newClass.ReplaceNode(prop, AddOrReplaceSummary(prop, item.Summary));
+							newClass = newClass.ReplaceNode(prop, prop.AddOrReplaceSummary(item.Summary));
 						}
 					}
 					var compilationUnitNew = compilationUnit.ReplaceNode(firstClass, newClass);
@@ -289,56 +290,34 @@ namespace Api.Services
 
 
 		/// <summary>
-		/// 生成基类的配置
+		/// 生成配置节点
 		/// </summary>
 		/// <param name="classDefinition"></param>
+		/// <param name="isBase">是否是基类</param>
 		/// <returns></returns>
-		private static CompilationUnitSyntax CreateBaseConfigurationNode(ClassDefinition classDefinition)
+		private static CompilationUnitSyntax CreateConfigurationNode(ClassDefinition classDefinition, bool isBase)
 		{
 			StringBuilder stringBuilder = new();
-			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore;");
-			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore.Metadata.Builders;");
-			stringBuilder.AppendLine($"");
-			stringBuilder.AppendLine($"using {classDefinition.NameSpace};");
-			stringBuilder.AppendLine($"/// <summary>");
-			stringBuilder.AppendLine($"/// 基类的配置");
-			stringBuilder.AppendLine($"/// </summary>");
-			stringBuilder.AppendLine($"/// <typeparam name=\"Entity\"></typeparam>");
-			stringBuilder.AppendLine($"internal abstract class {classDefinition.Name}Configuration<Entity> : IEntityTypeConfiguration<Entity> where Entity : {classDefinition.Name}");
-			stringBuilder.AppendLine($"{{");
-			stringBuilder.AppendLine($"\tpublic virtual void Configure(EntityTypeBuilder<Entity> builder)");
-			stringBuilder.AppendLine($"\t{{");
-			foreach (var item in classDefinition.Properties)
-			{
-				stringBuilder.AppendLine(CreateBuilderStatement(item));
-			}
-			stringBuilder.AppendLine($"\t}}");
-			stringBuilder.AppendLine($"}}");
+			stringBuilder.AppendLine($$""""
+				using Microsoft.EntityFrameworkCore;
+				using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-			return ParseSyntaxTree(stringBuilder.ToString()).GetCompilationUnitRoot();
-		}
-		/// <summary>
-		/// 生成派生类的配置
-		/// </summary>
-		/// <param name="classDefinition"></param>
-		/// <returns></returns>
-		private static CompilationUnitSyntax CreateDerivedConfigurationNode(ClassDefinition classDefinition)
-		{
-			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore;");
-			stringBuilder.AppendLine($"using Microsoft.EntityFrameworkCore.Metadata.Builders;");
-			stringBuilder.AppendLine($"");
-			stringBuilder.AppendLine($"using {classDefinition.NameSpace};");
-			stringBuilder.AppendLine($"/// <summary>");
-			stringBuilder.AppendLine($"/// 派生类的配置");
-			stringBuilder.AppendLine($"/// </summary>");
-			stringBuilder.AppendLine($"/// <typeparam name=\"Entity\"></typeparam>");
-			stringBuilder.AppendLine($"internal class {classDefinition.Name}Configuration : {classDefinition.Base}Configuration<{classDefinition.Name}>");
-			stringBuilder.AppendLine($"{{");
-			stringBuilder.AppendLine($"\tpublic override void Configure(EntityTypeBuilder<{classDefinition.Name}> builder)");
-			stringBuilder.AppendLine($"\t{{");
-			stringBuilder.AppendLine($"\t\tbase.Configure(builder);");
-			stringBuilder.AppendLine($"\t\tbuilder.Metadata.SetComment(\"{classDefinition.Summary}\");");
+				using {{classDefinition.NameSpace}};
+				/// <summary>
+				/// {{(isBase ? "基类的配置" : "派生类的配置")}}
+				/// </summary>
+				/// <typeparam name="Entity"></typeparam>
+				{{(isBase ? $"internal abstract class {classDefinition.Name}Configuration<Entity> : IEntityTypeConfiguration<Entity> where Entity : {classDefinition.Name}"
+				: $"internal class {classDefinition.Name}Configuration : {classDefinition.Base}Configuration<{classDefinition.Name}>")}}
+				{
+					public {{(isBase ? "virtual" : "override")}} void Configure(EntityTypeBuilder<{{(isBase ? "Entity" : classDefinition.Name)}}> builder)
+					{
+				"""");
+			if (!isBase)
+			{
+				stringBuilder.AppendLine($"\t\tbase.Configure(builder);");
+				stringBuilder.AppendLine($"\t\tbuilder.Metadata.SetComment(\"{classDefinition.Summary}\");");
+			}
 			foreach (var item in classDefinition.Properties)
 			{
 				if ((IsBaseType(item.Type) || item.IsEnum) && item.HasSet)
@@ -366,7 +345,7 @@ namespace Api.Services
 			catch (Exception ex)
 			{
 				Log.Error(ex, "基类{name}配置格式错误,重新生成了配置文件", classDefinition.Name);
-				source = CreateBaseConfigurationNode(classDefinition);
+				source = CreateConfigurationNode(classDefinition, true);
 			}
 			return source;
 		}
@@ -399,7 +378,7 @@ namespace Api.Services
 			catch (Exception ex)
 			{
 				Log.Error(ex, "派生类{name}配置格式错误,重新生成了配置文件", classDefinition.Name);
-				source = CreateDerivedConfigurationNode(classDefinition);
+				source = CreateConfigurationNode(classDefinition, false);
 			}
 			return source;
 		}
@@ -520,7 +499,7 @@ namespace Api.Services
 				var cs = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>();
 				var compilationUnitNew = compilationUnit.ReplaceNodes(cs,
 					   (c, r) => c.ReplaceNodes(c.ChildNodes().OfType<PropertyDeclarationSyntax>(),
-						(source, reWrite) => { return SyncPropertity(c, source, maid); }));
+						(source, reWrite) => { return SyncProperties(c, source, maid); }));
 				await FileTools.Write(file, compilationUnit, compilationUnitNew);
 			}
 			#endregion
@@ -532,7 +511,7 @@ namespace Api.Services
 		/// <param name="source">需要同步的属性</param>
 		/// <param name="maid">保存好所有关联对象的maid</param>
 		/// <returns></returns>
-		static PropertyDeclarationSyntax SyncPropertity(ClassDeclarationSyntax classDeclaration, PropertyDeclarationSyntax source, Maid maid)
+		static PropertyDeclarationSyntax SyncProperties(ClassDeclarationSyntax classDeclaration, PropertyDeclarationSyntax source, Maid maid)
 		{
 			//先找到这个类对应的数据库中源数据的类
 			var c = maid.Classes.Where(x => classDeclaration.Identifier.Text.StartsWith(x.Name)).OrderByDescending(x => x.Name.Length).FirstOrDefault();
@@ -565,7 +544,7 @@ namespace Api.Services
 				}
 				else
 				{
-					source = AddOrReplaceAttribute(source, attribute);
+					source = source.AddOrReplaceAttribute(attribute);
 				}
 			}
 			//同步summary
@@ -578,7 +557,7 @@ namespace Api.Services
 			var type = x.Last().Type;
 			if (IsBaseType(type) && source.Type.ToString().Trim('?') != type.Trim('?'))
 				source = source.WithType(ParseTypeName(type + (source.Type.ToString().EndsWith('?') ? "? " : " ")));
-			return AddOrReplaceSummary(source, summary);
+			return source.AddOrReplaceSummary(summary);
 		}
 		/// <summary>
 		/// 根据属性名称找到可以组合成这个名称的一组属性
@@ -752,7 +731,7 @@ public class {DtoName}
 			{
 				switch (attribute.Name)
 				{
-					//如果有人使用工具 有人没有使用工具 会造成修改实体的maxlength后 配置文件里没有变化 而迁移会以fluentApi为准 会导致长度约束不生效 所以移除maxlength的支持
+					//如果有人使用工具 有人没有使用工具 会造成修改实体的MaxLength后 配置文件里没有变化 而迁移会以fluentApi为准 会导致长度约束不生效 所以移除MaxLength的支持
 					//case "MaxLength":
 					//	stringBuilder.Append($".HasMaxLength({attribute.Arguments})");
 					//	break;
@@ -790,7 +769,7 @@ public class {DtoName}
 			}.Contains(type);
 		}
 		/// <summary>
-		/// 类型是否可以有maxlength限制
+		/// 类型是否可以有MaxLength限制
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
@@ -811,10 +790,10 @@ public class {DtoName}
 			{
 				NameSpace = (classDeclaration.SyntaxTree.GetRoot().ChildNodes().FirstOrDefault(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax) as BaseNamespaceDeclarationSyntax)?.Name?.ToString(),
 				Name = classDeclaration.Identifier.Text,
-				Summary = classDeclaration.GetSummay(),
+				Summary = classDeclaration.GetSummary(),
 				LeadingTrivia = classDeclaration.GetLeadingTrivia().ToFullString(),
 				Base = classDeclaration.BaseList?.Types.ToString(),
-				IsDeleted=false,
+				IsDeleted = false,
 			};
 		}
 		/// <summary>
@@ -828,7 +807,7 @@ public class {DtoName}
 			{
 				NameSpace = (classDeclaration.SyntaxTree.GetRoot().ChildNodes().FirstOrDefault(x => x is NamespaceDeclarationSyntax || x is FileScopedNamespaceDeclarationSyntax) as BaseNamespaceDeclarationSyntax)?.Name?.ToString(),
 				Name = classDeclaration.Identifier.Text,
-				Summary = classDeclaration.GetSummay(),
+				Summary = classDeclaration.GetSummary(),
 				LeadingTrivia = classDeclaration.GetLeadingTrivia().ToFullString(),
 			};
 		}
@@ -849,7 +828,7 @@ public class {DtoName}
 				ClassDefinition = owner,
 				FullText = propertyDeclaration.ToFullString(),
 				LeadingTrivia = leaderTrivia.ToFullString(),
-				Summary = propertyDeclaration.GetSummay(),
+				Summary = propertyDeclaration.GetSummary(),
 				Remark = propertyDeclaration.GetRemark(),
 				Name = propertyDeclaration.Identifier.Text,
 				Type = propertyDeclaration.Type.ToString(),
@@ -860,7 +839,7 @@ public class {DtoName}
 				Get = get?.ExpressionBody?.ToFullString(),
 				HasSet = set != null,
 				Set = set?.ExpressionBody?.ToFullString(),
-				IsDeleted=false,
+				IsDeleted = false,
 			};
 
 			foreach (var item in propertyDeclaration.AttributeLists)
@@ -868,7 +847,7 @@ public class {DtoName}
 				var name = item.Attributes[0].Name.ToString();
 				if (name == "MaxLength" && !IsCanHaveMaxLength(result.Type))
 				{
-					Log.Error("类{className}属性{propName}的类型为{type}不能有maxlength限制", owner.Name, result.Name, result.Type);
+					Log.Error("类{className}属性{propName}的类型为{type}不能有MaxLength限制", owner.Name, result.Name, result.Type);
 					continue;
 				}
 				AttributeDefinition attributeDefinition = new()
@@ -900,163 +879,15 @@ public class {DtoName}
 			{
 				lastValue = int.Parse(enumMemberDeclarationSyntax.EqualsValue.Value.ToFullString().Replace("_", ""));
 			}
-			var desp = enumMemberDeclarationSyntax.AttributeLists.FirstOrDefault(x => x.Attributes[0].Name.ToString() == "Description")?.Attributes[0].ArgumentList?.Arguments.ToString().Trim('\"');
+			var description = enumMemberDeclarationSyntax.AttributeLists.FirstOrDefault(x => x.Attributes[0].Name.ToString() == "Description")?.Attributes[0].ArgumentList?.Arguments.ToString().Trim('\"');
 			return new EnumMemberDefinition()
 			{
 				Name = enumMemberDeclarationSyntax.Identifier.Text,
 				Value = lastValue,
-				Description = desp,
-				Summary = enumMemberDeclarationSyntax.GetSummay(),
+				Description = description,
+				Summary = enumMemberDeclarationSyntax.GetSummary(),
 			};
 		}
 
-		/// <summary>
-		/// 添加或者替换remarks标签
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="typeDeclarationSyntax"></param>
-		/// <param name="remark"></param>
-		/// <returns></returns>
-		private static T AddOrReplaceRemark<T>(T typeDeclarationSyntax, string remark) where T : MemberDeclarationSyntax
-		{
-			//当原来没有注释的时候不添加新的内容 防止破坏警告信息
-			var summary = typeDeclarationSyntax.GetSummay();
-			if (summary is null) return typeDeclarationSyntax;
-			return AddOrReplaceXmlContent(typeDeclarationSyntax, "remarks", remark);
-		}
-
-		/// <summary>
-		/// 添加或者替换summary标签
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="typeDeclarationSyntax"></param>
-		/// <param name="summary">注释</param>
-		/// <returns></returns>
-		private static T AddOrReplaceSummary<T>(T typeDeclarationSyntax, string? summary) where T : MemberDeclarationSyntax
-		{
-			var oldsummary = typeDeclarationSyntax.GetSummay();
-			if (oldsummary == summary || summary is null) return typeDeclarationSyntax;
-			return AddOrReplaceXmlContent(typeDeclarationSyntax, "summary", summary);
-		}
-		/// <summary>
-		/// 添加或者替换XML节点内容
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="typeDeclarationSyntax"></param>
-		/// <param name="tagName"></param>
-		/// <param name="text"></param>
-		/// <returns></returns>
-		private static T AddOrReplaceXmlContent<T>(T typeDeclarationSyntax, string tagName, string text) where T : MemberDeclarationSyntax
-		{
-			//是否是顶级的元素
-			var isTop = true;
-			//获取原来的缩进
-			var indentation = typeDeclarationSyntax.GetLeadingTrivia().Last().ToString();
-			if (indentation.IsNullOrWhiteSpace())
-			{
-				isTop = false;
-			}
-			//如果是summary 则内容要修改成多行的格式
-			var content = tagName == "summary" ? $"{Environment.NewLine}{indentation}/// {text}{Environment.NewLine}{indentation}/// " : text;
-			//拿到这个tag
-			var xml = typeDeclarationSyntax.GetLeadingTrivia()
-				.Select(x => x.GetStructure())
-				.OfType<DocumentationCommentTriviaSyntax>()
-				.FirstOrDefault()?.ChildNodes()
-				.OfType<XmlElementSyntax>()
-				.FirstOrDefault(x => x.StartTag.Name.ToString() == tagName);
-			if (xml is null)
-			{
-				//新增标签 前面要有缩进 后面要有换行 且保留原来的trivia
-				var tag = string.Empty;
-				if (isTop)
-				{
-					tag = $"/// <{tagName}>{content}</{tagName}>{Environment.NewLine}";
-				}
-				else
-				{
-					tag = $"/// <{tagName}>{content}</{tagName}>{Environment.NewLine}{indentation}";
-				}
-				return typeDeclarationSyntax.WithLeadingTrivia(
-					typeDeclarationSyntax.GetLeadingTrivia()
-					.AddRange(SyntaxTriviaList.Create(SyntaxTrivia(SyntaxKind.SingleLineCommentTrivia, tag)))
-					);
-			}
-			else
-			{
-				//替换标签
-				var contentNode = xml.ChildNodes().OfType<XmlTextSyntax>().FirstOrDefault();
-				var newContentNode = XmlText(content);
-				return typeDeclarationSyntax.ReplaceNode(xml, xml.ReplaceNode(contentNode!, newContentNode));
-			}
-		}
-		/// <summary>
-		/// 添加或者替换属性
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="typeDeclarationSyntax"></param>
-		/// <param name="attribute"></param>
-		/// <returns></returns>
-		private static T AddOrReplaceAttribute<T>(T typeDeclarationSyntax, AttributeDefinition attribute) where T : MemberDeclarationSyntax
-		{
-			var attr = typeDeclarationSyntax.AttributeLists.SelectMany(x => x.Attributes).FirstOrDefault(x => x.Name.ToString() == attribute.Name);
-			if (attr != null)
-			{
-				if (attribute.ArgumentsText is null)
-				{
-					return typeDeclarationSyntax;
-				}
-				else
-				{
-					return typeDeclarationSyntax.ReplaceNode(attr, attr.WithArgumentList(SyntaxFactory.ParseAttributeArgumentList(attribute.ArgumentsText)));
-				}
-			}
-			else
-			{
-				var name = SyntaxFactory.ParseName(attribute.Name);
-				var arguments = attribute.ArgumentsText is null ? null : SyntaxFactory.ParseAttributeArgumentList(attribute.ArgumentsText);
-				//是否是顶级的元素
-				var isTop = true;
-				//获取原来的缩进
-				var indentation = typeDeclarationSyntax.GetLeadingTrivia().Last();
-				if (indentation.ToString().IsNullOrWhiteSpace())
-				{
-					isTop = false;
-				}
-				if (isTop)
-				{
-					return (T)typeDeclarationSyntax.WithoutLeadingTrivia()
-						.AddAttributeLists(AttributeList().AddAttributes(SyntaxFactory.Attribute(name, arguments)))
-						.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia())
-						;
-				}
-				else
-				{
-					//如果不是顶级元素的话 需要在member前面加上缩进和换行
-					if (typeDeclarationSyntax.AttributeLists.Any())
-					{
-						//当有Attribute的时候 新增的Attribute需要
-						return (T)typeDeclarationSyntax.WithoutLeadingTrivia()
-							.AddAttributeLists(AttributeList()
-													.AddAttributes(SyntaxFactory.Attribute(name, arguments))
-													.WithLeadingTrivia(indentation)
-													.WithTrailingTrivia(SyntaxTrivia(SyntaxKind.EndOfLineTrivia, Environment.NewLine))
-													)
-							.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia());
-					}
-					else
-					{
-						return (T)typeDeclarationSyntax
-							.WithoutLeadingTrivia()
-							.WithLeadingTrivia(SyntaxTrivia(SyntaxKind.EndOfLineTrivia, Environment.NewLine), typeDeclarationSyntax.GetLeadingTrivia().Last())
-							.AddAttributeLists(AttributeList().AddAttributes(SyntaxFactory.Attribute(name, arguments)))
-							.WithLeadingTrivia(typeDeclarationSyntax.GetLeadingTrivia())
-							;
-					}
-				;
-				}
-			}
-
-		}
 	}
 }

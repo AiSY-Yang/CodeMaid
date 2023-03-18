@@ -23,9 +23,10 @@ namespace Api
 	public class Program
 	{
 		/// <summary>
-		/// ServiceProvider
+		/// root ServiceProvider
 		/// </summary>
-		public static IServiceProvider Services = null!;
+		public static IServiceProvider Services { get; private set; } = null!;
+
 		/// <summary>
 		/// main函数
 		/// </summary>
@@ -83,12 +84,12 @@ namespace Api
 			{
 				//支持可空引用类型
 				x.SupportNonNullableReferenceTypes();
-				//自定义schema名称 rapiDoc不支持使用带+号的schemaName
+				//自定义schema名称 RapiDoc不支持使用带+号的schemaName
 				x.CustomSchemaIds((x) => x.FullName!.Replace("+", "_"));
 				//自定义唯一ID
-				x.CustomOperationIds(apiDesc =>
+				x.CustomOperationIds(apiDescription =>
 				{
-					return apiDesc.TryGetMethodInfo(out System.Reflection.MethodInfo methodInfo) ? methodInfo.Name : null;
+					return apiDescription.TryGetMethodInfo(out System.Reflection.MethodInfo methodInfo) ? methodInfo.Name : null;
 				});
 				//添加XML注释
 				foreach (var item in Directory.GetFiles(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "./", "*.xml", SearchOption.TopDirectoryOnly))

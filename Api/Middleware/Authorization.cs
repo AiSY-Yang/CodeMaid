@@ -1,20 +1,23 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authorization.Policy;
-/// <inheritdoc/>
-public class SkipAuthorizationMiddleware : IAuthorizationMiddlewareResultHandler
+﻿using Microsoft.AspNetCore.Authorization.Policy;
+
+namespace Microsoft.AspNetCore.Authorization
 {
-	private readonly AuthorizationMiddlewareResultHandler defaultHandler = new();
-
 	/// <inheritdoc/>
-	public async Task HandleAsync(
-		RequestDelegate next,
-		HttpContext context,
-		AuthorizationPolicy policy,
-		PolicyAuthorizationResult authorizeResult)
+	public class SkipAuthorizationMiddleware : IAuthorizationMiddlewareResultHandler
 	{
+		private readonly AuthorizationMiddlewareResultHandler defaultHandler = new();
 
-		authorizeResult = PolicyAuthorizationResult.Success();
-		// Fall back to the default implementation.
-		await defaultHandler.HandleAsync(next, context, policy, authorizeResult);
+		/// <inheritdoc/>
+		public async Task HandleAsync(
+			RequestDelegate next,
+			HttpContext context,
+			AuthorizationPolicy policy,
+			PolicyAuthorizationResult authorizeResult)
+		{
+
+			authorizeResult = PolicyAuthorizationResult.Success();
+			// Fall back to the default implementation.
+			await defaultHandler.HandleAsync(next, context, policy, authorizeResult);
+		}
 	}
 }

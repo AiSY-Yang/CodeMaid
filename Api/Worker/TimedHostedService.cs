@@ -7,12 +7,14 @@ namespace Api.Worker
 	/// <summary>
 	/// 后台定时器
 	/// </summary>
-	public class TimedHostedService : IHostedService, IDisposable
+	public class TimedHostedService : IHostedService
 	{
 		readonly ILogger<TimedHostedService> _logger;
 		readonly IServiceProvider services;
 		private Timer? _timer = null;
-		/// <inheritdoc/>
+		/// <summary>
+		/// 后台定时器
+		/// </summary>
 		public TimedHostedService(IServiceProvider services, ILogger<TimedHostedService> logger)
 		{
 			this.services = services;
@@ -28,9 +30,16 @@ namespace Api.Worker
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex.Message + ex.Source + ex.StackTrace);
+				_logger.LogError(ex, "定时器开启异常");
 				return Task.CompletedTask;
 			}
+		}
+		/// <inheritdoc/>
+		public Task StopAsync(CancellationToken cancellationToken)
+		{
+			_ = (_timer?.Change(Timeout.Infinite, 0));
+			_timer?.Dispose();
+			return Task.CompletedTask;
 		}
 
 		public async void RunAsync(object? state)
@@ -53,16 +62,5 @@ namespace Api.Worker
 			}
 		}
 
-		/// <inheritdoc/>
-		public Task StopAsync(CancellationToken cancellationToken)
-		{
-			_ = (_timer?.Change(Timeout.Infinite, 0));
-			return Task.CompletedTask;
-		}
-		/// <inheritdoc/>
-		public void Dispose()
-		{
-			_timer?.Dispose();
-		}
 	}
 }

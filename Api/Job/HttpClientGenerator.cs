@@ -11,6 +11,7 @@ using Models.CodeMaid;
 using System.Text.Json;
 using ServicesModels.Settings;
 using System.Collections.Concurrent;
+using Api.Extensions;
 
 namespace Api.Job
 {
@@ -27,7 +28,7 @@ namespace Api.Job
 		/// <returns></returns>
 		public async Task ExecuteAsync(Maid maid)
 		{
-			HttpClient httpClient = new HttpClient() { BaseAddress = new Uri(maid.SourcePath) };
+			HttpClient httpClient = new() { BaseAddress = new Uri(maid.SourcePath) };
 			var json = await httpClient.GetStringAsync("");
 			var md5 = json.Hash(HashOption.MD5_32);
 			if (Md5s.TryGetValue(maid.SourcePath, out string? lastMd5) && lastMd5 == md5)
