@@ -24,6 +24,14 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string? NameSpace { get; set; } = null!;
 		/// <summary>
+		/// 修饰符
+		/// </summary>
+		public string? Modifiers { get; set; } = null!;
+		/// <summary>
+		/// 是否是抽象类
+		/// </summary>
+		public bool IsAbstract => Modifiers?.Contains("abstract") ?? false;
+		/// <summary>
 		/// 类名
 		/// </summary>
 		public string Name { get; set; } = null!;

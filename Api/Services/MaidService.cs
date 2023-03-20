@@ -206,49 +206,22 @@ namespace Api.Services
 		/// <returns></returns>
 		public static async Task UpdateConfiguration(Maid maid)
 		{
-			//获取所有的基类
-			var baseClassNameList = maid.Classes.Select(x => x.Base).Distinct();
-			//先生成基类的配置
-			var baseClassList = maid.Classes
-				.Where(x => !x.IsDeleted)
-				.Where(x => baseClassNameList.Contains(x.Name) || x.Base == null)
-				.ToList();
-			foreach (var item in baseClassList)
+			foreach (var item in maid.Classes.Where(x => !x.IsDeleted))
 			{
 				string fileName = Path.Combine(maid.Project.Path, maid.DestinationPath, $"{item.Name}Configuration.cs");
 				if (File.Exists(fileName))
 				{
 					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
-					var compilationUnitNew = UpdateBaseConfigurationNode(compilationUnit, item);
+					var compilationUnitNew = UpdateConfigurationNode(compilationUnit, item);
 					await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
 				}
 				else
 				{
-					var compilationUnit = CreateConfigurationNode(item, true);
+					var compilationUnit = CreateConfigurationNode(item);
 					await File.WriteAllTextAsync(fileName, compilationUnit.ToFullString());
 				}
 			}
-			//再生成派生类的配置
-			var derivedClassList = maid.Classes
-				.Where(x => !x.IsDeleted)
-				.Where(x => !baseClassNameList.Contains(x.Name))
-				.ToList();
-			foreach (var item in derivedClassList)
-			{
-				string fileName = Path.Combine(maid.Project.Path, maid.DestinationPath, $"{item.Name}Configuration.cs");
-				if (File.Exists(fileName))
-				{
-					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
-					var compilationUnitNew = UpdateDerivedConfigurationNode(compilationUnit, item);
-					await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
 
-				}
-				else
-				{
-					var compilationUnit = CreateConfigurationNode(item, false);
-					await File.WriteAllTextAsync(fileName, compilationUnit.ToFullString());
-				}
-			}
 			//更新Context文件里的类
 			if (maid.Setting != null)
 			{
@@ -261,7 +234,7 @@ namespace Api.Services
 					var firstClass = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 					//做个用于修改的镜像
 					var newClass = firstClass;
-					foreach (var item in derivedClassList)
+					foreach (var item in maid.Classes.Where(x => !x.Modifiers?.Contains("abstract") ?? false))
 					{
 						//取出最后一个属性 在之后做新属性的插入
 						var lastProperty = newClass.Members.Where(x => x is PropertyDeclarationSyntax).LastOrDefault();
@@ -293,10 +266,11 @@ namespace Api.Services
 		/// 生成配置节点
 		/// </summary>
 		/// <param name="classDefinition"></param>
-		/// <param name="isBase">是否是基类</param>
 		/// <returns></returns>
-		private static CompilationUnitSyntax CreateConfigurationNode(ClassDefinition classDefinition, bool isBase)
+		private static CompilationUnitSyntax CreateConfigurationNode(ClassDefinition classDefinition)
 		{
+			bool isAbstract = classDefinition.Modifiers?.Contains("abstract") ?? false;
+			bool hasBase = classDefinition.Base is not null;
 			StringBuilder stringBuilder = new();
 			stringBuilder.AppendLine($$""""
 				using Microsoft.EntityFrameworkCore;
@@ -304,23 +278,30 @@ namespace Api.Services
 
 				using {{classDefinition.NameSpace}};
 				/// <summary>
-				/// {{(isBase ? "基类的配置" : "派生类的配置")}}
+				/// {{(isAbstract ? "基类的配置" : "派生类的配置")}}
 				/// </summary>
-				/// <typeparam name="Entity"></typeparam>
-				{{(isBase ? $"internal abstract class {classDefinition.Name}Configuration<Entity> : IEntityTypeConfiguration<Entity> where Entity : {classDefinition.Name}"
-				: $"internal class {classDefinition.Name}Configuration : {classDefinition.Base}Configuration<{classDefinition.Name}>")}}
+				{{(
+				//当没有基类的时候 直接实现接口
+				!hasBase ? $"internal abstract class {classDefinition.Name}Configuration<TEntity> : IEntityTypeConfiguration<TEntity> where TEntity : {classDefinition.Name}"
+				//当为抽象类的时候 说明是其他类的基类 配置也要是抽象类
+				: isAbstract ? $"internal abstract class {classDefinition.Name}Configuration<TEntity> : {classDefinition.Base}Configuration<TEntity> where TEntity : {classDefinition.Name}"
+				: $"internal class {classDefinition.Name}Configuration : {classDefinition.Base}Configuration<{classDefinition.Name}>"
+				)}}
 				{
-					public {{(isBase ? "virtual" : "override")}} void Configure(EntityTypeBuilder<{{(isBase ? "Entity" : classDefinition.Name)}}> builder)
+					{{(!hasBase ? "public virtual void Configure(EntityTypeBuilder<TEntity> builder)"
+					: isAbstract ? $"public override void Configure(EntityTypeBuilder<TEntity> builder)"
+					: $"public override void Configure(EntityTypeBuilder<{classDefinition.Name}> builder)"
+					)}}
 					{
 				"""");
-			if (!isBase)
-			{
-				stringBuilder.AppendLine($"\t\tbase.Configure(builder);");
-				stringBuilder.AppendLine($"\t\tbuilder.Metadata.SetComment(\"{classDefinition.Summary}\");");
-			}
+			//当有基类的时候要调用基类的方法
+			if (hasBase) stringBuilder.AppendLine($"\t\tbase.Configure(builder);");
+			//当不是抽象类的时候要设置表名
+			if (!isAbstract) stringBuilder.AppendLine($"\t\tbuilder.Metadata.SetComment(\"{classDefinition.Summary}\");");
+			//设置属性
 			foreach (var item in classDefinition.Properties)
 			{
-				if ((IsBaseType(item.Type) || item.IsEnum) && item.HasSet)
+				if (!item.IsDeleted && (IsBaseType(item.Type) || item.IsEnum) && item.HasSet)
 					stringBuilder.AppendLine(CreateBuilderStatement(item));
 			}
 			stringBuilder.AppendLine($"\t}}");
@@ -330,55 +311,38 @@ namespace Api.Services
 		}
 
 		/// <summary>
-		/// 使用当前类更新基类的配置结点
-		/// </summary>
-		/// <param name="source">源数据</param>
-		/// <param name="classDefinition">类</param>
-		/// <returns></returns>
-		private static CompilationUnitSyntax UpdateBaseConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
-		{
-			try
-			{
-				var classNode = source.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
-				source = source.ReplaceNode(classNode, UpdateConfigurationNode(classNode, classDefinition));
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, "基类{name}配置格式错误,重新生成了配置文件", classDefinition.Name);
-				source = CreateConfigurationNode(classDefinition, true);
-			}
-			return source;
-		}
-		/// <summary>
-		/// 使用当前派生类更新派生类的配置节点
+		/// 更新配置节点
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="classDefinition"></param>
 		/// <returns></returns>
-		private static CompilationUnitSyntax UpdateDerivedConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
+		private static CompilationUnitSyntax UpdateConfigurationNode(CompilationUnitSyntax source, ClassDefinition classDefinition)
 		{
 			try
 			{
 				var classNode = source.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 				var classNodeNew = classNode;
-				//当基类改变的时候 要自动更新继承关系
-				var baseListString = $": {classDefinition.Base}Configuration<{classDefinition.Name}>";
-				if (baseListString != classNode.BaseList!.ToString())
+				if (!classDefinition.IsAbstract)
 				{
-					var baseList = BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(
-					   GenericName(Identifier($"{classDefinition.Base}Configuration"))
-					   .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName(classDefinition.Name))))
-					   )));
-					baseList = baseList.ReplaceToken(baseList.ColonToken, baseList.ColonToken.WithTrailingTrivia(classNode.BaseList.ColonToken.TrailingTrivia));
-					;
-					classNodeNew = classNodeNew.WithBaseList(baseList.WithTrailingTrivia(classNode.BaseList.GetTrailingTrivia()));
+					//当基类改变的时候 要自动更新继承关系
+					var baseListString = $": {classDefinition.Base}Configuration<{classDefinition.Name}>";
+					if (baseListString != classNode.BaseList!.ToString())
+					{
+						var baseList = BaseList(SingletonSeparatedList<BaseTypeSyntax>(SimpleBaseType(
+						   GenericName(Identifier($"{classDefinition.Base}Configuration"))
+						   .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName(classDefinition.Name))))
+						   )));
+						baseList = baseList.ReplaceToken(baseList.ColonToken, baseList.ColonToken.WithTrailingTrivia(classNode.BaseList.ColonToken.TrailingTrivia));
+						;
+						classNodeNew = classNodeNew.WithBaseList(baseList.WithTrailingTrivia(classNode.BaseList.GetTrailingTrivia()));
+					}
 				}
 				source = source.ReplaceNode(classNode, UpdateConfigurationNode(classNodeNew, classDefinition));
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, "派生类{name}配置格式错误,重新生成了配置文件", classDefinition.Name);
-				source = CreateConfigurationNode(classDefinition, false);
+				Log.Error(ex, "类{name}配置格式错误,重新生成了配置文件", classDefinition.Name);
+				source = CreateConfigurationNode(classDefinition);
 			}
 			return source;
 		}
@@ -397,9 +361,8 @@ namespace Api.Services
 			var newBlockCode = (BlockSyntax)blockCode;
 			//只有映射到数据库的字段才会更新配置
 			foreach (var item in classDefinition.Properties
-				.Where(x => (IsBaseType(x.Type) || x.IsEnum))
+				.Where(x => IsBaseType(x.Type) || x.IsEnum)
 				.Where(x => x.HasSet)
-				.Where(x => !x.IsDeleted)
 				.Where(x => !x.Attributes.Any(x => x.Name == "NotMapped")
 				))
 			{
@@ -454,12 +417,19 @@ namespace Api.Services
 				var match = propNameRegex.Match(item.ToFullString());
 				if (match.Success && match.Groups.Count == 2 && match.Groups[1].Value == property.Name)
 				{
-					var expression = CreateBuilderStatement(property, "") + Environment.NewLine;
-					return blockSyntax.ReplaceNode(item, ParseStatement(expression).WithLeadingTrivia(item.GetLeadingTrivia()));
+					switch (property.IsDeleted)
+					{
+						case true:
+							return blockSyntax.RemoveNode(item, SyntaxRemoveOptions.KeepNoTrivia)!;
+						case false:
+							var expression = CreateBuilderStatement(property, "") + Environment.NewLine;
+							return blockSyntax.ReplaceNode(item, ParseStatement(expression).WithLeadingTrivia(item.GetLeadingTrivia()));
+					}
 				}
 				continue;
 			}
-			return blockSyntax.InsertNodesAfter(blockSyntax.ChildNodes().Last(), new[] { ParseStatement(CreateBuilderStatement(property) + Environment.NewLine) });
+			if (property.IsDeleted) return blockSyntax;
+			else return blockSyntax.InsertNodesAfter(blockSyntax.ChildNodes().Last(), new[] { ParseStatement(CreateBuilderStatement(property) + Environment.NewLine) });
 		}
 		#endregion
 		#region Dto
@@ -792,6 +762,7 @@ public class {DtoName}
 				Name = classDeclaration.Identifier.Text,
 				Summary = classDeclaration.GetSummary(),
 				LeadingTrivia = classDeclaration.GetLeadingTrivia().ToFullString(),
+				Modifiers = string.Join(' ', classDeclaration.Modifiers.Select(x => x.Text)),
 				Base = classDeclaration.BaseList?.Types.ToString(),
 				IsDeleted = false,
 			};

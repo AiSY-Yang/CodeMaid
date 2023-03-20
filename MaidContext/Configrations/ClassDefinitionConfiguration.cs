@@ -20,5 +20,7 @@ internal class ClassDefinitionConfiguration : DatabaseEntityConfiguration<ClassD
 		builder.Property(x => x.Base).HasComment("基类或者接口名称");
 		builder.Property(x => x.Using).HasComment("类引用的命名空间");
 		builder.Property(x => x.LeadingTrivia).HasComment("前导");
+		builder.Property(x => x.MaidId).HasComment("Maid对象Id");
+		builder.Property(x => x.Modifiers).HasComment("修饰符");
 	}
 }
