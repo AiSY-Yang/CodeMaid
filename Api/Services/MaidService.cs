@@ -206,6 +206,7 @@ namespace Api.Services
 		/// <returns></returns>
 		public static async Task UpdateConfiguration(Maid maid)
 		{
+			//更新配置文件
 			foreach (var item in maid.Classes.Where(x => !x.IsDeleted))
 			{
 				string fileName = Path.Combine(maid.Project.Path, maid.DestinationPath, $"{item.Name}Configuration.cs");
@@ -234,7 +235,7 @@ namespace Api.Services
 					var firstClass = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 					//做个用于修改的镜像
 					var newClass = firstClass;
-					foreach (var item in maid.Classes.Where(x => !x.Modifiers?.Contains("abstract") ?? false))
+					foreach (var item in maid.Classes.Where(x => !x.IsDeleted).Where(x => !x.Modifiers?.Contains("abstract") ?? false))
 					{
 						//取出最后一个属性 在之后做新属性的插入
 						var lastProperty = newClass.Members.Where(x => x is PropertyDeclarationSyntax).LastOrDefault();
@@ -499,6 +500,11 @@ namespace Api.Services
 			//同步属性的相关内容
 			var x = GetClassesFromFlatteningClassName(maid, c, propName);
 			if (x.Count == 0) return source;
+			//当中间的任意一个属性被删除的时候 就把这个Dto里的属性也删除
+			if (x.Any(x => x.IsDeleted == true))
+			{
+				return null!;
+			}
 			//同步Attribute
 			foreach (var attribute in x.Last().Attributes.Where(x => !x.IsDeleted))
 			{
@@ -526,7 +532,7 @@ namespace Api.Services
 			//同步Type
 			var type = x.Last().Type;
 			if (IsBaseType(type) && source.Type.ToString().Trim('?') != type.Trim('?'))
-				source = source.WithType(ParseTypeName(type + (source.Type.ToString().EndsWith('?') ? "? " : " ")));
+				source = source.WithType(ParseTypeName(type + (!type.EndsWith('?') && source.Type.ToString().EndsWith('?') ? "? " : " ")));
 			return source.AddOrReplaceSummary(summary);
 		}
 		/// <summary>
@@ -538,22 +544,22 @@ namespace Api.Services
 		/// <returns></returns>
 		static List<PropertyDefinition> GetClassesFromFlatteningClassName(Maid maid, ClassDefinition c, string name)
 		{
-			//直接在类本身里寻找这个属性 如果有的话就返回这个属性
-			var absoluteProps = c.Properties.Where(x => !x.IsDeleted).Where(x => name == x.Name).ToList();
-			if (absoluteProps.Count > 0)
-			{
-				return absoluteProps;
-			}
+			//直接在类本身里寻找这个属性
+			var absoluteProp = c.Properties.FirstOrDefault(x => name == x.Name);
 			//在基类中找可能的属性 因为如果属于基类的话 则也属于这个类 应该直接返回对应的属性
-			var baseProps = maid.Classes.Where(x => x.Name == c.Base).SelectMany(x => x.Properties).Where(x => name == x.Name).ToList();
-			if (baseProps.Count > 0)
+			var baseProp = maid.Classes.Where(x => x.Name == c.Base).SelectMany(x => x.Properties).FirstOrDefault(x => name == x.Name);
+			//如果以上两个找到的话 取其中未被删除的属性返回 如果都删除的话任意返回一个
+			if (absoluteProp != null && baseProp != null)
 			{
-				return baseProps;
+				return absoluteProp == null ? new List<PropertyDefinition> { baseProp }
+					: baseProp == null ? new List<PropertyDefinition> { absoluteProp }
+					: absoluteProp.IsDeleted ? new List<PropertyDefinition> { baseProp }
+					: new List<PropertyDefinition> { absoluteProp };
 			}
+
 			var res = new List<PropertyDefinition>();
 			//在这个类里找可能的属性
-			var props = c.Properties.Where(x => !x.IsDeleted).Where(x => name.StartsWith(x.Name)).ToList();
-			//props Room
+			var props = c.Properties.Where(x => name.StartsWith(x.Name)).ToList();
 			//根据类型查出来对应的类
 			var classes = maid.Classes.Join(props, x => x.Name, x => x.Type.TrimEnd('?'), (c, p) => new { c, p }).ToList();
 			foreach (var item in classes)
