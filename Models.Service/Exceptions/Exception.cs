@@ -19,22 +19,47 @@ namespace ServicesModels.Exceptions
 		public string Msg { get; set; }
 	}
 
-	/// <inheritdoc/>
-	public abstract class ResultException : Exception, IExceptionResult
+	/// <summary>
+	/// 业务异常返回的结果模型
+	/// </summary>
+	public class ExceptionResult : IExceptionResult
 	{
 		/// <inheritdoc/>
-		protected ResultException(string msg)
+		public ExceptionResult(int code, string msg)
+		{
+			Code = code;
+			Msg = msg;
+		}
+
+		/// <inheritdoc/>
+		public ExceptionResult(ResultException resultException)
+		{
+			Code = resultException.Code;
+			Msg = resultException.Msg;
+		}
+
+		/// <inheritdoc/>
+		public int Code { get; set; }
+		/// <inheritdoc/>
+		public string Msg { get; set; }
+	}
+
+	/// <inheritdoc/>
+	public class ResultException : Exception, IExceptionResult
+	{
+		/// <inheritdoc/>
+		public ResultException(string msg)
 		{
 			Msg = msg;
 		}
 		/// <inheritdoc/>
-		protected ResultException(int code, string msg)
+		public ResultException(int code, string msg)
 		{
 			Code = code;
 			Msg = msg;
 		}
 		/// <inheritdoc/>
-		protected ResultException(int code, string msg, HttpStatusCode httpStatusCode)
+		public ResultException(int code, string msg, HttpStatusCode httpStatusCode)
 		{
 			Code = code;
 			Msg = msg;
@@ -50,7 +75,7 @@ namespace ServicesModels.Exceptions
 		public virtual int Code { get; set; } = 1;
 
 		/// <inheritdoc/>
-		public abstract string Msg { get; set; }
+		public virtual string Msg { get; set; }
 	}
 
 }

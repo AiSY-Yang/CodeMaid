@@ -8,10 +8,13 @@ using MaidContexts;
 using MassTransit;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 using Serilog;
+
+using ServicesModels.Exceptions;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -34,7 +37,7 @@ namespace Api
 		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
-			//配置使用serilog记录日志
+			//配置使用Serilog记录日志
 			builder.Host.UseSerilog((context, services, config) =>
 			{
 				//从配置文件读取日志规则
@@ -45,11 +48,18 @@ namespace Api
 			builder.WebHost.UseKestrel((c, x) =>
 			{
 				x.ListenAnyIP(5241);
+				x.AddServerHeader = false;
 			});
 			//添加数据库
-			string? conn = builder.Configuration.GetConnectionString("MaidContext");
-			builder.Services.AddDbContext<MaidContext>(x => x.UseMySql(conn, ServerVersion.AutoDetect(conn),
-				x => x.EnableRetryOnFailure(3).EnableIndexOptimizedBooleanColumns()).EnableSensitiveDataLogging());
+			string? connectionString = builder.Configuration.GetConnectionString("MaidContext");
+			builder.Services.AddEntityFrameworkMySql();
+			builder.Services.AddDbContextPool<MaidContext>((serviceProvider, x) =>
+			x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), x => x.EnableRetryOnFailure(3).EnableIndexOptimizedBooleanColumns())
+#if DEBUG
+			.EnableSensitiveDataLogging()
+#endif
+			.UseInternalServiceProvider(serviceProvider)
+			);
 			//添加仓储
 			builder.Services.AddMaidReponsitory();
 
@@ -61,6 +71,14 @@ namespace Api
 				//支持从body直接接收string参数
 				x.InputFormatters.Add(new TextFormatter());
 			})
+				.ConfigureApiBehaviorOptions(x =>
+				{
+					x.InvalidModelStateResponseFactory = x =>
+					{
+						var error = new ExceptionResult(400, string.Join(';', x.ModelState.Values.Select(x => x.Errors.FirstOrDefault()?.ErrorMessage).ToList()));
+						return new ObjectResult(error) { StatusCode = 400 };
+					};
+				})
 				//配置json解析
 				.AddJsonOptions(options =>
 				{
@@ -92,7 +110,7 @@ namespace Api
 					return apiDescription.TryGetMethodInfo(out System.Reflection.MethodInfo methodInfo) ? methodInfo.Name : null;
 				});
 				//添加XML注释
-				foreach (var item in Directory.GetFiles(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "./", "*.xml", SearchOption.TopDirectoryOnly))
+				foreach (var item in Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly))
 					try
 					{
 						x.IncludeXmlComments(item);
@@ -140,17 +158,20 @@ namespace Api
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
-			//处理点击劫持漏洞
-			app.Use(async (context, next) =>
-			{
-				context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
-				await next();
-			});
 			//HTTPS重定向
 			//app.UseHttpsRedirection();
 			//添加静态文件支持
 			app.UseDefaultFiles();
-			app.UseStaticFiles();
+			app.UseStaticFiles(new StaticFileOptions()
+			{
+				OnPrepareResponse = context =>
+				{
+					//处理点击劫持漏洞
+					context.Context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+					//CSP防止XSS
+					context.Context.Response.Headers.Add("Content-Security-Policy", "script-src 'self'");
+				}
+			});
 			//添加路由
 			app.UseRouting();
 			//本地化

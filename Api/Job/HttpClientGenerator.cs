@@ -144,7 +144,7 @@ public class {{openApiDocument.Info.Title}}
 						switch (operation.Value.Parameters.First().In)
 						{
 							case ParameterLocation.Query:
-								url += $$"""{{parameter.Name}}={{{UrlEncoder.Default.Encode(parameter.Name)}}}&""";
+								url += $$"""{{UrlEncoder.Default.Encode(parameter.Name)}}={{{parameter.Name}}}&""";
 								break;
 							case ParameterLocation.Header:
 								break;
@@ -158,7 +158,7 @@ public class {{openApiDocument.Info.Title}}
 								break;
 						}
 					}
-					stringBuilder.AppendLine($"\t\t\tRequestUri = new Uri(\"{url.TrimEnd('&', '?')}\", UriKind.Relative),");
+					stringBuilder.AppendLine($"\t\t\tRequestUri = new Uri($\"{url.TrimEnd('&', '?')}\", UriKind.Relative),");
 					if (operation.Value.RequestBody != null)
 					{
 						switch (operation.Value.RequestBody.Content.Keys.First())
@@ -182,9 +182,17 @@ public class {{openApiDocument.Info.Title}}
 							}
 					""");
 					}
-					stringBuilder.AppendLine($"\t\treturn await GetResult<{responseTypeName}>(httpRequestMessage, response);");
+					//achieve response data
+					switch (responseTypeName)
+					{
+						case "Stream":
+							stringBuilder.AppendLine($"\t\treturn await response.Content.ReadAsStreamAsync();");
+							break;
+						default:
+							stringBuilder.AppendLine($"\t\treturn await GetResult<{responseTypeName}>(httpRequestMessage, response);");
+							break;
+					}
 					stringBuilder.AppendLine("\t}");
-
 					newC = newC.AddMembers(SyntaxFactory.ParseMemberDeclaration(stringBuilder.ToString())!);
 				}
 			}

@@ -9,7 +9,7 @@ namespace Api.Middleware
 		{
 			if (context.Exception is ResultException ex)
 			{
-				context.Result = new Microsoft.AspNetCore.Mvc.ObjectResult(ex as IExceptionResult);
+				context.Result = new Microsoft.AspNetCore.Mvc.ObjectResult(new ExceptionResult(ex)) { StatusCode = (int?)ex.HttpStatusCode };
 				context.ExceptionHandled = true;
 			}
 			else

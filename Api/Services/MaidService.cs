@@ -59,7 +59,7 @@ namespace Api.Services
 		/// <returns></returns>
 		public static async Task<HashSet<string>> Update(Maid maid, string path)
 		{
-			var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(path));
+			var tree = CSharpSyntaxTree.ParseText(await File.ReadAllTextAsync(path));
 			var compilationUnit = tree.GetCompilationUnitRoot();
 			//记录下文件的using
 			var usingText = compilationUnit.Usings.ToFullString();
@@ -456,19 +456,19 @@ namespace Api.Services
 		static async Task UpdateDto(Maid maid)
 		{
 			var sourcePath = Path.Combine(maid.Project.Path, maid.SourcePath);
-			var destPath = Path.Combine(maid.Project.Path, maid.DestinationPath);
+			var destinationPath = Path.Combine(maid.Project.Path, maid.DestinationPath);
 			//确认目标路径的存在
-			if (!Directory.Exists(destPath))
-				Directory.CreateDirectory(destPath);
+			if (!Directory.Exists(destinationPath))
+				Directory.CreateDirectory(destinationPath);
 			if (maid.Setting != null)
 			{
 				//读取设置
 				DtoSyncSetting settings = maid.Setting!.AsJsonToObject<DtoSyncSetting>() ?? new DtoSyncSetting();
 				//所有的类都进行更新
-				foreach (var item in maid.Classes)
+				foreach (var item in maid.Classes.Where(x => !x.IsDeleted))
 				{
 					//生成Dto的目录
-					string dirPath = Path.Combine(destPath, item.Name + settings.DirectorySuffix);
+					string dirPath = Path.Combine(destinationPath, item.Name + settings.Suffix);
 					if (!Directory.Exists(dirPath))
 						Directory.CreateDirectory(dirPath);
 					foreach (var setting in settings.DtoSyncSettings)
@@ -478,7 +478,7 @@ namespace Api.Services
 				}
 			}
 			#region 同步属性的功能
-			foreach (var file in Directory.GetFiles(destPath, "*.cs", SearchOption.AllDirectories))
+			foreach (var file in Directory.GetFiles(destinationPath, "*.cs", SearchOption.AllDirectories))
 			{
 				var compilationUnit = CSharpSyntaxTree.ParseText(await File.ReadAllTextAsync(file)).GetCompilationUnitRoot();
 				var cs = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>();

@@ -1,5 +1,4 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json.Nodes;
 
@@ -122,28 +121,26 @@ public class SystemController : ControllerBase
 	/// 回显请求信息
 	/// </summary>
 	/// <returns></returns>
-	[HttpGet("[action]")]
-	[HttpPost("[action]")]
+	[Route("[action]")]
 	public async Task<object> Echo()
 	{
-		var body = Encoding.UTF8.GetString((await HttpContext.Request.BodyReader.ReadAsync()).Buffer);
 		var req = new
 		{
-			HttpContext.Connection.RemoteIpAddress,
+			AddressFamily = HttpContext.Connection.RemoteIpAddress?.AddressFamily.ToString(),
+			RemoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
 			HttpContext.Connection.RemotePort,
-			HttpContext.Session.Id,
-			HttpContext.Session.Keys,
-			HttpContext.Request.PathBase,
-			HttpContext.Request.Path,
+			PathBase = HttpContext.Request.PathBase.Value,
+			Path = HttpContext.Request.Path.Value,
 			HttpContext.Request.Method,
-			HttpContext.Request.QueryString,
+			QueryString = HttpContext.Request.QueryString.Value,
 			HttpContext.Request.ContentLength,
 			HttpContext.Request.IsHttps,
 			HttpContext.Request.Protocol,
 			HttpContext.Request.Scheme,
-			Headers = HttpContext.Request.Headers.Select(x => new { x.Key, x.Value }),
-			Body = body,
-			Form = HttpContext.Request.Form.Select(x => new { x.Key, x.Value })
+			HttpContext.Request.Headers,
+			Form = HttpContext.Request.HasFormContentType ? HttpContext.Request.Form.Select(x => new { x.Key, x.Value }) : null,
+			Files = HttpContext.Request.HasFormContentType ? HttpContext.Request.Form.Files : null,
+			Body = Encoding.UTF8.GetString((await HttpContext.Request.BodyReader.ReadAsync()).Buffer),
 		};
 		return req;
 	}

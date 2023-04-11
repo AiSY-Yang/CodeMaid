@@ -229,5 +229,20 @@ namespace Api.Extensions
 			return AddOrReplaceXmlContent(typeDeclarationSyntax, "summary", summary);
 		}
 
+		/// <summary>
+		/// 移除类里面指定类型的属性
+		/// </summary>
+		/// <param name="classDeclarationSyntax"></param>
+		/// <param name="propertyType">属性类型</param>
+		/// <returns></returns>
+		public static ClassDeclarationSyntax RemovePropertyByType(this ClassDeclarationSyntax classDeclarationSyntax, string propertyType)
+		{
+			var propertyDeclaration = classDeclarationSyntax.ChildNodes()
+				.OfType<PropertyDeclarationSyntax>()
+				.Where(p => p.Type.ToString() == propertyType)
+				.ToList();
+			return classDeclarationSyntax.RemoveNodes(propertyDeclaration, SyntaxRemoveOptions.KeepNoTrivia)!;
+		}
+
 	}
 }

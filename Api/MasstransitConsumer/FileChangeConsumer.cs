@@ -28,6 +28,7 @@ namespace Api.MasstransitConsumer
 		public async Task Consume(ConsumeContext<FileChangeEvent> context)
 		{
 			var maid = maidContext.Maids
+						.AsSplitQuery()
 						.Include(x => x.Project)
 						.Include(x => x.Enums)
 						.ThenInclude(x => x.EnumMembers)

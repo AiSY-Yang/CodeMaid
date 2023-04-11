@@ -31,6 +31,7 @@ namespace Api
 			var maids = await context.Maids
 				.Include(x => x.Project)
 				.Where(x => x.MaidWork != MaidWork.HttpClientSync)
+				.AsSplitQuery()
 				.ToListAsync();
 			foreach (var item in maids)
 			{
