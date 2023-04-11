@@ -235,25 +235,33 @@ namespace Api.Services
 					var firstClass = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 					//做个用于修改的镜像
 					var newClass = firstClass;
-					foreach (var item in maid.Classes.Where(x => !x.IsDeleted).Where(x => !x.Modifiers?.Contains("abstract") ?? false))
+					foreach (var item in maid.Classes)
 					{
-						//取出最后一个属性 在之后做新属性的插入
-						var lastProperty = newClass.Members.Where(x => x is PropertyDeclarationSyntax).LastOrDefault();
-						//如果一个属性都没有 则插入到最后一个构造函数后面
-						lastProperty ??= newClass.Members.Where(x => x is ConstructorDeclarationSyntax).LastOrDefault();
-						//如果构造函数也没有 则插入到第一个方法后面
-						lastProperty ??= newClass.Members.Where(x => x is MethodDeclarationSyntax).First();
-
-						var prop = newClass.Members.OfType<PropertyDeclarationSyntax>().Where(x => x.Type.ToString() == $"DbSet<{item.Name}>").FirstOrDefault();
-						if (prop is null)
+						//如果类被删除或者改成了抽象类 则从context中移除 否则插入或者更新
+						if (item.IsDeleted || item.IsAbstract)
 						{
-							newClass = newClass.InsertNodesAfter(lastProperty, new SyntaxNode[] {
-								(PropertyDeclarationSyntax)ParseMemberDeclaration($"{(item.LeadingTrivia==null?"\t":string.Join('\n',item.LeadingTrivia.Split('\n').Select(x=>"\t"+x)))}public virtual DbSet<{item.Name}> {item.Name.Pluralize(inputIsKnownToBeSingular: false)} {{ get; set; }} = null!;")!
-								.WithTrailingTrivia(ParseTrailingTrivia(Environment.NewLine))! });
+							newClass = newClass.RemovePropertyByType($"DbSet<{item.Name}>");
 						}
 						else
 						{
-							newClass = newClass.ReplaceNode(prop, prop.AddOrReplaceSummary(item.Summary));
+							//取出最后一个属性 在之后做新属性的插入
+							var lastProperty = newClass.Members.Where(x => x is PropertyDeclarationSyntax).LastOrDefault();
+							//如果一个属性都没有 则插入到最后一个构造函数后面
+							lastProperty ??= newClass.Members.Where(x => x is ConstructorDeclarationSyntax).LastOrDefault();
+							//如果构造函数也没有 则插入到第一个方法后面
+							lastProperty ??= newClass.Members.Where(x => x is MethodDeclarationSyntax).First();
+
+							var prop = newClass.Members.OfType<PropertyDeclarationSyntax>().Where(x => x.Type.ToString() == $"DbSet<{item.Name}>").FirstOrDefault();
+							if (prop is null)
+							{
+								newClass = newClass.InsertNodesAfter(lastProperty, new SyntaxNode[] {
+								(PropertyDeclarationSyntax)ParseMemberDeclaration($"{(item.LeadingTrivia==null?"\t":string.Join('\n',item.LeadingTrivia.Split('\n').Select(x=>"\t"+x)))}public virtual DbSet<{item.Name}> {item.Name.Pluralize(inputIsKnownToBeSingular: false)} {{ get; set; }} = null!;")!
+								.WithTrailingTrivia(ParseTrailingTrivia(Environment.NewLine))! });
+							}
+							else
+							{
+								newClass = newClass.ReplaceNode(prop, prop.AddOrReplaceSummary(item.Summary));
+							}
 						}
 					}
 					var compilationUnitNew = compilationUnit.ReplaceNode(firstClass, newClass);
@@ -337,6 +345,12 @@ namespace Api.Services
 						;
 						classNodeNew = classNodeNew.WithBaseList(baseList.WithTrailingTrivia(classNode.BaseList.GetTrailingTrivia()));
 					}
+				}
+				else
+				{
+					//如果是新修改的抽象类 则同时改变配置文件
+					if (!classNode.Modifiers.Any(x => x.Text == "abstract"))
+						classNodeNew = classNodeNew.WithModifiers(classNodeNew.Modifiers.Add(ParseToken("abstract ")));
 				}
 				source = source.ReplaceNode(classNode, UpdateConfigurationNode(classNodeNew, classDefinition));
 			}
@@ -548,8 +562,8 @@ namespace Api.Services
 			var absoluteProp = c.Properties.FirstOrDefault(x => name == x.Name);
 			//在基类中找可能的属性 因为如果属于基类的话 则也属于这个类 应该直接返回对应的属性
 			var baseProp = maid.Classes.Where(x => x.Name == c.Base).SelectMany(x => x.Properties).FirstOrDefault(x => name == x.Name);
-			//如果以上两个找到的话 取其中未被删除的属性返回 如果都删除的话任意返回一个
-			if (absoluteProp != null && baseProp != null)
+			//如果以上两个任意一个找到的话 取其中未被删除的属性返回 如果都删除的话任意返回一个
+			if (absoluteProp != null || baseProp != null)
 			{
 				return absoluteProp == null ? new List<PropertyDefinition> { baseProp }
 					: baseProp == null ? new List<PropertyDefinition> { absoluteProp }
@@ -558,10 +572,14 @@ namespace Api.Services
 			}
 
 			var res = new List<PropertyDefinition>();
-			//在这个类里找可能的属性
-			var props = c.Properties.Where(x => name.StartsWith(x.Name)).ToList();
+			//在这个类和基类里找可能的属性
+			var props = c.Properties.Union(maid.Classes.Where(x => x.Name == c.Base).SelectMany(x => x.Properties))
+				.Where(x => name.StartsWith(x.Name))
+				.ToList();
 			//根据类型查出来对应的类
-			var classes = maid.Classes.Join(props, x => x.Name, x => x.Type.TrimEnd('?'), (c, p) => new { c, p }).ToList();
+			var classes = maid.Classes.Join(props, x => x.Name, x => x.Type.TrimEnd('?'), (c, p) => new { c, p })
+				.OrderBy(x => x.p.IsDeleted)
+				.ToList();
 			foreach (var item in classes)
 			{
 				//去掉类名后当作下一个要查找的名称
@@ -569,6 +587,7 @@ namespace Api.Services
 				if (nextName == "")
 				{
 					res.Add(item.p);
+					break;
 				}
 				else
 				{
@@ -577,6 +596,7 @@ namespace Api.Services
 					{
 						res.Add(item.p);
 						res.AddRange(next);
+						break;
 					}
 				}
 			}
@@ -742,6 +762,7 @@ public class {DtoName}
 				"Guid", "Guid?",
 				"DateTime", "DateTime?", "DateTimeOffset", "DateTimeOffset?",
 				"DateOnly", "DateOnly?", "TimeOnly", "TimeOnly?",
+				"JsonDocument","JsonDocument?",
 			}.Contains(type);
 		}
 		/// <summary>
