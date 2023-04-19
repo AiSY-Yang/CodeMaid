@@ -1,17 +1,18 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using System.Collections.Concurrent;
+using System.Text.Encodings.Web;
+
+using Api.Extensions;
+using Api.Tools;
+
+using ExtensionMethods;
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
-using ExtensionMethods;
-using System.Text.Encodings.Web;
-using System.Text;
-using Api.Tools;
-using Microsoft.CodeAnalysis;
+
 using Models.CodeMaid;
-using System.Text.Json;
-using ServicesModels.Settings;
-using System.Collections.Concurrent;
-using Api.Extensions;
 
 namespace Api.Job
 {
@@ -35,13 +36,9 @@ namespace Api.Job
 			{
 				return;
 			}
-			else
-			{
-				Md5s[maid.SourcePath] = md5;
-				await Console.Out.WriteLineAsync("生成");
-			}
 			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out _);
-			var PATH = Path.Combine(maid.Project.Path, maid.DestinationPath, openApiDocument.Info.Title + ".cs");
+			RestfulApiDocument restfulApiDocument = new RestfulApiDocument(openApiDocument);
+			var PATH = Path.Combine(maid.Project.Path, maid.DestinationPath, restfulApiDocument.Title + ".cs");
 			CompilationUnitSyntax unit;
 			if (File.Exists(PATH))
 			{
@@ -54,11 +51,11 @@ using System.Net.Http.Json;
 
 using SnakeCharmerModel;
 
-public class {{openApiDocument.Info.Title}}
+public class {{restfulApiDocument.Title}}
 {
 	private readonly HttpClient httpClient;
 
-	public {{openApiDocument.Info.Title}}(HttpClient httpClient)
+	public {{restfulApiDocument.Title}}(HttpClient httpClient)
 	{
 		httpClient.BaseAddress = new Uri("http://localhost:5000");
 #if DEBUG
@@ -76,127 +73,40 @@ public class {{openApiDocument.Info.Title}}
 				unit = CSharpSyntaxTree.ParseText(text).GetCompilationUnitRoot();
 			}
 			var c = unit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
-			var ms = c.ChildNodes().OfType<MethodDeclarationSyntax>().ToList();
 			var newC = c;
-			foreach (var item in openApiDocument.Paths)
-			{
-				foreach (var operation in item.Value.Operations)
-				{
-					var bodyId = string.Empty;
-					var bodyParameterName = string.Empty;
-					//响应类型的名称
-					var responseTypeName = string.Empty;
-					if (!operation.Value.Responses.Any(x => x.Key == "200"))
-					{
-						//log
-						continue;
-					}
-					if (operation.Value.Responses["200"].Content.Any())
-					{
-						responseTypeName = operation.Value.Responses["200"].Content.FirstOrDefault().Value.Schema.GetTypeString();
-					}
-					else
-					{
-						responseTypeName = "Stream";
-					}
-					//返回值是否可能为null
-					var hasNullResponse = operation.Value.Responses.Any(x => x.Key == "204");
-					if (hasNullResponse)
-					{
-						responseTypeName += "?";
-					}
-					var methodName = operation.Value.OperationId?.ToNamingConvention(NamingConvention.PascalCase) ?? item.Key.Replace('/', '_').ToNamingConvention(NamingConvention.PascalCase);
 
-					var m = ms.FirstOrDefault(x => x.Identifier.Text == methodName);
-					if (m != null)
-					{
-						//当已经存在方法的时候跳过
-						continue;
-					}
-					var stringBuilder = new StringBuilder();
-					stringBuilder.AppendLine($"\t/// <summary>");
-					stringBuilder.AppendLine($"\t/// {operation.Value.Summary}");
-					stringBuilder.AppendLine($"\t/// </summary>");
-					stringBuilder.AppendLine($"\t/// <returns></returns>");
-					stringBuilder.Append($"\tpublic async ");
-					//method return
-					stringBuilder.Append($"Task<{responseTypeName}> ");
-					//method name
-					stringBuilder.Append($"{methodName}(");
-					//method parameter				
-					stringBuilder.Append(string.Join(", ", operation.Value.Parameters.Select(x => $"{x.Schema.GetTypeString()} {x.Name}")));
-					if (operation.Value.RequestBody != null)
-					{
-						bodyId = operation.Value.RequestBody.Content.First().Value.Schema.GetTypeString();
-						bodyParameterName = bodyId.ToNamingConvention(NamingConvention.camelCase);
-						stringBuilder.Append($"{bodyId} {bodyParameterName}");
-					}
-					stringBuilder.AppendLine(")");
-					stringBuilder.AppendLine("\t{");
-					//add HttpRequestMessage
-					stringBuilder.AppendLine("\t\tvar httpRequestMessage = new HttpRequestMessage()");
-					stringBuilder.AppendLine("\t\t{");
-					stringBuilder.AppendLine($"\t\t\tMethod = HttpMethod.{operation.Key},");
-					//build url
-					var url = $"{item.Key}?";
-					foreach (var parameter in operation.Value.Parameters)
-					{
-						switch (operation.Value.Parameters.First().In)
-						{
-							case ParameterLocation.Query:
-								url += $$"""{{UrlEncoder.Default.Encode(parameter.Name)}}={{{parameter.Name}}}&""";
-								break;
-							case ParameterLocation.Header:
-								break;
-							case ParameterLocation.Path:
-								break;
-							case ParameterLocation.Cookie:
-								break;
-							case null:
-								break;
-							default:
-								break;
-						}
-					}
-					stringBuilder.AppendLine($"\t\t\tRequestUri = new Uri($\"{url.TrimEnd('&', '?')}\", UriKind.Relative),");
-					if (operation.Value.RequestBody != null)
-					{
-						switch (operation.Value.RequestBody.Content.Keys.First())
-						{
-							case "application/json":
-							case "text/json":
-							case "application/*+json":
-								stringBuilder.AppendLine($"\t\t\tContent = JsonContent.Create({bodyParameterName}),");
-								break;
-						}
-					}
-					//HttpRequestMessage over
-					stringBuilder.AppendLine("\t\t};");
-					stringBuilder.AppendLine("		var response = await httpClient.SendAsync(httpRequestMessage);");
-					if (hasNullResponse)
-					{
-						stringBuilder.AppendLine("""
-							if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-							{
-								return null;
-							}
-					""");
-					}
-					//achieve response data
-					switch (responseTypeName)
-					{
-						case "Stream":
-							stringBuilder.AppendLine($"\t\treturn await response.Content.ReadAsStreamAsync();");
-							break;
-						default:
-							stringBuilder.AppendLine($"\t\treturn await GetResult<{responseTypeName}>(httpRequestMessage, response);");
-							break;
-					}
-					stringBuilder.AppendLine("\t}");
-					newC = newC.AddMembers(SyntaxFactory.ParseMemberDeclaration(stringBuilder.ToString())!);
+			foreach (var api in restfulApiDocument.Api)
+			{
+
+				var bodyId = string.Empty;
+				var bodyParameterName = string.Empty;
+				//响应类型的名称
+				var responseTypeName = api.ResponseType;
+
+				var hasNullResponse = api.MaybeReturnNull;
+				if (hasNullResponse)
+				{
+					responseTypeName += "?";
 				}
+				var methodName = api.MethodName;
+
+				var m = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().FirstOrDefault(x => x.Identifier.Text == methodName);
+				if (m != null)
+				{
+					//newC = newC.ReplaceNode(m, (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod()));
+					//当已经存在方法的时候跳过
+					continue;
+				}
+				else
+				{
+					newC = newC.AddMembers((MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod())!);
+				}
+
 			}
-			await FileTools.Write(PATH, unit, unit.ReplaceNode(c, newC));
+			await FileTools.Write(PATH, CSharpSyntaxTree.ParseText("").GetCompilationUnitRoot(), unit.ReplaceNode(c, newC));
+			Md5s[maid.SourcePath] = md5;
+			await Console.Out.WriteLineAsync("生成");
+
 		}
 	}
 	static class ApiModelExtensions
@@ -211,7 +121,14 @@ public class {{openApiDocument.Info.Title}}
 		{
 			var type = OpenApiSchema.Type switch
 			{
-				"string" => "string",
+				"string" => OpenApiSchema.Format switch
+				{
+					"uuid" => "Guid",
+					"binary" => "Stream",
+					"date" => "DateOnly",
+					"date-time" => "DateTimeOffset",
+					_ => "string",
+				},
 				"number" => OpenApiSchema.Format switch
 				{
 					"float" => "float",
@@ -225,10 +142,188 @@ public class {{openApiDocument.Info.Title}}
 					_ => "int",
 				},
 				"boolean" => "bool",
-				"array" => "",
-				_ => OpenApiSchema.Reference.Id,
+				"array" => $"List<{OpenApiSchema.Items.GetTypeString()}>",
+				_ => OpenApiSchema.Reference?.Id,
 			};
 			return OpenApiSchema.Nullable ? $"{type}?" : type;
 		}
 	}
+	class RestfulApiDocument
+	{
+		public RestfulApiDocument(OpenApiDocument openApiDocument)
+		{
+			Title = openApiDocument.Info.Title.Replace(" ", "_");
+			foreach (var item in openApiDocument.Paths)
+			{
+				foreach (var operation in item.Value.Operations)
+				{
+					//如果响应不包含200则不进行记录
+					if (!operation.Value.Responses.Any(x => x.Key == "200"))
+					{
+						//log
+						continue;
+					}
+					RestfulApiModel restfulApiModel = new RestfulApiModel()
+					{
+						Path = item.Key,
+						Method = operation.Key,
+						ResponseType = operation.Value.Responses["200"].Content.Any() ?
+						operation.Value.Responses["200"].Content.FirstOrDefault().Value.Schema.GetTypeString()
+						: "Stream",
+						MaybeReturnNull = operation.Value.Responses.Any(x => x.Key == "204"),
+						Id = operation.Value.OperationId,
+						Summary = operation.Value.Summary,
+						BodyParameter = operation.Value.RequestBody?.Content.Select(x => new BodyContent()
+						{
+							ContentType = x.Key,
+							Body = x.Value.Schema.GetTypeString(),
+							Form = x.Value.Schema.Properties.ToDictionary(x => x.Key, x => x.Value.GetTypeString()),
+						}).ToList(),
+						QueryParameter = operation.Value.Parameters.Where(x => x.In == ParameterLocation.Query).ToDictionary(x => x.Name, x => x.Schema.GetTypeString()),
+						PathParameter = operation.Value.Parameters.Where(x => x.In == ParameterLocation.Path).ToDictionary(x => x.Name, x => x.Schema.GetTypeString()),
+						HeaderParameter = operation.Value.Parameters.Where(x => x.In == ParameterLocation.Header).ToDictionary(x => x.Name, x => x.Schema.GetTypeString()),
+					};
+					if (restfulApiModel.Path.Contains("ImportFromExcel"))
+					{
+						Console.WriteLine(1);
+					}
+					Api.Add(restfulApiModel);
+				}
+			}
+		}
+		/// <summary>
+		/// 标题
+		/// </summary>
+		public string Title { get; private set; }
+		/// <summary>
+		/// Api
+		/// </summary>
+		public List<RestfulApiModel> Api { get; private set; } = new List<RestfulApiModel>();
+	}
+	class RestfulApiModel
+	{
+		/// <summary>
+		/// 接口路径
+		/// </summary>
+		public required string Path;
+		/// <summary>
+		/// Http方法
+		/// </summary>
+		public required OperationType Method;
+		/// <summary>
+		/// 响应类型
+		/// </summary>
+		public required string ResponseType;
+		/// <summary>
+		/// 是否会有null响应 响应码为204
+		/// </summary>
+		public required bool MaybeReturnNull;
+		/// <summary>
+		/// 注释
+		/// </summary>
+		public required string Summary;
+		/// <summary>
+		/// body参数
+		/// </summary>
+		public required List<BodyContent>? BodyParameter;
+
+		/// <summary>
+		/// Operation Id
+		/// </summary>
+		public required string Id;
+		public string MethodName { get => Id.ToNamingConvention(NamingConvention.PascalCase) ?? Path.Replace('/', '_').ToNamingConvention(NamingConvention.PascalCase); }
+		/// <summary>
+		/// 查询参数
+		/// </summary>
+		public required Dictionary<string, string> QueryParameter { get; internal set; }
+		/// <summary>
+		/// 路由参数
+		/// </summary>
+		public required Dictionary<string, string> PathParameter { get; internal set; }
+		/// <summary>
+		/// Header参数
+		/// </summary>
+		public required Dictionary<string, string> HeaderParameter { get; internal set; }
+
+		public string CreateMethod()
+		{
+#if DEBUG
+			ResponseType = "object";
+			BodyParameter?.ForEach(x => x.Body = x.Body is null ? null : "object");
+#endif
+			//组装请求url
+			var url = Path;
+			if (QueryParameter.Count > 0) url += "?";
+			{
+				var paraList = new List<string>();
+				foreach (var item in QueryParameter.ToDictionary(x => x.Key.ToNamingConvention(NamingConvention.camelCase), x => x.Value))
+					paraList.Add($"{UrlEncoder.Default.Encode(item.Key)}={{{item.Key}}}");
+				url += string.Join('&', paraList);
+			}
+			//合并所有参数 作为方法的入参
+			var para = PathParameter.Union(QueryParameter).Union(HeaderParameter).ToList();
+			//此处只处理一种contentType
+			if (BodyParameter != null)
+			{
+				var item = BodyParameter.First();
+				if (item.Body != null)
+				{
+					para.Add(new KeyValuePair<string, string>("body", item.Body));
+				}
+			}
+			para = para.Select(x => new KeyValuePair<string, string>(x.Key.ToNamingConvention(NamingConvention.camelCase), x.Value)).ToList();
+			//确定body内容
+			var body = BodyParameter?.FirstOrDefault();
+			var bodyContnet = string.Empty;
+			if (body != null)
+				bodyContnet = body.HasJsonContentType ? $"var content = JsonContent.Create(body);" : "var content = new MultipartFormDataContent();";
+			return $$"""
+					/// <summary>
+					/// {{Summary}}
+					/// </summary>
+					/// <returns></returns>
+					public async Task<{{ResponseType}}> {{MethodName}}({{string.Join(", ", para.Select(x => $"{x.Value} {x.Key}"))}})
+					{
+						{{(body != null ? bodyContnet : "")}}
+						var httpRequestMessage = new HttpRequestMessage()
+						{
+							Method = HttpMethod.{{Method}},
+							RequestUri = new Uri($"{{url}}", UriKind.Relative),
+							{{(body != null ? "Content = content," : "")}}
+						};
+						var response = await httpClient.SendAsync(httpRequestMessage);
+						{{(MaybeReturnNull ? "if (response.StatusCode == System.Net.HttpStatusCode.NoContent) return null;" : "")}}
+						{{ResponseType switch
+			{
+				"Stream" => $"return await response.Content.ReadAsStreamAsync();",
+				_ => $"return await GetResult<{ResponseType}>(httpRequestMessage, response);"
+			}}}
+					}
+
+				""";
+		}
+	}
+	public class BodyContent
+	{
+		public required string ContentType { get; set; }
+		///<inheritdoc cref="HttpRequestJsonExtensions.HasJsonContentType(HttpRequest)"/>
+		public bool HasJsonContentType
+		{
+			get
+			{
+				if (!Microsoft.Net.Http.Headers.MediaTypeHeaderValue.TryParse(ContentType, out var mt)) return false;
+				// Matches application/json
+				if (mt.MediaType.Equals("application/json", StringComparison.OrdinalIgnoreCase)) return true;
+				// Matches +json, e.g. application/ld+json
+				if (mt.Suffix.Equals("json", StringComparison.OrdinalIgnoreCase)) return true;
+				return false;
+			}
+		}
+		/// <summary>
+		/// Body的类型
+		/// </summary>
+		public required string? Body { get; set; }
+		public required Dictionary<string, string> Form { get; set; }
+	}
+
 }
