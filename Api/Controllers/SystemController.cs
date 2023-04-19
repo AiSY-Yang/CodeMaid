@@ -121,7 +121,13 @@ public class SystemController : ControllerBase
 	/// 回显请求信息
 	/// </summary>
 	/// <returns></returns>
-	[Route("[action]")]
+	[HttpGet("[action]")]
+	[HttpPost("[action]")]
+	[HttpPut("[action]")]
+	[HttpDelete("[action]")]
+	[HttpHead("[action]")]
+	[HttpOptions("[action]")]
+	[HttpPatch("[action]")]
 	public async Task<object> Echo()
 	{
 		var req = new

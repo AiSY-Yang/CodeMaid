@@ -30,12 +30,42 @@ namespace Api.Services
 	/// </summary>
 	public class MaidService
 	{
+		static HashSet<long> olds = new();
+
+		/// <summary>
+		/// 更新maid
+		/// </summary>
+		/// <param name="maid"></param>
+		/// <param name="path">变动的文件路径</param>
+		/// <param name="isDelete">是否是删除了文件</param>
+		/// <returns></returns>
+		public static async Task Update(Maid maid, string path, bool isDelete)
+		{
+			if (!olds.Contains(maid.Id))
+			{
+				Log.Information("maid{id}在程序启动后第一次更新,全量更新数据", maid.Id);
+				await Update(maid);
+			}
+			else
+			{
+				if (isDelete)
+				{
+					Log.Information("文件{path}删除,全量更新数据", path);
+					await Update(maid);
+				}
+				else
+				{
+					Log.Information("文件{path}改变,重新读取数据", path);
+					await Update(maid, path);
+				}
+			}
+		}
 		/// <summary>
 		/// 对maid全量更新
 		/// </summary>
 		/// <param name="maid"></param>
 		/// <returns></returns>
-		public static async Task<Maid> Update(Maid maid)
+		static async Task<Maid> Update(Maid maid)
 		{
 			var files = Directory.GetFiles(Path.Combine(maid.Project.Path, maid.SourcePath), "*.cs", SearchOption.AllDirectories);
 			HashSet<string> classList = new();
@@ -57,7 +87,7 @@ namespace Api.Services
 		/// <param name="maid"></param>
 		/// <param name="path">文件路径</param>
 		/// <returns></returns>
-		public static async Task<HashSet<string>> Update(Maid maid, string path)
+		static async Task<HashSet<string>> Update(Maid maid, string path)
 		{
 			var tree = CSharpSyntaxTree.ParseText(await File.ReadAllTextAsync(path));
 			var compilationUnit = tree.GetCompilationUnitRoot();
@@ -158,7 +188,7 @@ namespace Api.Services
 						}
 					}
 					p.ClassDefinitionId = c.Id;
-					var e = maid.Enums.FirstOrDefault(x => x.Name == p.Type);
+					var e = maid.Enums.FirstOrDefault(x => x.Name == p.Type.TrimEnd('?'));
 					if (e is not null)
 					{
 						p.IsEnum = true;
@@ -544,8 +574,9 @@ namespace Api.Services
 				return source;
 			}
 			//同步Type
-			var type = x.Last().Type;
-			if (IsBaseType(type) && source.Type.ToString().Trim('?') != type.Trim('?'))
+			var p = x.Last();
+			var type = p.Type;
+			if ((IsBaseType(type) || p.IsEnum) && source.Type.ToString().Trim('?') != type.Trim('?'))
 				source = source.WithType(ParseTypeName(type + (!type.EndsWith('?') && source.Type.ToString().EndsWith('?') ? "? " : " ")));
 			return source.AddOrReplaceSummary(summary);
 		}

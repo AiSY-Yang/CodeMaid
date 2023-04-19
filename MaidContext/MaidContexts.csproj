@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Models.DbContext\MaidModels.csproj" />
-    <ProjectReference Include="..\Reponsitory\Reponsitory.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -53,7 +53,6 @@ namespace Api
 						//   | NotifyFilters.LastWrite
 						//   | NotifyFilters.Security
 						//   | NotifyFilters.Size;
-
 						Filter = "*.cs",
 						IncludeSubdirectories = true,
 						EnableRaisingEvents = true

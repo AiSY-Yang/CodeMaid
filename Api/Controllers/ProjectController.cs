@@ -8,12 +8,27 @@ namespace Api.Controllers
 	[Route("[controller]")]
 	public class ProjectController : ControllerBase
 	{
-		private readonly ILogger<ProjectController> _logger;
+		private readonly ILogger<ProjectController> logger;
+		private readonly ProjectRepository projectRepository;
 
-		public ProjectController(ILogger<ProjectController> logger)
+		public ProjectController(ILogger<ProjectController> logger,ProjectRepository projectRepository)
 		{
-			_logger = logger;
+			this.logger = logger;
+			this.projectRepository = projectRepository;
 		}
+		void Add(object a)
+		{
+			//return projectRepository.Add(a);
+		}
+	}
+	public class ProjectServices
+	{
+		public ProjectServices(ProjectRepository projectRepository)
+		{
+		}
+	}
+	public class ProjectRepository
+	{
 
 	}
 }

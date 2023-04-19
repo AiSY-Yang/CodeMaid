@@ -52,7 +52,6 @@ namespace Api
 			});
 			//添加数据库
 			string? connectionString = builder.Configuration.GetConnectionString("MaidContext");
-			builder.Services.AddEntityFrameworkMySql();
 			builder.Services.AddDbContextPool<MaidContext>((serviceProvider, x) =>
 			x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), x => x.EnableRetryOnFailure(3).EnableIndexOptimizedBooleanColumns())
 #if DEBUG
@@ -60,8 +59,9 @@ namespace Api
 #endif
 			.UseInternalServiceProvider(serviceProvider)
 			);
+			builder.Services.AddEntityFrameworkMySql();
 			//添加仓储
-			builder.Services.AddMaidReponsitory();
+			builder.Services.AddMaidRepository();
 
 			//添加控制器
 			builder.Services.AddControllers(x =>

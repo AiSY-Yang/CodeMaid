@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 using Models.CodeMaid;
 
-using Reponsitory;
+using Repository;
 
-namespace MaidReponsitory.Base
+namespace MaidRepository.Base
 {
-	public abstract class DatabaseEntityReponsitory<Entity> : IReponsitory<MaidContext, Entity> where Entity : DatabaseEntity
+	public abstract class DatabaseEntityRepository<Entity> where Entity : DatabaseEntity
 	{
-		protected DatabaseEntityReponsitory(MaidContext context)
+		protected DatabaseEntityRepository(MaidContext context)
 		{
 			Context = context;
 		}

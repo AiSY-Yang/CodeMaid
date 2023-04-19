@@ -51,16 +51,7 @@ namespace Api.MasstransitConsumer
 				}
 			}
 			//检查更新
-			if (context.Message.IsDelete)
-			{
-				logger.LogInformation("文件{path}删除,全量更新数据", context.Message.FilePath);
-				await MaidService.Update(maid);
-			}
-			else
-			{
-				logger.LogInformation("文件{path}改变,重新读取数据", context.Message.FilePath);
-				await MaidService.Update(maid, context.Message.FilePath);
-			}
+			await MaidService.Update(maid, context.Message.FilePath, context.Message.IsDelete);
 			//如果有变化的话则发布变化事件
 			if (maidContext.ChangeTracker.Entries().Where(x => x.State != EntityState.Unchanged).Any())
 			{
