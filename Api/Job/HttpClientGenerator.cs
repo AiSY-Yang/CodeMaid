@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Text;
 using System.Text.Encodings.Web;
 
 using Api.Extensions;
@@ -6,9 +7,14 @@ using Api.Tools;
 
 using ExtensionMethods;
 
+using MassTransit.Internals.GraphValidation;
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Extensions;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.Readers;
 
@@ -38,6 +44,33 @@ namespace Api.Job
 			}
 			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out _);
 			RestfulApiDocument restfulApiDocument = new RestfulApiDocument(openApiDocument);
+			#region create model file
+			//模型文件路径
+			var modelPath = Path.Combine(maid.Project.Path, maid.DestinationPath, restfulApiDocument.Title + "Model.cs");
+			CompilationUnitSyntax modelUnit;
+			if (File.Exists(modelPath))
+				modelUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(modelPath)).GetCompilationUnitRoot();
+			else
+				modelUnit = CSharpSyntaxTree.ParseText("""
+				#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
+				using System.Text.Json.Serialization;
+				namespace RestfulClient;
+				
+				#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
+				""").GetCompilationUnitRoot();
+			var modelUnitNew = modelUnit;
+			foreach (var item in restfulApiDocument.Models)
+			{
+				var obj = modelUnitNew.GetDeclarationSyntaxes<BaseTypeDeclarationSyntax>().Where(x => x.Identifier.Text == item.Name).FirstOrDefault();
+				if (obj == null)
+					modelUnitNew = modelUnitNew.AddMembers(SyntaxFactory.ParseMemberDeclaration(item.ToString())!);
+				else
+					modelUnitNew = modelUnitNew.ReplaceNode(obj, SyntaxFactory.ParseMemberDeclaration(item.ToString())!);
+			}
+			await FileTools.Write(modelPath, modelUnit, modelUnitNew);
+			#endregion
+
+			//文件路径
 			var PATH = Path.Combine(maid.Project.Path, maid.DestinationPath, restfulApiDocument.Title + ".cs");
 			CompilationUnitSyntax unit;
 			if (File.Exists(PATH))
@@ -49,7 +82,7 @@ namespace Api.Job
 				var text = $$"""
 using System.Net.Http.Json;
 
-using SnakeCharmerModel;
+namespace RestfulClient;
 
 public class {{restfulApiDocument.Title}}
 {
@@ -93,7 +126,16 @@ public class {{restfulApiDocument.Title}}
 				var m = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().FirstOrDefault(x => x.Identifier.Text == methodName);
 				if (m != null)
 				{
-					//newC = newC.ReplaceNode(m, (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod()));
+					try
+					{
+						var a = (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod());
+					}
+					catch (Exception)
+					{
+						var x = api.CreateMethod();
+						throw;
+					}
+					newC = newC.ReplaceNode(m, (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod()));
 					//当已经存在方法的时候跳过
 					continue;
 				}
@@ -104,7 +146,7 @@ public class {{restfulApiDocument.Title}}
 
 			}
 			await FileTools.Write(PATH, CSharpSyntaxTree.ParseText("").GetCompilationUnitRoot(), unit.ReplaceNode(c, newC));
-			Md5s[maid.SourcePath] = md5;
+			//Md5s[maid.SourcePath] = md5;
 			await Console.Out.WriteLineAsync("生成");
 
 		}
@@ -143,7 +185,8 @@ public class {{restfulApiDocument.Title}}
 				},
 				"boolean" => "bool",
 				"array" => $"List<{OpenApiSchema.Items.GetTypeString()}>",
-				_ => OpenApiSchema.Reference?.Id,
+				null => "JsonDocument",
+				_ => OpenApiSchema.Reference?.Id ?? "object",
 			};
 			return OpenApiSchema.Nullable ? $"{type}?" : type;
 		}
@@ -153,6 +196,43 @@ public class {{restfulApiDocument.Title}}
 		public RestfulApiDocument(OpenApiDocument openApiDocument)
 		{
 			Title = openApiDocument.Info.Title.Replace(" ", "_");
+			foreach (var item in openApiDocument.Components.Schemas)
+			{
+				var enums = new List<EnumField>();
+				for (int i = 0; i < item.Value.Enum.Count; i++)
+				{
+					EnumField enumField = new EnumField()
+					{
+						Name = (item.Value.Extensions["x-enumNames"] as OpenApiArray)![i] switch
+						{
+							OpenApiString s => s.Value,
+							_ => throw new Exception()
+						},
+						Value = item.Value.Enum[i] switch
+						{
+							OpenApiInteger number => number.Value,
+							OpenApiLong number => number.Value,
+							OpenApiString s => null,
+							_ => throw new Exception()
+						},
+					};
+					enums.Add(enumField);
+				}
+				var restfulModel = new RestfulModel()
+				{
+					Name = item.Key,
+					EnumFields = enums,
+					Type = item.Value.Type,
+					Summary = item.Value.Description,
+					ClassFields = item.Value.Properties.Select(x => new ClassField()
+					{
+						Name = x.Key,
+						Type = x.Value.GetTypeString(),
+						Summary = x.Value.Description,
+					}).ToList(),
+				};
+				Models.Add(restfulModel);
+			}
 			foreach (var item in openApiDocument.Paths)
 			{
 				foreach (var operation in item.Value.Operations)
@@ -176,17 +256,13 @@ public class {{restfulApiDocument.Title}}
 						BodyParameter = operation.Value.RequestBody?.Content.Select(x => new BodyContent()
 						{
 							ContentType = x.Key,
-							Body = x.Value.Schema.GetTypeString(),
-							Form = x.Value.Schema.Properties.ToDictionary(x => x.Key, x => x.Value.GetTypeString()),
+							BodyType = x.Value.Schema.GetTypeString(),
+							Form = x.Value.Schema.Properties.Select(x => new ClassField() { Name = x.Key, Type = x.Value.GetTypeString(), Summary = x.Value.Description }).ToList(),
 						}).ToList(),
-						QueryParameter = operation.Value.Parameters.Where(x => x.In == ParameterLocation.Query).ToDictionary(x => x.Name, x => x.Schema.GetTypeString()),
-						PathParameter = operation.Value.Parameters.Where(x => x.In == ParameterLocation.Path).ToDictionary(x => x.Name, x => x.Schema.GetTypeString()),
-						HeaderParameter = operation.Value.Parameters.Where(x => x.In == ParameterLocation.Header).ToDictionary(x => x.Name, x => x.Schema.GetTypeString()),
+						QueryParameter = operation.Value.Parameters.Where(x => x.In == ParameterLocation.Query).Select(x => new ClassField() { Name = x.Name, Type = x.Schema.GetTypeString(), Summary = x.Description }).ToList(),
+						PathParameter = operation.Value.Parameters.Where(x => x.In == ParameterLocation.Path).Select(x => new ClassField() { Name = x.Name, Type = x.Schema.GetTypeString(), Summary = x.Description }).ToList(),
+						HeaderParameter = operation.Value.Parameters.Where(x => x.In == ParameterLocation.Header).Select(x => new ClassField() { Name = x.Name, Type = x.Schema.GetTypeString(), Summary = x.Description }).ToList(),
 					};
-					if (restfulApiModel.Path.Contains("ImportFromExcel"))
-					{
-						Console.WriteLine(1);
-					}
 					Api.Add(restfulApiModel);
 				}
 			}
@@ -199,6 +275,87 @@ public class {{restfulApiDocument.Title}}
 		/// Api
 		/// </summary>
 		public List<RestfulApiModel> Api { get; private set; } = new List<RestfulApiModel>();
+		public List<RestfulModel> Models { get; private set; } = new List<RestfulModel>();
+	}
+	class RestfulModel
+	{
+		/// <summary>
+		/// 成员名称
+		/// </summary>
+		public required string Name { get; set; }
+		public required List<EnumField> EnumFields { get; set; }
+		public required List<ClassField> ClassFields { get; set; }
+		/// <summary>
+		/// 类型 如果是枚举的话可能自定义类型转换器
+		/// </summary>
+		public required string Type { get; set; }
+		/// <summary>
+		/// 类或者枚举的注释
+		/// </summary>
+		public required string? Summary { get; set; }
+
+		/// <summary>
+		/// 转换为C#类定义字符串
+		/// </summary>
+		/// <returns></returns>
+		public override string ToString()
+		{
+			StringBuilder stringBuilder = new StringBuilder();
+			if (EnumFields.Count > 0)
+			{
+				if (Type == "string") stringBuilder.AppendLine($"[JsonConverter(typeof(JsonStringEnumConverter))]");
+				stringBuilder.AppendLine($"public enum {Name}");
+				stringBuilder.AppendLine("{");
+				foreach (var item in EnumFields)
+				{
+					if (item.Value is null)
+						stringBuilder.AppendLine($"	{item.Name},");
+					else
+						stringBuilder.AppendLine($"	{item.Name} = {item.Value},");
+				}
+			}
+			else
+			{
+				stringBuilder.AppendLine($"/// <summary>");
+				stringBuilder.AppendLine($"/// {Summary}");
+				stringBuilder.AppendLine($"/// </summary>");
+				stringBuilder.AppendLine($"public class {Name}");
+				stringBuilder.AppendLine("{");
+				foreach (var item in ClassFields)
+				{
+					stringBuilder.AppendLine($"	/// <summary>");
+					stringBuilder.AppendLine($"	/// {item.Summary}");
+					stringBuilder.AppendLine($"	/// </summary>");
+					stringBuilder.AppendLine($"	[JsonPropertyName(\"{item.Name}\")]");
+					stringBuilder.AppendLine($"	public {item.Type} {item.Name.ToNamingConvention(NamingConvention.PascalCase)} {{ get; set; }}");
+				}
+			}
+			stringBuilder.AppendLine("}");
+			return stringBuilder.ToString();
+		}
+	}
+	class EnumField
+	{
+		public required string Name { get; set; }
+		public required long? Value { get; set; }
+	}
+	public class ClassField
+	{
+		private string? summary;
+
+		/// <summary>
+		/// 属性名称
+		/// </summary>
+		public required string Name { get; set; }
+		/// <summary>
+		/// 属性类型
+		/// </summary>
+		public required string Type { get; set; }
+		/// <summary>
+		/// 字段的注释
+		/// </summary>
+		public required string? Summary { get => summary?.Replace('\n', ' ').Replace('\r', ' '); set => summary = value; }
+
 	}
 	class RestfulApiModel
 	{
@@ -235,29 +392,30 @@ public class {{restfulApiDocument.Title}}
 		/// <summary>
 		/// 查询参数
 		/// </summary>
-		public required Dictionary<string, string> QueryParameter { get; internal set; }
+		public required List<ClassField> QueryParameter { get; internal set; }
 		/// <summary>
 		/// 路由参数
 		/// </summary>
-		public required Dictionary<string, string> PathParameter { get; internal set; }
+		public required List<ClassField> PathParameter { get; internal set; }
 		/// <summary>
 		/// Header参数
 		/// </summary>
-		public required Dictionary<string, string> HeaderParameter { get; internal set; }
+		public required List<ClassField> HeaderParameter { get; internal set; }
+
 
 		public string CreateMethod()
 		{
 #if DEBUG
-			ResponseType = "object";
-			BodyParameter?.ForEach(x => x.Body = x.Body is null ? null : "object");
+			//ResponseType = "object";
+			//BodyParameter?.ForEach(x => x.Body = x.Body is null ? null : "object");
 #endif
 			//组装请求url
 			var url = Path;
 			if (QueryParameter.Count > 0) url += "?";
 			{
 				var paraList = new List<string>();
-				foreach (var item in QueryParameter.ToDictionary(x => x.Key.ToNamingConvention(NamingConvention.camelCase), x => x.Value))
-					paraList.Add($"{UrlEncoder.Default.Encode(item.Key)}={{{item.Key}}}");
+				foreach (var item in QueryParameter)
+					paraList.Add($"{UrlEncoder.Default.Encode(item.Name)}={{{item.Name.ToNamingConvention(NamingConvention.camelCase)}}}");
 				url += string.Join('&', paraList);
 			}
 			//合并所有参数 作为方法的入参
@@ -266,38 +424,62 @@ public class {{restfulApiDocument.Title}}
 			if (BodyParameter != null)
 			{
 				var item = BodyParameter.First();
-				if (item.Body != null)
+				if (item.HasJsonContentType)
 				{
-					para.Add(new KeyValuePair<string, string>("body", item.Body));
+					para.Add(new ClassField() { Name = "body", Type = item.BodyType, Summary = null });
+				}
+				else
+				{
+					foreach (var form in item.Form)
+					{
+						para.Add(form);
+					}
 				}
 			}
-			para = para.Select(x => new KeyValuePair<string, string>(x.Key.ToNamingConvention(NamingConvention.camelCase), x.Value)).ToList();
 			//确定body内容
 			var body = BodyParameter?.FirstOrDefault();
-			var bodyContnet = string.Empty;
-			if (body != null)
-				bodyContnet = body.HasJsonContentType ? $"var content = JsonContent.Create(body);" : "var content = new MultipartFormDataContent();";
 			return $$"""
 					/// <summary>
 					/// {{Summary}}
 					/// </summary>
 					/// <returns></returns>
-					public async Task<{{ResponseType}}> {{MethodName}}({{string.Join(", ", para.Select(x => $"{x.Value} {x.Key}"))}})
+				{{string.Concat(para.Select(x => $"	/// <param name=\"{x.Name.ToNamingConvention(NamingConvention.camelCase)}\">{x.Summary}</param>{Environment.NewLine}"))
+					//拼接参数信息
+				}}	public async Task<{{ResponseType}}> {{MethodName}}({{string.Join(", ", para.Select(x => $"{x.Type} {x.Name.ToNamingConvention(NamingConvention.camelCase)}"))}})
 					{
-						{{(body != null ? bodyContnet : "")}}
-						var httpRequestMessage = new HttpRequestMessage()
+				{{(body != null
+				? body.HasJsonContentType
+					? $"		var content = JsonContent.Create(body);\r\n"
+					: $"""
+							var content = new MultipartFormDataContent();
+					{string.Join("\r\n", body.Form.Select(x => x.Type switch
+					{
+						"Stream" => $"		content.Add(new StreamContent({x.Name.ToNamingConvention(NamingConvention.camelCase)}));",
+						_ => $"		content.Add(JsonContent.Create({x.Name.ToNamingConvention(NamingConvention.camelCase)}));",
+					}))}
+
+					"""
+				: "")
+				//body
+				}}		var httpRequestMessage = new HttpRequestMessage()
 						{
 							Method = HttpMethod.{{Method}},
 							RequestUri = new Uri($"{{url}}", UriKind.Relative),
 							{{(body != null ? "Content = content," : "")}}
 						};
-						var response = await httpClient.SendAsync(httpRequestMessage);
+						{{
+						//如果返回的是流的话 默认提前响应
+						ResponseType switch
+						{
+							"Stream" => $"var response = await httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead);",
+							_ => $"var response = await httpClient.SendAsync(httpRequestMessage);"
+						}}}
 						{{(MaybeReturnNull ? "if (response.StatusCode == System.Net.HttpStatusCode.NoContent) return null;" : "")}}
 						{{ResponseType switch
-			{
-				"Stream" => $"return await response.Content.ReadAsStreamAsync();",
-				_ => $"return await GetResult<{ResponseType}>(httpRequestMessage, response);"
-			}}}
+						{
+							"Stream" => $"return await response.Content.ReadAsStreamAsync();",
+							_ => $"return await GetResult<{ResponseType}>(httpRequestMessage, response);"
+						}}}
 					}
 
 				""";
@@ -322,8 +504,8 @@ public class {{restfulApiDocument.Title}}
 		/// <summary>
 		/// Body的类型
 		/// </summary>
-		public required string? Body { get; set; }
-		public required Dictionary<string, string> Form { get; set; }
+		public required string BodyType { get; set; }
+		public required List<ClassField> Form { get; set; }
 	}
 
 }

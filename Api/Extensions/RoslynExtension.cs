@@ -15,7 +15,7 @@ namespace Api.Extensions
 	public static class RoslynExtension
 	{
 		/// <summary>
-		/// 获取编译单元下的所有指定的类型的对象
+		/// 获取编译单元下的所有指定的类型的对象 忽略命名空间层级
 		/// </summary>
 		/// <param name="compilationUnit"></param>
 		/// <returns></returns>

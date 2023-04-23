@@ -172,7 +172,7 @@ namespace Api.Services
 					{
 						var pNew = CreatePropertyEntity(c, propertyDeclaration);
 						pNew.Adapt(p);
-						//删除所有已删除的属性
+						//删除所有已删除的特性
 						p.Attributes.RemoveAll(x => !pNew.Attributes.Select(x => x.Name).Contains(x.Name));
 						foreach (var attributeNew in pNew.Attributes)
 						{

@@ -12,6 +12,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
 using Serilog;
 
 using ServicesModels.Exceptions;
@@ -25,6 +29,7 @@ namespace Api
 	/// </summary>
 	public class Program
 	{
+		const string ServicesName = "CodeMaid";
 		/// <summary>
 		/// root ServiceProvider
 		/// </summary>
@@ -146,6 +151,87 @@ namespace Api
 			});
 			//添加后台服务
 			builder.Services.AddHostedService<TimedHostedService>();
+			//添加OpenTelemetry
+			var otlpOptions = new Action<OtlpExporterOptions>(opt =>
+			{
+				opt.Endpoint = new Uri("http://localhost:4317");
+			});
+			builder.Services.AddOpenTelemetry()
+				.ConfigureResource(x => x.AddService(ServicesName, serviceInstanceId: Environment.MachineName))
+				.WithTracing(x =>
+				{
+					//记录对外Httpclient请求
+					x.AddHttpClientInstrumentation(options =>
+					{
+						options.RecordException = true;
+						//记录请求
+						options.EnrichWithHttpRequestMessage = (activity, httpRequestMessage) =>
+						{
+							if (httpRequestMessage.Content != null)
+							{
+								var headers = httpRequestMessage.Content.Headers;
+								// 过滤过长或文件类型
+								var contentLength = headers.ContentLength ?? 0;
+								var contentType = headers.ContentType?.ToString();
+								if (contentLength <= 10 * 1024 && (contentType == null || !contentType.Contains("multipart/form-data")))
+								{
+									var body = httpRequestMessage.Content.ReadAsStringAsync().Result;
+									activity.SetTag("requestBody", body);
+								}
+							}
+						};
+						//记录响应
+						options.EnrichWithHttpResponseMessage = (activity, httpResponseMessage) =>
+						{
+							var uri = httpResponseMessage.RequestMessage?.RequestUri;
+							if (httpResponseMessage.Content != null)
+							{
+								if (httpResponseMessage.Content.Headers.ContentType.MediaType == "application/octet-stream")
+								{
+									return;
+								}
+								// 不要使用await:The stream was already consumed. It cannot be read again
+								var body = httpResponseMessage.Content.ReadAsStringAsync().Result;
+								activity.SetTag("responseBody", body);
+							}
+						};
+						//记录异常
+						options.EnrichWithException = (activity, exception) =>
+						{
+							activity.SetTag("stackTrace", exception.StackTrace);
+							activity.SetTag("message", exception.Message);
+						};
+
+					});
+					//记录请求
+					x.AddAspNetCoreInstrumentation(options =>
+					{
+						options.RecordException = true;
+						options.EnrichWithHttpRequest = async (activity, request) =>
+						{
+							// 此处过滤文件或过长的内容
+							var contentLength = request.ContentLength ?? 0;
+							var contentType = request.ContentType ?? string.Empty;
+							if (contentLength <= 10 * 1024 && !contentType.Contains("multipart/form-data"))
+							{
+								request.EnableBuffering();
+								request.Body.Position = 0;
+								var reader = new StreamReader(request.Body);
+								activity.SetTag("requestBody", await reader.ReadToEndAsync());
+								request.Body.Position = 0;
+							}
+						};
+
+						options.EnrichWithException = (activity, exception) =>
+						{
+							activity.SetTag("stackTrace", exception.StackTrace);
+							activity.SetTag("message", exception.Message);
+						};
+					});
+					x.AddMassTransitInstrumentation();
+					x.AddOtlpExporter(otlpOptions);
+				})
+				.WithMetrics();
 
 			var app = builder.Build();
 
