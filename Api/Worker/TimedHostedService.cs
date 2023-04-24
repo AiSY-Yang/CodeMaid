@@ -42,6 +42,10 @@ namespace Api.Worker
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Http客户端生成任务
+		/// </summary>
+		/// <param name="state"></param>
 		public async void RunAsync(object? state)
 		{
 			try

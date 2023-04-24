@@ -100,7 +100,7 @@ public class SystemController : ControllerBase
 					ActionInfo actionInfo = new ActionInfo() { Name = method.Name, ParamList = new List<ParameterInfo>() };
 					actionInfo.ParamList.AddRange(method.GetParameters().ToList().Select(item => new ParameterInfo
 					{
-						Name = item.Name,
+						Name = item.Name!,
 						Type = item.ParameterType
 					})
 					);

@@ -84,7 +84,7 @@ using System.Net.Http.Json;
 
 namespace RestfulClient;
 
-public class {{restfulApiDocument.Title}}
+public partial class {{restfulApiDocument.Title}}
 {
 	private readonly HttpClient httpClient;
 
@@ -126,16 +126,7 @@ public class {{restfulApiDocument.Title}}
 				var m = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().FirstOrDefault(x => x.Identifier.Text == methodName);
 				if (m != null)
 				{
-					try
-					{
-						var a = (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod());
-					}
-					catch (Exception)
-					{
-						var x = api.CreateMethod();
-						throw;
-					}
-					newC = newC.ReplaceNode(m, (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod()));
+					newC = newC.ReplaceNode(m, (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod())!);
 					//当已经存在方法的时候跳过
 					continue;
 				}
@@ -146,7 +137,7 @@ public class {{restfulApiDocument.Title}}
 
 			}
 			await FileTools.Write(PATH, CSharpSyntaxTree.ParseText("").GetCompilationUnitRoot(), unit.ReplaceNode(c, newC));
-			//Md5s[maid.SourcePath] = md5;
+			Md5s[maid.SourcePath] = md5;
 			await Console.Out.WriteLineAsync("生成");
 
 		}
@@ -334,11 +325,17 @@ public class {{restfulApiDocument.Title}}
 			return stringBuilder.ToString();
 		}
 	}
+	/// <summary>
+	/// 枚举字段信息
+	/// </summary>
 	class EnumField
 	{
 		public required string Name { get; set; }
 		public required long? Value { get; set; }
 	}
+	/// <summary>
+	/// 类的字段信息
+	/// </summary>
 	public class ClassField
 	{
 		private string? summary;
@@ -444,7 +441,7 @@ public class {{restfulApiDocument.Title}}
 					/// </summary>
 					/// <returns></returns>
 				{{string.Concat(para.Select(x => $"	/// <param name=\"{x.Name.ToNamingConvention(NamingConvention.camelCase)}\">{x.Summary}</param>{Environment.NewLine}"))
-					//拼接参数信息
+				//拼接参数信息
 				}}	public async Task<{{ResponseType}}> {{MethodName}}({{string.Join(", ", para.Select(x => $"{x.Type} {x.Name.ToNamingConvention(NamingConvention.camelCase)}"))}})
 					{
 				{{(body != null
@@ -465,8 +462,7 @@ public class {{restfulApiDocument.Title}}
 						{
 							Method = HttpMethod.{{Method}},
 							RequestUri = new Uri($"{{url}}", UriKind.Relative),
-							{{(body != null ? "Content = content," : "")}}
-						};
+							{{(body != null ? "Content = content,\r\n\t\t" : "")}}};
 						{{
 						//如果返回的是流的话 默认提前响应
 						ResponseType switch
@@ -485,8 +481,14 @@ public class {{restfulApiDocument.Title}}
 				""";
 		}
 	}
+	/// <summary>
+	/// Body内容
+	/// </summary>
 	public class BodyContent
 	{
+		/// <summary>
+		/// body的contentType
+		/// </summary>
 		public required string ContentType { get; set; }
 		///<inheritdoc cref="HttpRequestJsonExtensions.HasJsonContentType(HttpRequest)"/>
 		public bool HasJsonContentType
@@ -505,6 +507,9 @@ public class {{restfulApiDocument.Title}}
 		/// Body的类型
 		/// </summary>
 		public required string BodyType { get; set; }
+		/// <summary>
+		/// body的form参数
+		/// </summary>
 		public required List<ClassField> Form { get; set; }
 	}
 

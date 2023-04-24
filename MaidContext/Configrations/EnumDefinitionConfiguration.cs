@@ -12,7 +12,6 @@ internal class EnumDefinitionConfiguration : DatabaseEntityConfiguration<EnumDef
 	{
 		base.Configure(builder);
 		builder.Metadata.SetComment("枚举定义");
-		builder.HasComment("枚举定义");
 		builder.Property(x => x.NameSpace).HasComment("命名空间");
 		builder.Property(x => x.Name).HasComment("枚举名");
 		builder.Property(x => x.Summary).HasComment("注释");

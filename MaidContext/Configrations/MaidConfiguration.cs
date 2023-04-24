@@ -12,7 +12,6 @@ internal class MaidConfiguration : DatabaseEntityConfiguration<Maid>
 	{
 		base.Configure(builder);
 		builder.Metadata.SetComment("功能");
-		builder.HasComment("功能");
 		builder.Property(x => x.Name).HasComment("名称");
 		builder.Property(x => x.SourcePath).HasComment("原路径");
 		builder.Property(x => x.DestinationPath).HasComment("目标路径");

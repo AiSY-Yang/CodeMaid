@@ -6,29 +6,40 @@ namespace Api.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class ProjectController : ControllerBase
+	public class ProjectController : ControllerBase, IAdd<object, bool>
 	{
 		private readonly ILogger<ProjectController> logger;
-		private readonly ProjectRepository projectRepository;
+		private readonly ProjectServices projectServices;
 
-		public ProjectController(ILogger<ProjectController> logger,ProjectRepository projectRepository)
+		public ProjectController(ILogger<ProjectController> logger, ProjectServices projectServices)
 		{
 			this.logger = logger;
-			this.projectRepository = projectRepository;
+			this.projectServices = projectServices;
 		}
-		void Add(object a)
+		[HttpPost]
+		public bool Add(object data)
 		{
-			//return projectRepository.Add(a);
+			return projectServices.Add(data);
 		}
 	}
-	public class ProjectServices
+	public class ProjectServices : IAdd<object, bool>
 	{
 		public ProjectServices(ProjectRepository projectRepository)
 		{
+		}
+
+		public bool Add(object data)
+		{
+			throw new NotImplementedException();
 		}
 	}
 	public class ProjectRepository
 	{
 
+	}
+
+	interface IAdd<TData, TResult>
+	{
+		public TResult Add(TData data);
 	}
 }

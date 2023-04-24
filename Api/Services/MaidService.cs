@@ -30,7 +30,7 @@ namespace Api.Services
 	/// </summary>
 	public class MaidService
 	{
-		static HashSet<long> olds = new();
+		static readonly HashSet<long> olds = new();
 
 		/// <summary>
 		/// 更新maid
@@ -596,7 +596,7 @@ namespace Api.Services
 			//如果以上两个任意一个找到的话 取其中未被删除的属性返回 如果都删除的话任意返回一个
 			if (absoluteProp != null || baseProp != null)
 			{
-				return absoluteProp == null ? new List<PropertyDefinition> { baseProp }
+				return absoluteProp == null ? new List<PropertyDefinition> { baseProp! }
 					: baseProp == null ? new List<PropertyDefinition> { absoluteProp }
 					: absoluteProp.IsDeleted ? new List<PropertyDefinition> { baseProp }
 					: new List<PropertyDefinition> { absoluteProp };

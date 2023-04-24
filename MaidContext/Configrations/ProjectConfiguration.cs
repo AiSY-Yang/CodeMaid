@@ -12,7 +12,6 @@ internal class ProjectConfiguration : DatabaseEntityConfiguration<Project>
 	{
 		base.Configure(builder);
 		builder.Metadata.SetComment("项目定义");
-		builder.HasComment("项目定义");
 		builder.Property(x => x.Name).HasComment("项目名");
 		builder.Property(x => x.Path).HasComment("项目路径");
 		builder.Property(x => x.GitBranch).HasComment("Git分支");

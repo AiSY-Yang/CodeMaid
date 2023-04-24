@@ -12,7 +12,6 @@ internal class AttributeDefinitionConfiguration : DatabaseEntityConfiguration<At
 	{
 		base.Configure(builder);
 		builder.Metadata.SetComment("属性定义");
-		builder.HasComment("类定义");
 		builder.Property(x => x.Name).HasComment("Attribute名称");
 		builder.Property(x => x.Text).HasComment("Attribute文本");
 		builder.Property(x => x.ArgumentsText).HasComment("参数文本");

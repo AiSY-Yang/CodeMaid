@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -158,10 +159,10 @@ namespace Api
 			});
 			builder.Services.AddOpenTelemetry()
 				.ConfigureResource(x => x.AddService(ServicesName, serviceInstanceId: Environment.MachineName))
-				.WithTracing(x =>
+				.WithTracing(config =>
 				{
 					//记录对外Httpclient请求
-					x.AddHttpClientInstrumentation(options =>
+					config.AddHttpClientInstrumentation(options =>
 					{
 						options.RecordException = true;
 						//记录请求
@@ -186,7 +187,7 @@ namespace Api
 							var uri = httpResponseMessage.RequestMessage?.RequestUri;
 							if (httpResponseMessage.Content != null)
 							{
-								if (httpResponseMessage.Content.Headers.ContentType.MediaType == "application/octet-stream")
+								if (httpResponseMessage.Content.Headers.ContentType?.MediaType == "application/octet-stream")
 								{
 									return;
 								}
@@ -204,7 +205,7 @@ namespace Api
 
 					});
 					//记录请求
-					x.AddAspNetCoreInstrumentation(options =>
+					config.AddAspNetCoreInstrumentation(options =>
 					{
 						options.RecordException = true;
 						options.EnrichWithHttpRequest = async (activity, request) =>
@@ -228,10 +229,18 @@ namespace Api
 							activity.SetTag("message", exception.Message);
 						};
 					});
-					x.AddMassTransitInstrumentation();
-					x.AddOtlpExporter(otlpOptions);
+					config.AddMassTransitInstrumentation();
+					config.AddEntityFrameworkCoreInstrumentation();
+					config.AddOtlpExporter(otlpOptions);
 				})
-				.WithMetrics();
+				.WithMetrics(config =>
+				{
+					config.AddAspNetCoreInstrumentation();
+					config.AddHttpClientInstrumentation();
+					config.AddEventCountersInstrumentation();
+					config.AddRuntimeInstrumentation();
+					config.AddOtlpExporter(otlpOptions);
+				});
 
 			var app = builder.Build();
 
