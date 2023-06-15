@@ -52,7 +52,7 @@ public class SystemController : ControllerBase
 				}));
 			}
 			//小驼峰命名
-			result.Add(string.Concat(char.ToLower(type.Name[0]), type.Name[1..]), array);
+			result.Add(type.Name.ToNamingConvention(NamingConvention.camelCase), array);
 		}
 		return new JsonObject(result.AsEnumerable());
 	}

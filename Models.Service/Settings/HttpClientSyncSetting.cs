@@ -12,5 +12,9 @@ namespace ServicesModels.Settings
 	/// </summary>
 	public class HttpClientSyncSetting
 	{
-	}
+		/// <summary>
+		/// 是否创建模型
+		/// </summary>
+        public bool CreateModel { get; set; }
+    }
 }

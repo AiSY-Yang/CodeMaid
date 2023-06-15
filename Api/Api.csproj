@@ -17,7 +17,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.3" />
+		<PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.4" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
 		<PackageReference Include="OpenTelemetry" Version="1.4.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.4.0" />
@@ -47,10 +47,5 @@
 	  </Reference>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="MaidContexts\" />
-	</ItemGroup>
-
-	<ProjectExtensions><VisualStudio><UserProperties appsettings_1development_1json__JsonSchema="https://json.schemastore.org/appsettings.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

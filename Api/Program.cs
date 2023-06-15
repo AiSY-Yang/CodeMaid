@@ -19,7 +19,7 @@ using OpenTelemetry.Trace;
 
 using Serilog;
 
-using ServicesModels.Exceptions;
+using ServicesModels.Results;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -81,7 +81,7 @@ namespace Api
 				{
 					x.InvalidModelStateResponseFactory = x =>
 					{
-						var error = new ExceptionResult(400, string.Join(';', x.ModelState.Values.Select(x => x.Errors.FirstOrDefault()?.ErrorMessage).ToList()));
+						var error = new ExceptionResult("ParameterError", string.Join(';', x.ModelState.Values.Select(x => x.Errors.FirstOrDefault()?.ErrorMessage).ToList()));
 						return new ObjectResult(error) { StatusCode = 400 };
 					};
 				})
@@ -284,10 +284,16 @@ namespace Api
 			app.MapControllers();
 			//版本信息
 			app.MapGet("/version", () => $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
+			//数据库迁移
 			Task.Run(() =>
 			{
 				var scope = app.Services.CreateScope();
 				var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
+				context.Database.Migrate();
+			});
+			//初始化服务
+			Task.Run(() =>
+			{
 				InitServices.Init(app.Services);
 			});
 			//开始运行

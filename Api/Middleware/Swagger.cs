@@ -3,7 +3,7 @@
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
-using ServicesModels.Exceptions;
+using ServicesModels.Results;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 namespace Microsoft.Extensions.DependencyInjection;

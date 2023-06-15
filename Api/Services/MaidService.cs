@@ -30,6 +30,12 @@ namespace Api.Services
 	/// </summary>
 	public class MaidService
 	{
+		class UpdateResult
+		{
+			public required HashSet<string> ClassList;
+			public required HashSet<string> EnumList;
+		}
+
 		static readonly HashSet<long> olds = new();
 
 		/// <summary>
@@ -45,6 +51,7 @@ namespace Api.Services
 			{
 				Log.Information("maid{id}在程序启动后第一次更新,全量更新数据", maid.Id);
 				await Update(maid);
+				olds.Add(maid.Id);
 			}
 			else
 			{
@@ -68,17 +75,26 @@ namespace Api.Services
 		static async Task<Maid> Update(Maid maid)
 		{
 			var files = Directory.GetFiles(Path.Combine(maid.Project.Path, maid.SourcePath), "*.cs", SearchOption.AllDirectories);
-			HashSet<string> classList = new();
+			var result = new UpdateResult()
+			{
+				ClassList = new HashSet<string>(),
+				EnumList = new HashSet<string>()
+			};
 			foreach (var file in files)
 			{
 				var list = await Update(maid, file);
-				foreach (var item in list)
+				foreach (var item in list.ClassList)
 				{
-					classList.Add(item);
+					result.ClassList.Add(item);
+				}
+				foreach (var item in list.EnumList)
+				{
+					result.EnumList.Add(item);
 				}
 			}
 			//如果本次没有这个类则删除它
-			maid.Classes.Where(x => !classList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
+			maid.Classes.Where(x => !result.ClassList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
+			maid.Enums.Where(x => !result.EnumList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
 			return maid;
 		}
 		/// <summary>
@@ -87,8 +103,13 @@ namespace Api.Services
 		/// <param name="maid"></param>
 		/// <param name="path">文件路径</param>
 		/// <returns></returns>
-		static async Task<HashSet<string>> Update(Maid maid, string path)
+		static async Task<UpdateResult> Update(Maid maid, string path)
 		{
+			var result = new UpdateResult()
+			{
+				ClassList = new HashSet<string>(),
+				EnumList = new HashSet<string>()
+			};
 			var tree = CSharpSyntaxTree.ParseText(await File.ReadAllTextAsync(path));
 			var compilationUnit = tree.GetCompilationUnitRoot();
 			//记录下文件的using
@@ -127,6 +148,7 @@ namespace Api.Services
 				}
 				//本次如果没有这个成员的话 则标记删除
 				e.EnumMembers.Where(x => !MemberList.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
+				result.EnumList.Add(e.Name);
 			}
 			//如果需要给枚举增加remark信息的话 在更新的时候就加上
 			if (maid.Project.AddEnumRemark)
@@ -142,8 +164,6 @@ namespace Api.Services
 			#endregion
 			#region 更新类
 			var classes = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>();
-			//记录本次更新的类的名称
-			HashSet<string> classList = new();
 			foreach (var classNode in classes)
 			{
 				var c = maid.Classes.FirstOrDefault(x => x.Name == classNode.Identifier.ValueText);
@@ -156,7 +176,7 @@ namespace Api.Services
 				{
 					CreateClassEntity(classNode).Adapt(c);
 				}
-				classList.Add(c.Name);
+				result.ClassList.Add(c.Name);
 				c.Using = usingText;
 				//记录这个类现在有的属性
 				HashSet<string> Properties = new();
@@ -188,7 +208,7 @@ namespace Api.Services
 						}
 					}
 					p.ClassDefinitionId = c.Id;
-					var e = maid.Enums.FirstOrDefault(x => x.Name == p.Type.TrimEnd('?'));
+					var e = maid.Enums.FirstOrDefault(x => !x.IsDeleted && x.Name == p.Type.TrimEnd('?'));
 					if (e is not null)
 					{
 						p.IsEnum = true;
@@ -205,7 +225,7 @@ namespace Api.Services
 				c.Properties.Where(x => !Properties.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
 			}
 			#endregion
-			return classList;
+			return result;
 		}
 
 		/// <summary>
@@ -308,7 +328,7 @@ namespace Api.Services
 		/// <returns></returns>
 		private static CompilationUnitSyntax CreateConfigurationNode(ClassDefinition classDefinition)
 		{
-			bool isAbstract = classDefinition.Modifiers?.Contains("abstract") ?? false;
+			bool isAbstract = classDefinition.IsAbstract;
 			bool hasBase = classDefinition.Base is not null;
 			StringBuilder stringBuilder = new();
 			stringBuilder.AppendLine($$""""

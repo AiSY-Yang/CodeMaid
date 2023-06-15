@@ -1,3 +1,5 @@
+using System;
+
 using Microsoft.EntityFrameworkCore;
 
 using Models.CodeMaid;
@@ -36,13 +38,7 @@ namespace MaidContexts
 		public virtual DbSet<EnumMemberDefinition> EnumMemberDefinitions { get; set; } = null!;
 		public MaidContext(DbContextOptions<MaidContext> options) : base(options)
 		{
-			if (!HasMigrate)
-			{
-				Database.Migrate();
-				HasMigrate = true;
-			}
 		}
-		private static bool HasMigrate = false;
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.ApplyConfigurationsFromAssembly(typeof(MaidContext).Assembly);
@@ -59,6 +55,11 @@ namespace MaidContexts
 			FakeDelete();
 			SetUpdateTime();
 			return base.SaveChanges(acceptAllChangesOnSuccess);
+		}
+		protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+		{
+			configurationBuilder.Properties<DateTimeOffset>(x => x.HaveConversion<Converter>());
+			base.ConfigureConventions(configurationBuilder);
 		}
 		/// <summary>
 		/// 设置更新时间
@@ -81,5 +82,11 @@ namespace MaidContexts
 				item.Entity.IsDeleted = true;
 			}
 		}
+	}
+}
+public class Converter : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTimeOffset, DateTimeOffset>
+{
+	public Converter() : base(v => v, v => v.ToLocalTime())
+	{
 	}
 }

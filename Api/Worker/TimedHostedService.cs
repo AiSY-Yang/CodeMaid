@@ -53,6 +53,7 @@ namespace Api.Worker
 				using var scope = services.CreateScope();
 				var context = scope.ServiceProvider.GetRequiredService<MaidContexts.MaidContext>();
 				var maids = context.Maids
+					.Where(x => !x.IsDeleted)
 					.Include(x => x.Project)
 					.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync);
 				foreach (var maid in maids)

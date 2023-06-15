@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServicesModels.Exceptions
+namespace ServicesModels.Results
 {
 	/// <summary>
 	/// 业务异常
@@ -18,12 +18,12 @@ namespace ServicesModels.Exceptions
 		}
 
 		/// <inheritdoc/>
-		public BusinessException(int code, string msg) : base(code, msg)
+		public BusinessException(string code, string msg) : base(code, msg)
 		{
 		}
 
 		/// <inheritdoc/>
-		public BusinessException(int code, string msg, HttpStatusCode httpStatusCode) : base(code, msg, httpStatusCode)
+		public BusinessException(string code, string msg, HttpStatusCode httpStatusCode) : base(code, msg, httpStatusCode)
 		{
 		}
 

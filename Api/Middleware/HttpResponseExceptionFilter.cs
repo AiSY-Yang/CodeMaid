@@ -1,4 +1,4 @@
-﻿using ServicesModels.Exceptions;
+﻿using ServicesModels.Results;
 
 namespace Api.Middleware
 {

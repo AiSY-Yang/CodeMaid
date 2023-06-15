@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json.Serialization;
 
-namespace ServicesModels.Exceptions
+namespace ServicesModels.Results
 {
 	/// <summary>
 	/// 业务异常返回的结果模型
@@ -11,7 +11,7 @@ namespace ServicesModels.Exceptions
 		/// <summary>
 		/// 错误码
 		/// </summary>
-		public int Code { get; set; }
+		public string Code { get; set; }
 
 		/// <summary>
 		/// 异常消息
@@ -25,7 +25,7 @@ namespace ServicesModels.Exceptions
 	public class ExceptionResult : IExceptionResult
 	{
 		/// <inheritdoc/>
-		public ExceptionResult(int code, string msg)
+		public ExceptionResult(string code, string msg)
 		{
 			Code = code;
 			Msg = msg;
@@ -39,7 +39,7 @@ namespace ServicesModels.Exceptions
 		}
 
 		/// <inheritdoc/>
-		public int Code { get; set; }
+		public string Code { get; set; }
 		/// <inheritdoc/>
 		public string Msg { get; set; }
 	}
@@ -53,13 +53,13 @@ namespace ServicesModels.Exceptions
 			Msg = msg;
 		}
 		/// <inheritdoc/>
-		public ResultException(int code, string msg)
+		public ResultException(string code, string msg)
 		{
 			Code = code;
 			Msg = msg;
 		}
 		/// <inheritdoc/>
-		public ResultException(int code, string msg, HttpStatusCode httpStatusCode)
+		public ResultException(string code, string msg, HttpStatusCode httpStatusCode)
 		{
 			Code = code;
 			Msg = msg;
@@ -69,10 +69,10 @@ namespace ServicesModels.Exceptions
 		/// HTTP状态码
 		/// </summary>
 		[JsonIgnore]
-		public virtual HttpStatusCode HttpStatusCode { get; set; } = HttpStatusCode.OK;
+		public virtual HttpStatusCode HttpStatusCode { get; set; } = HttpStatusCode.BadRequest;
 
 		/// <inheritdoc/>
-		public virtual int Code { get; set; } = 1;
+		public virtual string Code { get; set; } = "Error";
 
 		/// <inheritdoc/>
 		public virtual string Msg { get; set; }

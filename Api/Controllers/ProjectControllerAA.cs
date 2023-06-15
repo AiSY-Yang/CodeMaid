@@ -4,14 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
+	interface IServices
+	{
+	}
+
 	[ApiController]
 	[Route("[controller]")]
 	public class ProjectController : ControllerBase, IAdd<object, bool>
 	{
 		private readonly ILogger<ProjectController> logger;
-		private readonly ProjectServices projectServices;
+		private readonly ProjectService projectServices;
 
-		public ProjectController(ILogger<ProjectController> logger, ProjectServices projectServices)
+		public ProjectController(ILogger<ProjectController> logger, ProjectService projectServices)
 		{
 			this.logger = logger;
 			this.projectServices = projectServices;
@@ -22,11 +26,13 @@ namespace Api.Controllers
 			return projectServices.Add(data);
 		}
 	}
-	public class ProjectServices : IAdd<object, bool>
+	public class ProjectService : IServices, IAdd<object, bool>
 	{
-		public ProjectServices(ProjectRepository projectRepository)
+		public ProjectService(ProjectRepository projectRepository)
 		{
 		}
+
+		public ControllerBase Controller { get; init; }
 
 		public bool Add(object data)
 		{
