@@ -14,7 +14,7 @@ namespace ServicesModels.Settings
 		/// <summary>
 		/// 是否创建目录 如果为false则生成单个文件 里面有多个类 如果为true则生成文件夹 每个类生成和类同名的文件
 		/// </summary>
-		public bool CreateDirectory;
+		public bool CreateDirectory { get; set; }
 		/// <summary>
 		/// 文件或者目录的后缀
 		/// </summary>

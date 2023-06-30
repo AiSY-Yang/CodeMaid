@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 using Mapster;
 
@@ -35,10 +37,9 @@ namespace Models.CodeMaid
 		/// </summary>
 		public bool Autonomous { get; set; }
 		/// <summary>
-		/// 序列化保存的设置
+		/// 设置
 		/// </summary>
-		[StringSyntax(StringSyntaxAttribute.Json)]
-		public string? Setting { get; set; } = null!;
+		public JsonElement? Setting { get; set; }
 		/// <summary>
 		/// 包含的类
 		/// </summary>

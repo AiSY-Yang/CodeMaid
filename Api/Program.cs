@@ -296,6 +296,19 @@ namespace Api
 			{
 				InitServices.Init(app.Services);
 			});
+			Task.Run(() =>
+			{
+				var scope = app.Services.CreateScope();
+				var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
+				var x = context.Maids.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync).ToList();
+				foreach (var item in x)
+				{
+					//if (item.Setting != null)
+					//{
+						//item.Setting.Value.TryGetProperty()
+					//}
+				}
+			});
 			//开始运行
 			app.Run();
 			//程序结束的时候刷新日志

@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ContextBase\ContextBase.csproj" />
     <ProjectReference Include="..\Models.DbContext\MaidModels.csproj" />
   </ItemGroup>
 

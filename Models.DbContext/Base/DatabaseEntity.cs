@@ -12,7 +12,7 @@ namespace Models.CodeMaid
 	/// <summary>
 	/// 所有数据库对象的基类
 	/// </summary>
-	public abstract class DatabaseEntity : IDatabaseEntity
+	public abstract class DatabaseEntity
 	{
 		///<inheritdoc cref="IDatabaseEntity.Id"/>
 		[Key]

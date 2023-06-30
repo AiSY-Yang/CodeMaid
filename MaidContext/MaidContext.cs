@@ -1,4 +1,8 @@
 using System;
+using System.Text.Json;
+
+using ContextBases;
+using ContextBases.Convert.MySQL;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +10,7 @@ using Models.CodeMaid;
 
 namespace MaidContexts
 {
-	public class MaidContext : DbContext
+	public class MaidContext : ContextBase
 	{
 		/// <summary>
 		/// 项目定义
@@ -58,7 +62,8 @@ namespace MaidContexts
 		}
 		protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
 		{
-			configurationBuilder.Properties<DateTimeOffset>(x => x.HaveConversion<Converter>());
+			configurationBuilder.Properties<DateTimeOffset>(x => x.HaveConversion<DateTimeOffsetConverter>());
+			configurationBuilder.Properties<JsonElement>(x => x.HaveConversion<JsonElementConverter>());
 			base.ConfigureConventions(configurationBuilder);
 		}
 		/// <summary>
@@ -82,11 +87,5 @@ namespace MaidContexts
 				item.Entity.IsDeleted = true;
 			}
 		}
-	}
-}
-public class Converter : Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTimeOffset, DateTimeOffset>
-{
-	public Converter() : base(v => v, v => v.ToLocalTime())
-	{
 	}
 }

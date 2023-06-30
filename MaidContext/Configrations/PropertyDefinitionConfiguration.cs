@@ -26,5 +26,6 @@ internal class PropertyDefinitionConfiguration : DatabaseEntityConfiguration<Pro
 		builder.Property(x => x.HasSet).HasComment("是否包含Set");
 		builder.Property(x => x.Remark).HasComment("备注");
 		builder.Property(x => x.IsEnum).HasComment("是否是枚举");
+		builder.Property(x => x.ClassDefinitionId).HasComment("所属类Id");
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 using Api.Extensions;
@@ -276,7 +277,7 @@ namespace Api.Services
 			//更新Context文件里的类
 			if (maid.Setting != null)
 			{
-				var setting = maid.Setting.AsJsonToObject<ConfigurationSyncSetting>() ?? new ConfigurationSyncSetting();
+				var setting = maid.Setting?.Deserialize<ConfigurationSyncSetting>() ?? new ConfigurationSyncSetting();
 				if (setting.ContextPath != null)
 				{
 					string fileName = Path.Combine(maid.Project.Path, setting.ContextPath);
@@ -360,7 +361,7 @@ namespace Api.Services
 			//设置属性
 			foreach (var item in classDefinition.Properties)
 			{
-				if (!item.IsDeleted && (IsBaseType(item.Type) || item.IsEnum) && item.HasSet)
+				if (!item.IsDeleted && CanBeMapToDataBase(item))
 					stringBuilder.AppendLine(CreateBuilderStatement(item));
 			}
 			stringBuilder.AppendLine($"\t}}");
@@ -425,11 +426,7 @@ namespace Api.Services
 			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
 			var newBlockCode = (BlockSyntax)blockCode;
 			//只有映射到数据库的字段才会更新配置
-			foreach (var item in classDefinition.Properties
-				.Where(x => IsBaseType(x.Type) || x.IsEnum)
-				.Where(x => x.HasSet)
-				.Where(x => !x.Attributes.Any(x => x.Name == "NotMapped")
-				))
+			foreach (var item in classDefinition.Properties.Where(CanBeMapToDataBase))
 			{
 				newBlockCode = UpdateOrInsertConfigurationStatement(newBlockCode, item);
 			}
@@ -513,7 +510,7 @@ namespace Api.Services
 			if (maid.Setting != null)
 			{
 				//读取设置
-				DtoSyncSetting settings = maid.Setting!.AsJsonToObject<DtoSyncSetting>() ?? new DtoSyncSetting();
+				DtoSyncSetting settings = maid.Setting?.Deserialize<DtoSyncSetting>() ?? new DtoSyncSetting();
 				//所有的类都进行更新
 				foreach (var item in maid.Classes.Where(x => !x.IsDeleted))
 				{
@@ -814,8 +811,30 @@ public class {DtoName}
 				"DateTime", "DateTime?", "DateTimeOffset", "DateTimeOffset?",
 				"DateOnly", "DateOnly?", "TimeOnly", "TimeOnly?",
 				"JsonDocument","JsonDocument?",
+				"JsonElement","JsonElement?",
 			}.Contains(type);
 		}
+		/// <summary>
+		/// 是否可以被映射到数据库 postgres支持数组
+		/// </summary>
+		/// <param name="maid"></param>
+		/// <param name="property"></param>
+		/// <returns></returns>
+		private static bool CanBeMapToDataBase(PropertyDefinition property)
+		{
+			return (property.IsEnum || IsBaseType(RemoveGeneric(property.Type)))
+				&& property.HasSet
+				&& !property.Attributes.Any(x => x.Name == "NotMapped");
+			string RemoveGeneric(string type)
+			{
+				if (type.StartsWith("List<") && type.EndsWith(">")) return RemoveGeneric(type[5..^1]);
+				if (type.StartsWith("IList<") && type.EndsWith(">")) return RemoveGeneric(type[6..^1]);
+				if (type.StartsWith("IEnumerable<") && type.EndsWith(">")) return RemoveGeneric(type[12..^1]);
+				return type;
+			}
+		}
+
+
 		/// <summary>
 		/// 类型是否可以有MaxLength限制
 		/// </summary>

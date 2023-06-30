@@ -54,7 +54,7 @@ namespace Api.Job
 			{
 				return;
 			}
-			var setting = maid.Setting == null ? new HttpClientSyncSetting() : JsonSerializer.Deserialize<HttpClientSyncSetting>(maid.Setting) ?? new HttpClientSyncSetting();
+			var setting = maid.Setting?.Deserialize<HttpClientSyncSetting>() ?? new HttpClientSyncSetting();
 			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out _);
 			RestfulApiDocument restfulApiDocument = new RestfulApiDocument(openApiDocument);
 			#region create model file
@@ -362,7 +362,7 @@ public partial class {{restfulApiDocument.Title}}
 			return stringBuilder.ToString();
 		}
 	}
-	class RestfulModel : Field
+	abstract class RestfulModel : Field
 	{
 		/// <summary>
 		/// 类型 如果是枚举的话可能自定义类型转换器
@@ -372,12 +372,6 @@ public partial class {{restfulApiDocument.Title}}
 		/// 类或者枚举的注释
 		/// </summary>
 		public required string? Summary { get; set; }
-
-		/// <summary>
-		/// 转换为C#类定义字符串
-		/// </summary>
-		/// <returns></returns>
-		public override string? ToString() => base.ToString();
 	}
 	/// <summary>
 	/// 枚举字段信息
@@ -452,9 +446,9 @@ public partial class {{restfulApiDocument.Title}}
 	/// <summary>
 	/// 字段信息
 	/// </summary>
-	public class Field
+	abstract public class Field
 	{
-		static char[] number = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+		static readonly char[] number = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
 		/// <summary>
 		/// 名称
 		/// </summary>
@@ -501,7 +495,7 @@ public partial class {{restfulApiDocument.Title}}
 		/// <summary>
 		/// Operation Id
 		/// </summary>
-		public required string? Id { get; set; }
+		public required string? Id { private get; set; }
 		public string MethodName { get => Id?.ToNamingConvention(NamingConvention.PascalCase) ?? Path.Replace('/', '_').ToNamingConvention(NamingConvention.PascalCase); }
 		/// <summary>
 		/// 查询参数
@@ -516,7 +510,10 @@ public partial class {{restfulApiDocument.Title}}
 		/// </summary>
 		public required List<ClassField> HeaderParameter { get; internal set; }
 
-
+		/// <summary>
+		/// 生成请求方法
+		/// </summary>
+		/// <returns></returns>
 		public string CreateMethod()
 		{
 			//组装请求url

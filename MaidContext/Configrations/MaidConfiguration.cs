@@ -16,7 +16,7 @@ internal class MaidConfiguration : DatabaseEntityConfiguration<Maid>
 		builder.Property(x => x.SourcePath).HasComment("原路径");
 		builder.Property(x => x.DestinationPath).HasComment("目标路径");
 		builder.Property(x => x.Autonomous).HasComment("是否自动修复");
-		builder.Property(x => x.Setting).HasComment("序列化保存的设置");
-		builder.Property(x => x.MaidWork).HasComment("功能(0-配置同步功能,1-DTO同步)");
+		builder.Property(x => x.Setting).HasComment("设置");
+		builder.Property(x => x.MaidWork).HasComment("功能(0-配置同步功能,1-DTO同步,2-HTTP客户端生成)");
 	}
 }
