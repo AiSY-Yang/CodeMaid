@@ -13,7 +13,6 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 配置同步功能
 		/// </summary>
-		[Description]
 		ConfigurationSync,
 		/// <summary>
 		/// DTO同步

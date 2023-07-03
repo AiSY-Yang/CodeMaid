@@ -124,7 +124,8 @@ namespace Api
 					catch (Exception)
 					{
 					}
-				x.OperationFilter<BusinessExceptionFilter>();
+				x.OperationFilter<AddBusinessExceptionResponse>();
+				x.OperationFilter<Add204ResponseWhenReturnMaybeNull>();
 				x.SchemaFilter<EnumSchemaFilter>();
 				x.SchemaFilter<InheritInterfaceXmlCommentSchemaFilter>();
 				//参数采用小驼峰

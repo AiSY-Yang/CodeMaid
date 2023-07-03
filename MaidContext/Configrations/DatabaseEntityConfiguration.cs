@@ -14,8 +14,8 @@ internal abstract class DatabaseEntityConfiguration<Entity> : IEntityTypeConfigu
 		builder.Metadata.SetComment("所有数据库对象的基类");
 		builder.HasKey(x => x.Id);
 		builder.Property(x => x.Id).HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
-		builder.Property(x => x.CreateTime);
-		builder.Property(x => x.UpdateTime);
-		builder.Property(x => x.IsDeleted);
+		builder.Property(x => x.CreateTime).HasComment("创建时间");
+		builder.Property(x => x.UpdateTime).HasComment("更新时间");
+		builder.Property(x => x.IsDeleted).HasComment("是否有效");
 	}
 }

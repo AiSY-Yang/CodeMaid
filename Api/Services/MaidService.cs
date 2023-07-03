@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
 using Api.Extensions;
@@ -510,17 +511,30 @@ namespace Api.Services
 			if (maid.Setting != null)
 			{
 				//读取设置
-				DtoSyncSetting settings = maid.Setting?.Deserialize<DtoSyncSetting>() ?? new DtoSyncSetting();
+				var setting = maid.Setting?.Deserialize<DtoSyncSetting>() ?? Default;
 				//所有的类都进行更新
-				foreach (var item in maid.Classes.Where(x => !x.IsDeleted))
+				foreach (var c in maid.Classes.Where(x => !x.IsDeleted))
 				{
-					//生成Dto的目录
-					string dirPath = Path.Combine(destinationPath, item.Name + settings.Suffix);
-					if (!Directory.Exists(dirPath))
-						Directory.CreateDirectory(dirPath);
-					foreach (var setting in settings.DtoSyncSettings)
+					if (setting.CreateDirectory)
 					{
-						await UpdateDto(dirPath, item, setting);
+						//生成Dto的目录
+						string dirPath = Path.Combine(destinationPath, c.Name + setting.Suffix);
+						if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+						foreach (var dtoSetting in setting.DtoSyncSettings)
+						{
+							string className = c.Name + dtoSetting.Suffix;
+							string fileName = Path.Combine(dirPath, className + ".cs");
+							await UpdateDto(fileName, className, c, dtoSetting);
+						}
+					}
+					else
+					{
+						string fileName = Path.Combine(destinationPath, c.Name + setting.Suffix + ".cs");
+						foreach (var dtoSetting in setting.DtoSyncSettings)
+						{
+							string className = c.Name + dtoSetting.Suffix;
+							await UpdateDto(fileName, className, c, dtoSetting);
+						}
 					}
 				}
 			}
@@ -654,14 +668,13 @@ namespace Api.Services
 		/// <summary>
 		/// 更新Dto
 		/// </summary>
-		/// <param name="path">文件的路径</param>
+		/// <param name="fileName">文件的路径</param>
+		/// <param name="className">类名</param>
 		/// <param name="classDefinition">类信息</param>
 		/// <param name="setting">设置</param>
 		/// <returns></returns>
-		static async Task UpdateDto(string path, ClassDefinition classDefinition, DtoSyncSettingItem setting)
+		static async Task UpdateDto(string fileName, string className, ClassDefinition classDefinition, DtoSyncSettingItem setting)
 		{
-			string DtoName = classDefinition.Name + setting.Suffix;
-			string fileName = Path.Combine(path, DtoName + ".cs");
 			CompilationUnitSyntax compilationUnit;
 			if (File.Exists(fileName))
 				compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
@@ -672,7 +685,7 @@ namespace Models;
 /// <summary>
 /// {classDefinition.Summary}
 /// </summary>
-public class {DtoName}
+public class {className}
 {{
 }}").GetCompilationUnitRoot();
 

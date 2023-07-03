@@ -1,11 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 using Mapster;
-
-using Microsoft.EntityFrameworkCore;
-
-using Models.CodeMaid.Interface;
 
 namespace Models.CodeMaid
 {
@@ -14,16 +9,24 @@ namespace Models.CodeMaid
 	/// </summary>
 	public abstract class DatabaseEntity
 	{
-		///<inheritdoc cref="IDatabaseEntity.Id"/>
+		/// <summary>
+		/// 唯一ID1
+		/// </summary>
 		[Key]
 		public long Id { get; }
-		///<inheritdoc cref="IDatabaseEntity.CreateTime"/>
+		/// <summary>
+		/// 创建时间
+		/// </summary>
 		[AdaptIgnore(MemberSide.Destination)]
 		public DateTimeOffset CreateTime { get; set; } = DateTimeOffset.Now;
-		///<inheritdoc cref="IDatabaseEntity.UpdateTime"/>
+		/// <summary>
+		/// 更新时间
+		/// </summary>
 		[AdaptIgnore(MemberSide.Destination)]
 		public DateTimeOffset UpdateTime { get; set; } = DateTimeOffset.Now;
-		///<inheritdoc cref="IDatabaseEntity.IsDeleted"/>
+		/// <summary>
+		/// 是否有效
+		/// </summary>
 		public bool IsDeleted { get; set; }
 	}
 }

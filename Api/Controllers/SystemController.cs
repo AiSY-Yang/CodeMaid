@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 
+using Models.CodeMaid;
 using Models.CodeMaid.Enum;
 
 namespace Api.Controllers;
@@ -40,7 +41,10 @@ public class SystemController : ControllerBase
 	public JsonObject GetEnumDictionaries()
 	{
 		var result = new Dictionary<string, JsonNode?>();
-		foreach (var type in typeof(Sex).Assembly.GetTypes().Where(x => x.IsEnum))
+		IEnumerable<Type> types = Array.Empty<Type>();
+		types = types.Union(typeof(Sex).Assembly.GetTypes().Where(x => x.IsEnum));
+		types = types.Union(typeof(MaidWork).Assembly.GetTypes().Where(x => x.IsEnum));
+		foreach (var type in types)
 		{
 			var array = new JsonArray();
 			foreach (var item in type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
