@@ -39,7 +39,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 设置
 		/// </summary>
-		public JsonElement? Setting { get; set; }
+		public JsonElement Setting { get; set; }
 		/// <summary>
 		/// 包含的类
 		/// </summary>

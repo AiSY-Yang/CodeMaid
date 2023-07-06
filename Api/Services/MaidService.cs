@@ -165,7 +165,7 @@ namespace Api.Services
 			}
 			#endregion
 			#region 更新类
-			var classes = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>();
+			List<TypeDeclarationSyntax> classes = compilationUnit.GetDeclarationSyntaxes<TypeDeclarationSyntax>();
 			foreach (var classNode in classes)
 			{
 				var c = maid.Classes.FirstOrDefault(x => x.Name == classNode.Identifier.ValueText);
@@ -178,6 +178,14 @@ namespace Api.Services
 				{
 					CreateClassEntity(classNode).Adapt(c);
 				}
+				c.MemberType = classNode switch
+				{
+					ClassDeclarationSyntax => MemberType.ClassDeclarationSyntax,
+					InterfaceDeclarationSyntax => MemberType.InterfaceDeclarationSyntax,
+					RecordDeclarationSyntax => MemberType.RecordDeclarationSyntax,
+					StructDeclarationSyntax => MemberType.StructDeclarationSyntax,
+					_ => throw new NotSupportedException("异常的成员类型")
+				};
 				result.ClassList.Add(c.Name);
 				c.Using = usingText;
 				//记录这个类现在有的属性
@@ -245,10 +253,72 @@ namespace Api.Services
 				case Models.CodeMaid.MaidWork.DtoSync:
 					await UpdateDto(maid);
 					break;
+				case Models.CodeMaid.MaidWork.MasstransitConsumerSync:
+					await MasstransitConsumerSync(maid);
+					break;
 				default:
 					break;
 			}
 		}
+		public static async Task MasstransitConsumerSync(Maid maid)
+		{
+			var setting = maid.Setting.Deserialize<ConfigurationSyncSetting>() ?? new ConfigurationSyncSetting();
+			foreach (var classDefinition in maid.Classes)
+			{
+				var destinationPath = Path.Combine(maid.Project.Path, maid.DestinationPath, $"{classDefinition.Name}Consumer.cs");
+				CompilationUnitSyntax compilationUnit;
+				if (File.Exists(destinationPath))
+					compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(destinationPath)).GetCompilationUnitRoot();
+				else
+				{
+					compilationUnit = CSharpSyntaxTree.ParseText($$"""
+						using MassTransit;
+						using MassTransit.ConsumeConfigurators;
+						using MassTransit.Definition;
+
+						using {{classDefinition.NameSpace}};
+
+						using Microsoft.EntityFrameworkCore;
+
+						namespace Api.MasstransitConsumer
+						{
+							public class {{classDefinition.Name}}Consumer : IConsumer<{{classDefinition.Name}}>
+							{
+								private readonly ILogger<{{classDefinition.Name}}Consumer> logger;
+
+								public {{classDefinition.Name}}Consumer(ILogger<{{classDefinition.Name}}Consumer> logger)
+								{
+									this.logger = logger;
+								}
+
+								public async Task Consume(ConsumeContext<{{classDefinition.Name}}> context)
+								{
+								}
+							}
+							///<inheritdoc/>
+							public class {{classDefinition.Name}}ConsumerDefinition : ConsumerDefinition<{{classDefinition.Name}}Consumer>
+							{
+								///<inheritdoc/>
+								protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<{{classDefinition.Name}}Consumer> consumerConfigurator)
+								{
+								}
+							}
+						}
+						""").GetCompilationUnitRoot();
+				}
+				CompilationUnitSyntax compilationUnitNew = compilationUnit;
+				compilationUnitNew = compilationUnitNew.ReplaceNodes(compilationUnitNew.GetDeclarationSyntaxes<ClassDeclarationSyntax>(), (node, node2) =>
+				{
+					if (node.Identifier.Text.EndsWith("Consumer"))
+					{
+						return node2.AddOrReplaceSummary(classDefinition.Summary);
+					}
+					return node;
+				});
+				await FileTools.Write(destinationPath, compilationUnit, compilationUnitNew);
+			}
+		}
+
 
 		#region Configuration
 		/// <summary>
@@ -276,49 +346,46 @@ namespace Api.Services
 			}
 
 			//更新Context文件里的类
-			if (maid.Setting != null)
+			var setting = maid.Setting.Deserialize<ConfigurationSyncSetting>() ?? new ConfigurationSyncSetting();
+			if (setting.ContextPath != null)
 			{
-				var setting = maid.Setting?.Deserialize<ConfigurationSyncSetting>() ?? new ConfigurationSyncSetting();
-				if (setting.ContextPath != null)
+				string fileName = Path.Combine(maid.Project.Path, setting.ContextPath);
+				var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
+				//取出第一个类 要求第一个类必须就是dbContext
+				var firstClass = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
+				//做个用于修改的镜像
+				var newClass = firstClass;
+				foreach (var item in maid.Classes)
 				{
-					string fileName = Path.Combine(maid.Project.Path, setting.ContextPath);
-					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
-					//取出第一个类 要求第一个类必须就是dbContext
-					var firstClass = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
-					//做个用于修改的镜像
-					var newClass = firstClass;
-					foreach (var item in maid.Classes)
+					//如果类被删除或者改成了抽象类 则从context中移除 否则插入或者更新
+					if (item.IsDeleted || item.IsAbstract)
 					{
-						//如果类被删除或者改成了抽象类 则从context中移除 否则插入或者更新
-						if (item.IsDeleted || item.IsAbstract)
+						newClass = newClass.RemovePropertyByType($"DbSet<{item.Name}>");
+					}
+					else
+					{
+						//取出最后一个属性 在之后做新属性的插入
+						var lastProperty = newClass.Members.Where(x => x is PropertyDeclarationSyntax).LastOrDefault();
+						//如果一个属性都没有 则插入到最后一个构造函数后面
+						lastProperty ??= newClass.Members.Where(x => x is ConstructorDeclarationSyntax).LastOrDefault();
+						//如果构造函数也没有 则插入到第一个方法后面
+						lastProperty ??= newClass.Members.Where(x => x is MethodDeclarationSyntax).First();
+
+						var prop = newClass.Members.OfType<PropertyDeclarationSyntax>().Where(x => x.Type.ToString() == $"DbSet<{item.Name}>").FirstOrDefault();
+						if (prop is null)
 						{
-							newClass = newClass.RemovePropertyByType($"DbSet<{item.Name}>");
+							newClass = newClass.InsertNodesAfter(lastProperty, new SyntaxNode[] {
+								(PropertyDeclarationSyntax)ParseMemberDeclaration($"{(item.LeadingTrivia==null?"\t":string.Join('\n',item.LeadingTrivia.Split('\n').Select(x=>"\t"+x)))}public virtual DbSet<{item.Name}> {item.Name.Pluralize(inputIsKnownToBeSingular: false)} {{ get; set; }} = null!;")!
+								.WithTrailingTrivia(ParseTrailingTrivia(Environment.NewLine))! });
 						}
 						else
 						{
-							//取出最后一个属性 在之后做新属性的插入
-							var lastProperty = newClass.Members.Where(x => x is PropertyDeclarationSyntax).LastOrDefault();
-							//如果一个属性都没有 则插入到最后一个构造函数后面
-							lastProperty ??= newClass.Members.Where(x => x is ConstructorDeclarationSyntax).LastOrDefault();
-							//如果构造函数也没有 则插入到第一个方法后面
-							lastProperty ??= newClass.Members.Where(x => x is MethodDeclarationSyntax).First();
-
-							var prop = newClass.Members.OfType<PropertyDeclarationSyntax>().Where(x => x.Type.ToString() == $"DbSet<{item.Name}>").FirstOrDefault();
-							if (prop is null)
-							{
-								newClass = newClass.InsertNodesAfter(lastProperty, new SyntaxNode[] {
-								(PropertyDeclarationSyntax)ParseMemberDeclaration($"{(item.LeadingTrivia==null?"\t":string.Join('\n',item.LeadingTrivia.Split('\n').Select(x=>"\t"+x)))}public virtual DbSet<{item.Name}> {item.Name.Pluralize(inputIsKnownToBeSingular: false)} {{ get; set; }} = null!;")!
-								.WithTrailingTrivia(ParseTrailingTrivia(Environment.NewLine))! });
-							}
-							else
-							{
-								newClass = newClass.ReplaceNode(prop, prop.AddOrReplaceSummary(item.Summary));
-							}
+							newClass = newClass.ReplaceNode(prop, prop.AddOrReplaceSummary(item.Summary));
 						}
 					}
-					var compilationUnitNew = compilationUnit.ReplaceNode(firstClass, newClass);
-					await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
 				}
+				var compilationUnitNew = compilationUnit.ReplaceNode(firstClass, newClass);
+				await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
 			}
 		}
 
@@ -508,33 +575,30 @@ namespace Api.Services
 			//确认目标路径的存在
 			if (!Directory.Exists(destinationPath))
 				Directory.CreateDirectory(destinationPath);
-			if (maid.Setting != null)
+			//读取设置
+			var setting = maid.Setting.Deserialize<DtoSyncSetting>() ?? Default;
+			//所有的类都进行更新
+			foreach (var c in maid.Classes.Where(x => !x.IsDeleted))
 			{
-				//读取设置
-				var setting = maid.Setting?.Deserialize<DtoSyncSetting>() ?? Default;
-				//所有的类都进行更新
-				foreach (var c in maid.Classes.Where(x => !x.IsDeleted))
+				if (setting.CreateDirectory)
 				{
-					if (setting.CreateDirectory)
+					//生成Dto的目录
+					string dirPath = Path.Combine(destinationPath, c.Name + setting.Suffix);
+					if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+					foreach (var dtoSetting in setting.DtoSyncSettings)
 					{
-						//生成Dto的目录
-						string dirPath = Path.Combine(destinationPath, c.Name + setting.Suffix);
-						if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-						foreach (var dtoSetting in setting.DtoSyncSettings)
-						{
-							string className = c.Name + dtoSetting.Suffix;
-							string fileName = Path.Combine(dirPath, className + ".cs");
-							await UpdateDto(fileName, className, c, dtoSetting);
-						}
+						string className = c.Name + dtoSetting.Suffix;
+						string fileName = Path.Combine(dirPath, className + ".cs");
+						await UpdateDto(fileName, className, c, dtoSetting);
 					}
-					else
+				}
+				else
+				{
+					string fileName = Path.Combine(destinationPath, c.Name + setting.Suffix + ".cs");
+					foreach (var dtoSetting in setting.DtoSyncSettings)
 					{
-						string fileName = Path.Combine(destinationPath, c.Name + setting.Suffix + ".cs");
-						foreach (var dtoSetting in setting.DtoSyncSettings)
-						{
-							string className = c.Name + dtoSetting.Suffix;
-							await UpdateDto(fileName, className, c, dtoSetting);
-						}
+						string className = c.Name + dtoSetting.Suffix;
+						await UpdateDto(fileName, className, c, dtoSetting);
 					}
 				}
 			}
@@ -864,7 +928,7 @@ public class {className}
 		/// </summary>
 		/// <param name="classDeclaration"></param>
 		/// <returns></returns>
-		private static ClassDefinition CreateClassEntity(ClassDeclarationSyntax classDeclaration)
+		private static ClassDefinition CreateClassEntity(TypeDeclarationSyntax classDeclaration)
 		{
 			return new ClassDefinition()
 			{

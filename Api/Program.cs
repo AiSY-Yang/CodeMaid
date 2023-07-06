@@ -7,10 +7,15 @@ using MaidContexts;
 
 using MassTransit;
 
+using MasstransitModels;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+
+using Models.CodeMaid;
 
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
@@ -40,7 +45,7 @@ namespace Api
 		/// main函数
 		/// </summary>
 		/// <param name="args"></param>
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
 			//配置使用Serilog记录日志
@@ -286,30 +291,35 @@ namespace Api
 			//版本信息
 			app.MapGet("/version", () => $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
 			//数据库迁移
-			Task.Run(() =>
-			{
-				var scope = app.Services.CreateScope();
-				var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-				context.Database.Migrate();
-			});
-			//初始化服务
-			Task.Run(() =>
-			{
-				InitServices.Init(app.Services);
-			});
-			Task.Run(() =>
-			{
-				var scope = app.Services.CreateScope();
-				var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-				var x = context.Maids.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync).ToList();
-				foreach (var item in x)
+			await Task.Run(() =>
 				{
-					//if (item.Setting != null)
-					//{
-						//item.Setting.Value.TryGetProperty()
-					//}
-				}
-			});
+					var scope = app.Services.CreateScope();
+					var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
+					context.Database.Migrate();
+				});
+			//初始化服务
+			await Task.Run(async () =>
+				{
+					await InitServices.Init(app.Services);
+					await Console.Out.WriteLineAsync("1");
+				});
+			await Task.Run(async () =>
+					{
+						var scope = app.Services.CreateScope();
+						var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
+						var x = context.Maids.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync).ToList();
+						foreach (var item in x)
+						{
+							//if (item.Setting != null)
+							//{
+							//item.Setting.Value.TryGetProperty()
+							//}
+						}
+						await Console.Out.WriteLineAsync("2");
+						File.WriteAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs", " " + File.ReadAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs"));
+						//await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(new MaidChangeEvent() { MaidId = maid.Id });
+
+					});
 			//开始运行
 			app.Run();
 			//程序结束的时候刷新日志

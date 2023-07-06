@@ -18,10 +18,10 @@ namespace Api.Tools
 		/// <returns></returns>
 		public static async Task Write(string path, CompilationUnitSyntax oldCompilationUnitSyntax, CompilationUnitSyntax newCompilationUnitSyntax)
 		{
-			if (oldCompilationUnitSyntax.FullSpan.CompareTo(newCompilationUnitSyntax.FullSpan) != 0)
-			{
-				await File.WriteAllTextAsync(path, newCompilationUnitSyntax.ToFullString());
-			}
+			if (oldCompilationUnitSyntax.FullSpan.CompareTo(newCompilationUnitSyntax.FullSpan) == 0)
+				if (File.Exists(path))
+					return;
+			await File.WriteAllTextAsync(path, newCompilationUnitSyntax.ToFullString());
 		}
 	}
 }

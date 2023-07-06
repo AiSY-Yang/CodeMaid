@@ -14,7 +14,7 @@ namespace ServicesModels.Settings
 		/// <summary>
 		/// 默认值
 		/// </summary>
-		public static DtoSyncSetting Default = new()
+		public static readonly DtoSyncSetting Default = new()
 		{
 			CreateDirectory = false,
 		};

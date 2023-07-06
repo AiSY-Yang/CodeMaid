@@ -20,7 +20,12 @@ namespace Models.CodeMaid
 		DtoSync,
 		/// <summary>
 		/// HTTP客户端生成
-		/// </summary>      
+		/// </summary>
 		HttpClientSync,
+		/// <summary>
+		/// controller同步
+		/// </summary>
+		ControllerSync,
+		MasstransitConsumerSync,
 	}
 }

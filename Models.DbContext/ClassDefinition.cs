@@ -52,9 +52,20 @@ namespace Models.CodeMaid
 		/// </summary>
 		public string? LeadingTrivia { get; set; }
 		/// <summary>
+		/// 成员类型
+		/// </summary>
+		public MemberType MemberType { get; set; }
+		/// <summary>
 		/// 属性列表
 		/// </summary>
 		[AdaptIgnore]
 		public List<PropertyDefinition> Properties { get; set; } = new();
+	}
+	public enum MemberType
+	{
+		ClassDeclarationSyntax,
+		InterfaceDeclarationSyntax,
+		RecordDeclarationSyntax,
+		StructDeclarationSyntax,
 	}
 }

@@ -23,7 +23,7 @@ namespace Api
 		/// 初始化文件监听器
 		/// </summary>
 		/// <param name="serviceProvider"></param>
-		public static async void Init(IServiceProvider serviceProvider)
+		public static async Task Init(IServiceProvider serviceProvider)
 		{
 			InitServices.serviceProvider = serviceProvider;
 			var scope = serviceProvider.CreateScope();

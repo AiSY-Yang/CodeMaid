@@ -54,7 +54,7 @@ namespace Api.Job
 			{
 				return;
 			}
-			var setting = maid.Setting?.Deserialize<HttpClientSyncSetting>() ?? new HttpClientSyncSetting();
+			var setting = maid.Setting.Deserialize<HttpClientSyncSetting>() ?? new HttpClientSyncSetting();
 			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out _);
 			RestfulApiDocument restfulApiDocument = new RestfulApiDocument(openApiDocument);
 			#region create model file
