@@ -34,7 +34,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 类名
 		/// </summary>
-		public string Name { get; set; } = null!;
+		public required string Name { get; set; }
 		/// <summary>
 		/// 注释
 		/// </summary>
@@ -54,18 +54,33 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 成员类型
 		/// </summary>
-		public MemberType MemberType { get; set; }
+		public required MemberType MemberType { get; set; }
 		/// <summary>
 		/// 属性列表
 		/// </summary>
 		[AdaptIgnore]
 		public List<PropertyDefinition> Properties { get; set; } = new();
 	}
+	/// <summary>
+	/// 成员类型
+	/// </summary>
 	public enum MemberType
 	{
+		/// <summary>
+		/// 类
+		/// </summary>
 		ClassDeclarationSyntax,
+		/// <summary>
+		/// 接口
+		/// </summary>
 		InterfaceDeclarationSyntax,
+		/// <summary>
+		/// 记录
+		/// </summary>
 		RecordDeclarationSyntax,
+		/// <summary>
+		/// 结构体
+		/// </summary>
 		StructDeclarationSyntax,
 	}
 }

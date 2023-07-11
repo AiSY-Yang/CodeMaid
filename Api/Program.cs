@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 using Api.Middleware;
@@ -12,10 +13,7 @@ using MasstransitModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-
-using Models.CodeMaid;
 
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
@@ -25,6 +23,7 @@ using OpenTelemetry.Trace;
 using Serilog;
 
 using ServicesModels.Results;
+using ServicesModels.Settings;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -61,6 +60,8 @@ namespace Api
 				x.ListenAnyIP(5241);
 				x.AddServerHeader = false;
 			});
+			//添加映射配置
+			builder.Services.AddMapster();
 			//添加数据库
 			string? connectionString = builder.Configuration.GetConnectionString("MaidContext");
 			builder.Services.AddDbContextPool<MaidContext>((serviceProvider, x) =>
@@ -301,25 +302,32 @@ namespace Api
 			await Task.Run(async () =>
 				{
 					await InitServices.Init(app.Services);
-					await Console.Out.WriteLineAsync("1");
 				});
+#if DEBUG
 			await Task.Run(async () =>
 					{
 						var scope = app.Services.CreateScope();
 						var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-						var x = context.Maids.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync).ToList();
-						foreach (var item in x)
-						{
-							//if (item.Setting != null)
-							//{
-							//item.Setting.Value.TryGetProperty()
-							//}
-						}
+						var x = context.Maids.FirstOrDefault(x => x.Id == 16);
+						x.Setting = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(ControllerSetting.Default));
+						context.SaveChanges();
+
 						await Console.Out.WriteLineAsync("2");
-						File.WriteAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs", " " + File.ReadAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs"));
-						//await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(new MaidChangeEvent() { MaidId = maid.Id });
+						//File.WriteAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs", " " + File.ReadAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs"));
+						File.Delete("D:\\Code\\Test\\WebDemo\\ProjectService.cs");
+						File.Delete("D:\\Code\\Test\\WebDemo\\ProjectController.cs");
+						await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(new ControllerCreateEvent()
+						{
+							MaidId = 16,
+							ServicePath = "D:\\Code\\Test\\WebDemo\\ProjectService.cs",
+							ControllerPath = "D:\\Code\\Test\\WebDemo\\ProjectController.cs",
+							EntityName = "Project",
+							EntityPath = "D:\\Code\\Template.WebApi\\Models.DbContext\\Project.cs",
+						});
 
 					});
+#endif
+
 			//开始运行
 			app.Run();
 			//程序结束的时候刷新日志

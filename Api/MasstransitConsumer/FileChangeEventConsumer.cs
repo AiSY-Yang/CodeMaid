@@ -28,17 +28,15 @@ namespace Api.MasstransitConsumer
 {
 	public class FileChangeEventConsumer : IConsumer<FileChangeEvent>
 	{
-		readonly static SyntaxTriviaList space = SyntaxTriviaList.Create(SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " "));
-		readonly static SyntaxTriviaList endline = SyntaxTriviaList.Create(SyntaxFactory.SyntaxTrivia(SyntaxKind.EndOfLineTrivia, Environment.NewLine));
 		private readonly ILogger<FileChangeEventConsumer> logger;
 		private readonly MaidContext maidContext;
-
+		///<inheritdoc/>
 		public FileChangeEventConsumer(ILogger<FileChangeEventConsumer> logger, MaidContext maidContext)
 		{
 			this.logger = logger;
 			this.maidContext = maidContext;
 		}
-
+		///<inheritdoc/>
 		public async Task Consume(ConsumeContext<FileChangeEvent> context)
 		{
 			var maid = maidContext.Maids
@@ -64,72 +62,20 @@ namespace Api.MasstransitConsumer
 					return;
 				}
 			}
-			if (maid.MaidWork == Models.CodeMaid.MaidWork.ControllerSync)
+			switch (maid.MaidWork)
 			{
-				var content = await File.ReadAllTextAsync(context.Message.FilePath);
-				var setting = maid.Setting.Deserialize<ControllerSetting>() ?? ControllerSetting.Default;
-				CompilationUnitSyntax compilationUnitSyntax = CSharpSyntaxTree.ParseText(content).GetCompilationUnitRoot();
-				var cs = compilationUnitSyntax.GetDeclarationSyntaxes<ClassDeclarationSyntax>();
-				var compilationUnitSyntaxNew = compilationUnitSyntax;
-				compilationUnitSyntaxNew = compilationUnitSyntaxNew.ReplaceNodes(cs, (c, c2) =>
-				{
-					if (c.BaseList is null) return c2;
-					var baselist = c.BaseList.ChildNodes().OfType<SimpleBaseTypeSyntax>().Select(x => x.Type).OfType<GenericNameSyntax>().ToList();
-					foreach (var item in baselist)
-					{
-						var parameterType = item.TypeArgumentList.Arguments[0];
-						var parameterTypeString = parameterType.ToString();
-						var returnType = item.TypeArgumentList.Arguments[1];
-						var identity = nameof(ServicesModels.Methods.IAdd);
-						switch (item.Identifier.Text)
-						{
-							case nameof(ServicesModels.Methods.IAdd):
-								{
-									var action = c2.Members.OfType<MethodDeclarationSyntax>().FirstOrDefault(x => x.Identifier.Text == nameof(ServicesModels.Methods.IAdd));
-									if (action is null)
-									{
-										var statements = new List<StatementSyntax>();
-										string servicesParameter;
-										statements.Add(SyntaxFactory.EmptyStatement().WithTrailingTrivia(endline));
-										if (parameterTypeString.EndsWith("vo"))
-										{
-											statements.Add(SyntaxFactory.ParseStatement($"var data=vo.Adapt<{parameterTypeString.Replace("vo", "dto")}>()"));
-											servicesParameter = "data";
-										}
-										statements.Add(SyntaxFactory.ParseStatement($"var res=service.{identity}(data)").WithTrailingTrivia(endline));
-										statements.Add(SyntaxFactory.ParseStatement($"return res;").WithTrailingTrivia(endline));
-										var method = SyntaxFactory.MethodDeclaration(
-											returnType: returnType.WithTrailingTrivia(space),
-											identifier: identity
-											)
-										.WithAttributeLists(new SyntaxList<AttributeListSyntax>() { })
-										.WithModifiers(
-											new SyntaxTokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword).WithTrailingTrivia(space)))
-										.WithParameterList(
-											SyntaxFactory.ParameterList(
-												 SyntaxFactory.SeparatedList(new[] { SyntaxFactory.Parameter(
-																													attributeLists: new SyntaxList<AttributeListSyntax>(),
-																													modifiers: new SyntaxTokenList(),
-																													type: parameterType.WithTrailingTrivia(space),
-																													identifier: SyntaxFactory.Identifier("vo"),
-																													@default: null
-																												) })))
-										.WithBody(
-											   SyntaxFactory.Block(statements)
-											   .WithLeadingTrivia(endline)
-											   .WithTrailingTrivia(endline)
-											   )
-											;
-										c2 = c.AddMembers(method);
-									}
-									break;
-								}
-						}
-					}
-					return c2;
-				});
-				await FileTools.Write(context.Message.FilePath, compilationUnitSyntax, compilationUnitSyntaxNew);
-				return;
+				case Models.CodeMaid.MaidWork.ConfigurationSync:
+					break;
+				case Models.CodeMaid.MaidWork.DtoSync:
+					break;
+				case Models.CodeMaid.MaidWork.HttpClientSync:
+					break;
+				case Models.CodeMaid.MaidWork.ControllerSync:
+					break;
+				case Models.CodeMaid.MaidWork.MasstransitConsumerSync:
+					break;
+				default:
+					break;
 			}
 			//检查更新
 			await MaidService.Update(maid, context.Message.FilePath, context.Message.IsDelete);
@@ -142,8 +88,10 @@ namespace Api.MasstransitConsumer
 			return;
 		}
 	}
+	///<inheritdoc/>
 	public class FileChangeEventConsumerDefinition : ConsumerDefinition<FileChangeEventConsumer>
 	{
+		///<inheritdoc/>
 		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<FileChangeEventConsumer> consumerConfigurator)
 		{
 			endpointConfigurator.ConcurrentMessageLimit = 1;

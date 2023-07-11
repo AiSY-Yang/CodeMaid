@@ -178,14 +178,6 @@ namespace Api.Services
 				{
 					CreateClassEntity(classNode).Adapt(c);
 				}
-				c.MemberType = classNode switch
-				{
-					ClassDeclarationSyntax => MemberType.ClassDeclarationSyntax,
-					InterfaceDeclarationSyntax => MemberType.InterfaceDeclarationSyntax,
-					RecordDeclarationSyntax => MemberType.RecordDeclarationSyntax,
-					StructDeclarationSyntax => MemberType.StructDeclarationSyntax,
-					_ => throw new NotSupportedException("异常的成员类型")
-				};
 				result.ClassList.Add(c.Name);
 				c.Using = usingText;
 				//记录这个类现在有的属性
@@ -939,6 +931,14 @@ public class {className}
 				Modifiers = string.Join(' ', classDeclaration.Modifiers.Select(x => x.Text)),
 				Base = classDeclaration.BaseList?.Types.ToString(),
 				IsDeleted = false,
+				MemberType = classDeclaration switch
+				{
+					ClassDeclarationSyntax => MemberType.ClassDeclarationSyntax,
+					InterfaceDeclarationSyntax => MemberType.InterfaceDeclarationSyntax,
+					RecordDeclarationSyntax => MemberType.RecordDeclarationSyntax,
+					StructDeclarationSyntax => MemberType.StructDeclarationSyntax,
+					_ => throw new NotSupportedException("异常的成员类型")
+				},
 			};
 		}
 		/// <summary>

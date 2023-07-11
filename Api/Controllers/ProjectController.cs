@@ -1,8 +1,8 @@
-          using ServicesModels.Methods;
+using ServicesModels.Methods;
 
 namespace Api.Controllers
 {
-	public class ProjectController:IAdd<object,bool>
+	public class ProjectController
 	{
 		private ProjectController service;
 

@@ -11,9 +11,9 @@ namespace MasstransitModels
 		/// 1111111
 		/// </summary>
 		public required long MaidId { get; set; }
+		public required string EntityName { get; set; }
 		public required string EntityPath { get; set; }
-		void AA()
-		{
-		}
+		public required string ServicePath { get; set; }
+		public required string ControllerPath { get; set; }
 	}
 }
