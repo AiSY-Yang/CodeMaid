@@ -164,16 +164,42 @@ namespace Api.MasstransitConsumer
 					switch (interfaceSetting.MethodType)
 					{
 						case MethodType.Create:
-							statements = statements.Count != 0 ? statements : new SyntaxList<StatementSyntax>(new List<StatementSyntax>
-								{
-									SyntaxFactory.ParseStatement($"var entity = dto.Adapt<{entityName}>();"),
-									SyntaxFactory.ParseStatement($"context.Add(entity);"),
-									SyntaxFactory.ParseStatement($"context.SaveChanges();"),
-									SyntaxFactory.ParseStatement($"return entity;"),
-								}
-							.Select(x => x.WithLeadingTrivia(indent2).WithTrailingTrivia(eol)));
+							switch (type)
+							{
+								case FileType.Controller:
+									break;
+								case FileType.Service:
+									statements = statements.Count != 0 ? statements : new SyntaxList<StatementSyntax>(new List<StatementSyntax>
+										{
+											SyntaxFactory.ParseStatement($"var entity = dto.Adapt<{entityName}>();"),
+											SyntaxFactory.ParseStatement($"context.Add(entity);"),
+											SyntaxFactory.ParseStatement($"context.SaveChanges();"),
+											SyntaxFactory.ParseStatement($"return entity;"),
+										}
+									.Select(x => x.WithLeadingTrivia(indent2).WithTrailingTrivia(eol)));
+									break;
+								default:
+									break;
+							}
 							break;
 						case MethodType.Delete:
+							switch (type)
+							{
+								case FileType.Controller:
+									break;
+								case FileType.Service:
+									statements = statements.Count != 0 ? statements : new SyntaxList<StatementSyntax>(new List<StatementSyntax>
+										{
+											SyntaxFactory.ParseStatement($"var entity = context.Find<Project>(id);"),
+											SyntaxFactory.ParseStatement($"context.Remove(entity);"),
+											SyntaxFactory.ParseStatement($"var res = context.SaveChanges() > 0;"),
+											SyntaxFactory.ParseStatement($"return res;"),
+										}
+									.Select(x => x.WithLeadingTrivia(indent2).WithTrailingTrivia(eol)));
+									break;
+								default:
+									break;
+							}
 							break;
 						case MethodType.Put:
 							break;

@@ -51,7 +51,6 @@ public class Add204ResponseWhenReturnMaybeNull : IOperationFilter
 	{
 		var p = _nullabilityContext.Create(context.MethodInfo.ReturnParameter);
 		var maybeNull = p.WriteState is NullabilityState.Nullable;
-		Console.WriteLine($"{context.ApiDescription.RelativePath} {maybeNull}");
 		if (maybeNull)
 		{
 			if (!operation.Responses.ContainsKey("204"))

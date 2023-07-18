@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Models.CodeMaid;
 using Models.CodeMaid.Enum;
 
+using Serilog;
+
 namespace Api.Controllers;
 
 /// <summary>

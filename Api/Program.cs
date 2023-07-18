@@ -13,6 +13,7 @@ using MasstransitModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
 using OpenTelemetry.Exporter;
@@ -34,7 +35,7 @@ namespace Api
 	/// </summary>
 	public class Program
 	{
-		const string ServicesName = "CodeMaid";
+		const string ServiceName = "CodeMaid";
 		/// <summary>
 		/// root ServiceProvider
 		/// </summary>
@@ -47,11 +48,18 @@ namespace Api
 		public static async Task Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
+			var openTelemetryEndpoint = builder.Configuration.GetValue<string>("OpenTelemetryEndpoint")!;
 			//配置使用Serilog记录日志
 			builder.Host.UseSerilog((context, services, config) =>
 			{
 				//从配置文件读取日志规则
 				config.ReadFrom.Configuration(context.Configuration)
+				//写入OpenTelemetry
+				.WriteTo.OpenTelemetry(x =>
+				{
+					x.Endpoint = openTelemetryEndpoint;
+					x.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField;
+				})
 				;
 			});
 			//配置服务器
@@ -162,10 +170,10 @@ namespace Api
 			//添加OpenTelemetry
 			var otlpOptions = new Action<OtlpExporterOptions>(opt =>
 			{
-				opt.Endpoint = new Uri("http://localhost:4317");
+				opt.Endpoint = new Uri(openTelemetryEndpoint);
 			});
 			builder.Services.AddOpenTelemetry()
-				.ConfigureResource(x => x.AddService(ServicesName, serviceInstanceId: Environment.MachineName))
+				.ConfigureResource(x => x.AddService(ServiceName, serviceInstanceId: Environment.MachineName))
 				.WithTracing(config =>
 				{
 					//记录对外Httpclient请求
@@ -244,13 +252,18 @@ namespace Api
 				{
 					config.AddAspNetCoreInstrumentation();
 					config.AddHttpClientInstrumentation();
-					config.AddEventCountersInstrumentation();
+					config.AddEventCountersInstrumentation(x =>
+					{
+						//https://learn.microsoft.com/zh-cn/dotnet/core/diagnostics/available-counters
+						x.AddEventSources("Microsoft-AspNetCore-Server-Kestrel");
+						x.AddEventSources("Microsoft.AspNetCore.Hosting");
+						x.AddEventSources("System.Net.Http");
+					});
 					config.AddRuntimeInstrumentation();
 					config.AddOtlpExporter(otlpOptions);
-				});
-
+				})
+				;
 			var app = builder.Build();
-
 			//保存容器为全局变量 以便手动创建DI对象
 			Services = app.Services;
 			//开发环境显示swagger文档
