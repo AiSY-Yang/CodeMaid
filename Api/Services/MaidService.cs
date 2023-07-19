@@ -144,7 +144,7 @@ namespace Api.Services
 					}
 					else
 					{
-						CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue).Adapt(p);
+						p=CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue).Adapt(p);
 					}
 					MemberList.Add(p.Name);
 				}
@@ -929,7 +929,7 @@ public class {className}
 				Summary = classDeclaration.GetSummary(),
 				LeadingTrivia = classDeclaration.GetLeadingTrivia().ToFullString(),
 				Modifiers = string.Join(' ', classDeclaration.Modifiers.Select(x => x.Text)),
-				Base = classDeclaration.BaseList?.Types.ToString(),
+				Base = classDeclaration.BaseList?.Types.First().ToString(),
 				IsDeleted = false,
 				MemberType = classDeclaration switch
 				{

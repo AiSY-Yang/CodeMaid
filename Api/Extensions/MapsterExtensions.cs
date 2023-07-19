@@ -14,7 +14,6 @@ namespace Microsoft.Extensions.DependencyInjection
 		/// <param name="serviceCollection"></param>
 		public static void AddMapster(this IServiceCollection serviceCollection)
 		{
-			TypeAdapterConfig<int, int>.ForType();
 		}
 	}
 }
