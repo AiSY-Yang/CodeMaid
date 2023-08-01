@@ -13,7 +13,6 @@ using MasstransitModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
 using OpenTelemetry.Exporter;
@@ -154,7 +153,6 @@ namespace Api
 			var f = new PhysicalFileProvider("/files");
 			builder.Services.AddSingleton(f);
 			//添加消息总线
-			builder.Services.AddMassTransitHostedService();
 			builder.Services.AddMassTransit(x =>
 			{
 				//添加所有消费者
@@ -179,17 +177,19 @@ namespace Api
 					//记录对外Httpclient请求
 					config.AddHttpClientInstrumentation(options =>
 					{
+						var maxLength = 10 * 1024;
 						options.RecordException = true;
 						//记录请求
 						options.EnrichWithHttpRequestMessage = (activity, httpRequestMessage) =>
 						{
 							if (httpRequestMessage.Content != null)
 							{
+								var uri = httpRequestMessage.RequestUri;
 								var headers = httpRequestMessage.Content.Headers;
 								// 过滤过长或文件类型
 								var contentLength = headers.ContentLength ?? 0;
 								var contentType = headers.ContentType?.ToString();
-								if (contentLength <= 10 * 1024 && (contentType == null || !contentType.Contains("multipart/form-data")))
+								if (contentLength <= maxLength && (contentType == null || !contentType.Contains("multipart/form-data")))
 								{
 									var body = httpRequestMessage.Content.ReadAsStringAsync().Result;
 									activity.SetTag("requestBody", body);
@@ -199,23 +199,26 @@ namespace Api
 						//记录响应
 						options.EnrichWithHttpResponseMessage = (activity, httpResponseMessage) =>
 						{
-							var uri = httpResponseMessage.RequestMessage?.RequestUri;
 							if (httpResponseMessage.Content != null)
 							{
-								if (httpResponseMessage.Content.Headers.ContentType?.MediaType == "application/octet-stream")
+								var uri = httpResponseMessage.RequestMessage?.RequestUri;
+								var headers = httpResponseMessage.Content.Headers;
+								// 过滤过长或文件类型
+								var contentLength = headers.ContentLength ?? 0;
+								var contentType = headers.ContentType?.ToString();
+								if (contentLength <= maxLength && (httpResponseMessage.Content.Headers.ContentType?.MediaType) != "application/octet-stream")
 								{
-									return;
+									// 不要使用await:The stream was already consumed. It cannot be read again
+									var body = httpResponseMessage.Content.ReadAsStringAsync().Result;
+									activity.SetTag("responseBody", body);
 								}
-								// 不要使用await:The stream was already consumed. It cannot be read again
-								var body = httpResponseMessage.Content.ReadAsStringAsync().Result;
-								activity.SetTag("responseBody", body);
 							}
 						};
 						//记录异常
 						options.EnrichWithException = (activity, exception) =>
 						{
-							activity.SetTag("stackTrace", exception.StackTrace);
 							activity.SetTag("message", exception.Message);
+							activity.SetTag("stackTrace", exception.StackTrace);
 						};
 
 					});
@@ -244,12 +247,13 @@ namespace Api
 							activity.SetTag("message", exception.Message);
 						};
 					});
-					config.AddMassTransitInstrumentation();
+					config.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
 					config.AddEntityFrameworkCoreInstrumentation();
 					config.AddOtlpExporter(otlpOptions);
 				})
 				.WithMetrics(config =>
 				{
+					config.AddMeter(MassTransit.Monitoring.InstrumentationOptions.MeterName);
 					config.AddAspNetCoreInstrumentation();
 					config.AddHttpClientInstrumentation();
 					config.AddEventCountersInstrumentation(x =>
@@ -321,7 +325,7 @@ namespace Api
 					{
 						var scope = app.Services.CreateScope();
 						var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-						var x = context.Maids.FirstOrDefault(x => x.Id == 16);
+						var x = context.Maids.First(x => x.Id == 16);
 						x.Setting = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(ControllerSetting.Default));
 						context.SaveChanges();
 

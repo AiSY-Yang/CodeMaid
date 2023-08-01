@@ -17,6 +17,8 @@ namespace ServicesModels.Settings
 		public static readonly DtoSyncSetting Default = new()
 		{
 			CreateDirectory = false,
+			Suffix = "Dtos",
+			DtoSyncItemSettings = new(),
 		};
 		/// <summary>
 		/// 是否创建目录 如果为false则生成单个文件 里面有多个类 如果为true则生成文件夹 每个类生成和类同名的文件
@@ -25,15 +27,15 @@ namespace ServicesModels.Settings
 		/// <summary>
 		/// 文件或者目录的后缀
 		/// </summary>
-		public string? Suffix { get; set; }
+		public required string Suffix { get; set; }
 		/// <summary>
 		/// Dto同步的设置
 		/// </summary>
-		public List<DtoSyncSettingItem> DtoSyncSettings { get; set; } = null!;
+		public required List<DtoSyncItemSetting> DtoSyncItemSettings { get; set; } = null!;
 		/// <summary>
 		/// Dto同步的设置
 		/// </summary>
-		public class DtoSyncSettingItem
+		public class DtoSyncItemSetting
 		{
 			/// <summary>
 			/// 类后缀

@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using ExtensionMethods;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 
@@ -12,6 +13,8 @@ using Models.CodeMaid;
 using Models.CodeMaid.Enum;
 
 using Serilog;
+
+using ServicesModels.Results;
 
 namespace Api.Controllers;
 
@@ -134,7 +137,7 @@ public class SystemController : ControllerBase
 	[HttpHead("[action]")]
 	[HttpOptions("[action]")]
 	[HttpPatch("[action]")]
-	public async Task<object> Echo()
+	public async Task<object> Echo(int? statusCode)
 	{
 		var req = new
 		{
@@ -154,7 +157,9 @@ public class SystemController : ControllerBase
 			Files = HttpContext.Request.HasFormContentType ? HttpContext.Request.Form.Files : null,
 			Body = Encoding.UTF8.GetString((await HttpContext.Request.BodyReader.ReadAsync()).Buffer),
 		};
-		return req;
+		var res = new ObjectResult(req);
+		if (statusCode != null) res.StatusCode = statusCode;
+		return res;
 	}
 }
 

@@ -144,7 +144,7 @@ namespace Api.Services
 					}
 					else
 					{
-						p=CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue).Adapt(p);
+						p = CreateEnumMemberEntity(enumMemberDeclaration, ref lastValue).Adapt(p);
 					}
 					MemberList.Add(p.Name);
 				}
@@ -265,8 +265,6 @@ namespace Api.Services
 				{
 					compilationUnit = CSharpSyntaxTree.ParseText($$"""
 						using MassTransit;
-						using MassTransit.ConsumeConfigurators;
-						using MassTransit.Definition;
 
 						using {{classDefinition.NameSpace}};
 
@@ -321,19 +319,30 @@ namespace Api.Services
 		public static async Task UpdateConfiguration(Maid maid)
 		{
 			//更新配置文件
-			foreach (var item in maid.Classes.Where(x => !x.IsDeleted))
+			foreach (var item in maid.Classes)
 			{
 				string fileName = Path.Combine(maid.Project.Path, maid.DestinationPath, $"{item.Name}Configuration.cs");
-				if (File.Exists(fileName))
+				//当类被删除的时候 配置也一起删除掉
+				if (item.IsDeleted)
 				{
-					var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
-					var compilationUnitNew = UpdateConfigurationNode(compilationUnit, item);
-					await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
+					if (File.Exists(fileName))
+					{
+						File.Delete(fileName);
+					}
 				}
 				else
 				{
-					var compilationUnit = CreateConfigurationNode(item);
-					await File.WriteAllTextAsync(fileName, compilationUnit.ToFullString());
+					if (File.Exists(fileName))
+					{
+						var compilationUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(fileName)).GetCompilationUnitRoot();
+						var compilationUnitNew = UpdateConfigurationNode(compilationUnit, item);
+						await FileTools.Write(fileName, compilationUnit, compilationUnitNew);
+					}
+					else
+					{
+						var compilationUnit = CreateConfigurationNode(item);
+						await File.WriteAllTextAsync(fileName, compilationUnit.ToFullString());
+					}
 				}
 			}
 
@@ -570,27 +579,41 @@ namespace Api.Services
 			//读取设置
 			var setting = maid.Setting.Deserialize<DtoSyncSetting>() ?? Default;
 			//所有的类都进行更新
-			foreach (var c in maid.Classes.Where(x => !x.IsDeleted))
+			foreach (var c in maid.Classes.Where(x => true || x.UpdateTime > DateTimeOffset.Now.AddMinutes(-1)))
 			{
 				if (setting.CreateDirectory)
 				{
 					//生成Dto的目录
 					string dirPath = Path.Combine(destinationPath, c.Name + setting.Suffix);
-					if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-					foreach (var dtoSetting in setting.DtoSyncSettings)
+					if (c.IsDeleted)
 					{
-						string className = c.Name + dtoSetting.Suffix;
-						string fileName = Path.Combine(dirPath, className + ".cs");
-						await UpdateDto(fileName, className, c, dtoSetting);
+						Directory.Delete(dirPath, true);
+					}
+					else
+					{
+						if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+						foreach (var dtoSetting in setting.DtoSyncItemSettings)
+						{
+							string className = c.Name + dtoSetting.Suffix;
+							string fileName = Path.Combine(dirPath, className + ".cs");
+							await UpdateDto(fileName, className, c, dtoSetting);
+						}
 					}
 				}
 				else
 				{
 					string fileName = Path.Combine(destinationPath, c.Name + setting.Suffix + ".cs");
-					foreach (var dtoSetting in setting.DtoSyncSettings)
+					if (c.IsDeleted)
 					{
-						string className = c.Name + dtoSetting.Suffix;
-						await UpdateDto(fileName, className, c, dtoSetting);
+						File.Delete(fileName);
+					}
+					else
+					{
+						foreach (var dtoSetting in setting.DtoSyncItemSettings)
+						{
+							string className = c.Name + dtoSetting.Suffix;
+							await UpdateDto(fileName, className, c, dtoSetting);
+						}
 					}
 				}
 			}
@@ -729,7 +752,7 @@ namespace Api.Services
 		/// <param name="classDefinition">类信息</param>
 		/// <param name="setting">设置</param>
 		/// <returns></returns>
-		static async Task UpdateDto(string fileName, string className, ClassDefinition classDefinition, DtoSyncSettingItem setting)
+		static async Task UpdateDto(string fileName, string className, ClassDefinition classDefinition, DtoSyncItemSetting setting)
 		{
 			CompilationUnitSyntax compilationUnit;
 			if (File.Exists(fileName))
@@ -886,7 +909,6 @@ public class {className}
 		/// <summary>
 		/// 是否可以被映射到数据库 postgres支持数组
 		/// </summary>
-		/// <param name="maid"></param>
 		/// <param name="property"></param>
 		/// <returns></returns>
 		private static bool CanBeMapToDataBase(PropertyDefinition property)
@@ -896,6 +918,7 @@ public class {className}
 				&& !property.Attributes.Any(x => x.Name == "NotMapped");
 			string RemoveGeneric(string type)
 			{
+				if (type.EndsWith("[]")) return RemoveGeneric(type[0..^2]);
 				if (type.StartsWith("List<") && type.EndsWith(">")) return RemoveGeneric(type[5..^1]);
 				if (type.StartsWith("IList<") && type.EndsWith(">")) return RemoveGeneric(type[6..^1]);
 				if (type.StartsWith("IEnumerable<") && type.EndsWith(">")) return RemoveGeneric(type[12..^1]);

@@ -6,8 +6,6 @@ using Api.Tools;
 using MaidContexts;
 
 using MassTransit;
-using MassTransit.ConsumeConfigurators;
-using MassTransit.Definition;
 
 using MasstransitModels;
 

@@ -1,31 +1,19 @@
-using System.Text.Json;
-
-using Api.Controllers;
-using Api.Extensions;
 using Api.Services;
-using Api.Tools;
 
 using ExtensionMethods;
 
 using MaidContexts;
 
 using MassTransit;
-using MassTransit.ConsumeConfigurators;
-using MassTransit.Definition;
 
 using MasstransitModels;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
-
-using ServicesModels.Settings;
-
-using SharpYaml.Tokens;
 
 namespace Api.MasstransitConsumer
 {
+	///<inheritdoc/>
 	public class FileChangeEventConsumer : IConsumer<FileChangeEvent>
 	{
 		private readonly ILogger<FileChangeEventConsumer> logger;

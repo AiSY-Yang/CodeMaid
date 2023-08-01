@@ -14,7 +14,6 @@ namespace Api.Middleware
 			}
 			else
 			{
-				Console.WriteLine(context.Exception.Message);
 			}
 		}
 	}

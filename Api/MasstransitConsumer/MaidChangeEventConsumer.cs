@@ -3,8 +3,6 @@ using Api.Services;
 using MaidContexts;
 
 using MassTransit;
-using MassTransit.ConsumeConfigurators;
-using MassTransit.Definition;
 
 using MasstransitModels;
 
@@ -12,17 +10,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.MasstransitConsumer
 {
+	/// <inheritdoc/>
 	public class MaidChangeEventConsumer : IConsumer<MaidChangeEvent>
 	{
 		private readonly ILogger<MaidChangeEventConsumer> logger;
 		private readonly MaidContext maidContext;
 
+		/// <inheritdoc/>
 		public MaidChangeEventConsumer(ILogger<MaidChangeEventConsumer> logger, MaidContext maidContext)
 		{
 			this.logger = logger;
 			this.maidContext = maidContext;
 		}
 
+		/// <inheritdoc/>
 		public async Task Consume(ConsumeContext<MaidChangeEvent> context)
 		{
 			var maid = maidContext.Maids
@@ -42,8 +43,10 @@ namespace Api.MasstransitConsumer
 			await MaidService.Work(maid);
 		}
 	}
+	/// <inheritdoc/>
 	public class MaidChangeEventConsumerDefinition : ConsumerDefinition<MaidChangeEventConsumer>
 	{
+		/// <inheritdoc/>
 		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<MaidChangeEventConsumer> consumerConfigurator)
 		{
 		}
