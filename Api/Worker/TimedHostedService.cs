@@ -58,7 +58,7 @@ namespace Api.Worker
 					.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync);
 				foreach (var maid in maids)
 				{
-					await new HttpClientGenerator().ExecuteAsync(maid);
+					await scope.ServiceProvider.GetRequiredService<HttpClientGenerator>().ExecuteAsync(maid);
 				}
 			}
 			catch (Exception ex)

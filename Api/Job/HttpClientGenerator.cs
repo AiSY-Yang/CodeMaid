@@ -32,6 +32,16 @@ namespace Api.Job
 	public class HttpClientGenerator
 	{
 		static readonly ConcurrentDictionary<string, string> Md5s = new();
+		private readonly HttpClient httpClient;
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="httpClient"></param>
+		public HttpClientGenerator(HttpClient httpClient)
+		{
+			this.httpClient = httpClient;
+		}
+
 		/// <summary>
 		/// 生成Http客户端
 		/// </summary>
@@ -42,7 +52,7 @@ namespace Api.Job
 			string json;
 			if (Uri.TryCreate(maid.SourcePath, UriKind.Absolute, out var uri))
 			{
-				HttpClient httpClient = new() { BaseAddress = uri };
+				httpClient.BaseAddress = uri;
 				json = await httpClient.GetStringAsync("");
 			}
 			else

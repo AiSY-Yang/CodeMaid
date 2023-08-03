@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Api.Job;
 using Api.Middleware;
 using Api.Worker;
 
@@ -78,9 +79,15 @@ namespace Api
 #endif
 			.UseInternalServiceProvider(serviceProvider)
 			);
+			//添加基础组件
 			builder.Services.AddEntityFrameworkMySql();
+			builder.Services.AddHttpClient();
+			//添加后台服务
+			builder.Services.AddHostedService<TimedHostedService>();
 			//添加仓储
 			builder.Services.AddMaidRepository();
+			//添加Job
+			builder.Services.AddScoped<HttpClientGenerator>();
 
 			//添加控制器
 			builder.Services.AddControllers(x =>
@@ -163,8 +170,6 @@ namespace Api
 					cfg.ConfigureEndpoints(context);
 				});
 			});
-			//添加后台服务
-			builder.Services.AddHostedService<TimedHostedService>();
 			//添加OpenTelemetry
 			var otlpOptions = new Action<OtlpExporterOptions>(opt =>
 			{
