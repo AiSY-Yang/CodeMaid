@@ -579,7 +579,7 @@ namespace Api.Services
 			//读取设置
 			var setting = maid.Setting.Deserialize<DtoSyncSetting>() ?? Default;
 			//所有的类都进行更新
-			foreach (var c in maid.Classes.Where(x => true || x.UpdateTime > DateTimeOffset.Now.AddMinutes(-1)))
+			foreach (var c in maid.Classes.Where(x => x.UpdateTime > DateTimeOffset.Now.AddMinutes(-1)))
 			{
 				if (setting.CreateDirectory)
 				{
@@ -587,7 +587,10 @@ namespace Api.Services
 					string dirPath = Path.Combine(destinationPath, c.Name + setting.Suffix);
 					if (c.IsDeleted)
 					{
-						Directory.Delete(dirPath, true);
+						if (Directory.Exists(dirPath))
+						{
+							Directory.Delete(dirPath, true);
+						}
 					}
 					else
 					{
