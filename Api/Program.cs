@@ -1,6 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 using Api.Job;
 using Api.Middleware;
 using Api.Worker;
@@ -58,10 +55,11 @@ namespace Api
 				.WriteTo.OpenTelemetry(x =>
 				{
 					x.Endpoint = openTelemetryEndpoint;
-					x.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField;
+					x.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
 				})
 				;
 			});
+
 			//配置服务器
 			builder.WebHost.UseKestrel((c, x) =>
 			{
@@ -108,9 +106,8 @@ namespace Api
 				//配置json解析
 				.AddJsonOptions(options =>
 				{
-					options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+					options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
 					options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-					//options.JsonSerializerOptions.Converters.Add(new Core.Converter.NullableDateOnlyJsonConverter());
 					options.JsonSerializerOptions.ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip;
 					options.JsonSerializerOptions.AllowTrailingCommas = true;
 				});
@@ -171,12 +168,10 @@ namespace Api
 				});
 			});
 			//添加OpenTelemetry
-			var otlpOptions = new Action<OtlpExporterOptions>(opt =>
-			{
-				opt.Endpoint = new Uri(openTelemetryEndpoint);
-			});
+			void otlpOptions(OtlpExporterOptions x) => x.Endpoint = new Uri(openTelemetryEndpoint); ;
+			void resourceBuilder(ResourceBuilder x) => x.AddService(ServiceName, serviceInstanceId: Environment.MachineName);
 			builder.Services.AddOpenTelemetry()
-				.ConfigureResource(x => x.AddService(ServiceName, serviceInstanceId: Environment.MachineName))
+				.ConfigureResource(resourceBuilder)
 				.WithTracing(config =>
 				{
 					//记录对外Httpclient请求
@@ -231,21 +226,6 @@ namespace Api
 					config.AddAspNetCoreInstrumentation(options =>
 					{
 						options.RecordException = true;
-						options.EnrichWithHttpRequest = async (activity, request) =>
-						{
-							// 此处过滤文件或过长的内容
-							var contentLength = request.ContentLength ?? 0;
-							var contentType = request.ContentType ?? string.Empty;
-							if (contentLength <= 10 * 1024 && !contentType.Contains("multipart/form-data"))
-							{
-								request.EnableBuffering();
-								request.Body.Position = 0;
-								var reader = new StreamReader(request.Body);
-								activity.SetTag("requestBody", await reader.ReadToEndAsync());
-								request.Body.Position = 0;
-							}
-						};
-
 						options.EnrichWithException = (activity, exception) =>
 						{
 							activity.SetTag("stackTrace", exception.StackTrace);
@@ -272,6 +252,7 @@ namespace Api
 					config.AddOtlpExporter(otlpOptions);
 				})
 				;
+			//builder.Services.AddLogging(x => x.AddOpenTelemetry(x => x.se(x => otlpOptions)));
 			var app = builder.Build();
 			//保存容器为全局变量 以便手动创建DI对象
 			Services = app.Services;
@@ -282,6 +263,25 @@ namespace Api
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+			//请求日志记录
+			app.Use(async (context, next) =>
+			{
+				int maxLength = 20 * 1024;
+				long contentLength = context.Request.ContentLength ?? 0;
+				string? contentType = context.Request.ContentType ?? "";
+				if (contentLength > 0 && contentLength < maxLength && contentType.Contains("json"))
+				{
+					var logger = context.RequestServices.GetRequiredService<Microsoft.Extensions.Logging.ILogger<HttpRequest>>();
+					context.Request.EnableBuffering();
+					var pool = System.Buffers.ArrayPool<byte>.Shared;
+					var buffer = pool.Rent((int)contentLength);
+					await context.Request.Body.ReadAsync(buffer.AsMemory());
+					context.Request.Body.Seek(0, SeekOrigin.Begin);
+					logger.LogInformation("requestBody:{requestBody}", System.Text.Encoding.UTF8.GetString(buffer, 0, (int)contentLength));
+					pool.Return(buffer);
+				}
+				await next();
+			});
 			//HTTPS重定向
 			//app.UseHttpsRedirection();
 			//添加静态文件支持
@@ -331,7 +331,7 @@ namespace Api
 						var scope = app.Services.CreateScope();
 						var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
 						var x = context.Maids.First(x => x.Id == 16);
-						x.Setting = JsonSerializer.Deserialize<JsonElement>(JsonSerializer.Serialize(ControllerSetting.Default));
+						x.Setting = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(System.Text.Json.JsonSerializer.Serialize(ControllerSetting.Default));
 						context.SaveChanges();
 
 						await Console.Out.WriteLineAsync("2");

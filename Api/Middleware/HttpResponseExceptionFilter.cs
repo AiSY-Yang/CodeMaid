@@ -2,7 +2,9 @@
 
 namespace Api.Middleware
 {
-	//业务异常过滤器
+	/// <summary>
+	/// 业务异常过滤器
+	/// </summary>
 	class HttpResponseExceptionFilter : Microsoft.AspNetCore.Mvc.Filters.IExceptionFilter
 	{
 		public void OnException(Microsoft.AspNetCore.Mvc.Filters.ExceptionContext context)
@@ -14,6 +16,8 @@ namespace Api.Middleware
 			}
 			else
 			{
+				var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<HttpResponse>>();
+				logger.LogError(context.Exception, "exception response");
 			}
 		}
 	}
