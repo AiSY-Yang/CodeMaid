@@ -5,16 +5,11 @@ using System.Text.Json.Nodes;
 using ExtensionMethods;
 
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 
 using Models.CodeMaid;
 using Models.CodeMaid.Enum;
-
-using Serilog;
-
-using ServicesModels.Results;
 
 namespace Api.Controllers;
 
@@ -51,15 +46,17 @@ public class SystemController : ControllerBase
 		types = types.Union(typeof(MaidWork).Assembly.GetTypes().Where(x => x.IsEnum));
 		foreach (var type in types)
 		{
-			var array = new JsonArray();
-			foreach (var item in type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+			Dictionary<int, JsonObject> objects = new Dictionary<int, JsonObject>();
+			foreach (var item in type.GetFields(BindingFlags.Public | BindingFlags.Static)
 				.Where(x => x.GetCustomAttribute<System.Text.Json.Serialization.JsonIgnoreAttribute>() == null))
 			{
-				array.Add(new JsonObject(new Dictionary<string, JsonNode?>{
+				var order = item.GetCustomAttribute<System.Text.Json.Serialization.JsonPropertyOrderAttribute>()?.Order ?? objects.Count + 1;
+				objects[order] = new JsonObject(new Dictionary<string, JsonNode?>{
 					{ "description",JsonValue.Create((item.GetValue(type) as Enum)!.GetDescription()) },
 					{ "value",JsonValue.Create( item.GetValue(type)) },
-				}));
+				});
 			}
+			JsonArray array = new(objects.OrderBy(x => x.Key).Select(x => x.Value).ToArray());
 			//小驼峰命名
 			result.Add(type.Name.ToNamingConvention(NamingConvention.camelCase), array);
 		}
