@@ -15,6 +15,10 @@ namespace ServicesModels.Settings
 		/// <summary>
 		/// 是否创建模型
 		/// </summary>
-        public bool CreateModel { get; set; }
-    }
+		public bool CreateModel { get; set; }
+		/// <summary>
+		/// 模型文件路径
+		/// </summary>
+		public string? ModelPath { get; set; }
+	}
 }

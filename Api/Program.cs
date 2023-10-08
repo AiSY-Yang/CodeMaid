@@ -275,7 +275,7 @@ namespace Api
 					context.Request.EnableBuffering();
 					var pool = System.Buffers.ArrayPool<byte>.Shared;
 					var buffer = pool.Rent((int)contentLength);
-					await context.Request.Body.ReadAsync(buffer.AsMemory());
+					await context.Request.Body.ReadAsync(buffer);
 					context.Request.Body.Seek(0, SeekOrigin.Begin);
 					logger.LogInformation("requestBody:{requestBody}", System.Text.Encoding.UTF8.GetString(buffer, 0, (int)contentLength));
 					pool.Return(buffer);
@@ -301,7 +301,7 @@ namespace Api
 			//本地化
 			//app.UseRequestLocalization();
 			//跨域配置
-			app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod());
+			app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().SetPreflightMaxAge(TimeSpan.FromDays(1)));
 			//身份认证
 			app.UseAuthentication();
 			app.UseAuthorization();

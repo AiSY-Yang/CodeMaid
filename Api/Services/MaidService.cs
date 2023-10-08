@@ -866,29 +866,29 @@ public class {className}
 			stringBuilder.Append($"{leader}builder.Property(x => x.{property.Name})");
 			if (!property.Summary.IsNullOrWhiteSpace() || !property.Remark.IsNullOrWhiteSpace())
 				stringBuilder.Append($".HasComment(\"{property.Summary?.Replace("\"", "\\\"")}{(property.EnumDefinition != null ? $"({property.EnumDefinition.Remark})" : "")}\")");
-			foreach (var attribute in property.Attributes)
-			{
-				switch (attribute.Name)
-				{
-					//如果有人使用工具 有人没有使用工具 会造成修改实体的MaxLength后 配置文件里没有变化 而迁移会以fluentApi为准 会导致长度约束不生效 所以移除MaxLength的支持
-					//case "MaxLength":
-					//	stringBuilder.Append($".HasMaxLength({attribute.Arguments})");
-					//	break;
-					//常用于对decimal精度的指示
-					case "Column":
-						var match = Regex.Match(attribute.Arguments!, "\"(.*?)\\((\\d*),(\\d*)\\)\"");
-						stringBuilder.Append($".HasPrecision({match.Groups[2]}, {match.Groups[3]})");
-						break;
-					case "Unicode":
-						stringBuilder.Append($".IsUnicode({attribute.Arguments})");
-						break;
-					case "DefaultValue":
-						stringBuilder.Append($".HasDefaultValue({attribute.Arguments})");
-						break;
-					default:
-						break;
-				}
-			}
+			//如果有人使用工具 有人没有使用工具 会造成修改实体的attribute后 配置文件里没有变化 而迁移会以fluentApi为准 会导致长度约束不生效 所以移除attribute的支持
+			//foreach (var attribute in property.Attributes)
+			//{
+			//	switch (attribute.Name)
+			//	{
+			//case "MaxLength":
+			//	stringBuilder.Append($".HasMaxLength({attribute.Arguments})");
+			//	break;
+			//常用于对decimal精度的指示
+			//		case "Column":
+			//			var match = Regex.Match(attribute.Arguments!, "\"(.*?)\\((\\d*),(\\d*)\\)\"");
+			//			stringBuilder.Append($".HasPrecision({match.Groups[2]}, {match.Groups[3]})");
+			//			break;
+			//		case "Unicode":
+			//			stringBuilder.Append($".IsUnicode({attribute.Arguments})");
+			//			break;
+			//		case "DefaultValue":
+			//			stringBuilder.Append($".HasDefaultValue({attribute.Arguments})");
+			//			break;
+			//		default:
+			//			break;
+			//	}
+			//}
 			stringBuilder.Append(';');
 			return stringBuilder.ToString();
 		}

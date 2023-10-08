@@ -49,7 +49,7 @@ public class Add204ResponseWhenReturnMaybeNull : IOperationFilter
 	///<inheritdoc cref="IOperationFilter.Apply(OpenApiOperation, OperationFilterContext)"/>
 	public void Apply(OpenApiOperation operation, OperationFilterContext context)
 	{
-		var p = _nullabilityContext.Create(context.MethodInfo.ReturnParameter);
+		var p = new NullabilityInfoContext().Create(context.MethodInfo.ReturnParameter);
 		var maybeNull = p.WriteState is NullabilityState.Nullable;
 		if (maybeNull)
 		{
