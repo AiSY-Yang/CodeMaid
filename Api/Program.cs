@@ -11,7 +11,6 @@ using MasstransitModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
@@ -59,6 +58,7 @@ namespace Api
 				})
 				;
 			});
+			builder.Services.AddHttpLogging(x => { });
 
 			//配置服务器
 			builder.WebHost.UseKestrel((c, x) =>
@@ -71,11 +71,17 @@ namespace Api
 			//添加数据库
 			string? connectionString = builder.Configuration.GetConnectionString("MaidContext");
 			builder.Services.AddDbContextPool<MaidContext>((serviceProvider, x) =>
-			x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), x => x.EnableRetryOnFailure(3).EnableIndexOptimizedBooleanColumns())
+				x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), x => x
 #if DEBUG
-			.EnableSensitiveDataLogging()
+					.EnableRetryOnFailure(0)
 #endif
-			.UseInternalServiceProvider(serviceProvider)
+					.EnableIndexOptimizedBooleanColumns()
+				)
+#if DEBUG
+				.EnableDetailedErrors()
+				.EnableSensitiveDataLogging()
+#endif
+				.UseInternalServiceProvider(serviceProvider)
 			);
 			//添加基础组件
 			builder.Services.AddEntityFrameworkMySql();
@@ -154,8 +160,8 @@ namespace Api
 			});
 			//文件提供器
 			Directory.CreateDirectory("/files");
-			var f = new PhysicalFileProvider("/files");
-			builder.Services.AddSingleton(f);
+			var filePrevider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider("/files");
+			builder.Services.AddSingleton(filePrevider);
 			//添加消息总线
 			builder.Services.AddMassTransit(x =>
 			{
@@ -225,6 +231,7 @@ namespace Api
 					//记录请求
 					config.AddAspNetCoreInstrumentation(options =>
 					{
+						options.Filter = httpContent => !httpContent.Request.Path.StartsWithSegments("/swagger");
 						options.RecordException = true;
 						options.EnrichWithException = (activity, exception) =>
 						{
@@ -252,7 +259,6 @@ namespace Api
 					config.AddOtlpExporter(otlpOptions);
 				})
 				;
-			//builder.Services.AddLogging(x => x.AddOpenTelemetry(x => x.se(x => otlpOptions)));
 			var app = builder.Build();
 			//保存容器为全局变量 以便手动创建DI对象
 			Services = app.Services;
@@ -334,7 +340,6 @@ namespace Api
 						x.Setting = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(System.Text.Json.JsonSerializer.Serialize(ControllerSetting.Default));
 						context.SaveChanges();
 
-						await Console.Out.WriteLineAsync("2");
 						//File.WriteAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs", " " + File.ReadAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs"));
 						File.Delete("D:\\Code\\Test\\WebDemo\\ProjectService.cs");
 						File.Delete("D:\\Code\\Test\\WebDemo\\ProjectController.cs");

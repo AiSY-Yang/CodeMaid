@@ -110,7 +110,7 @@ namespace Api.Services
 			var result = new UpdateResult()
 			{
 				ClassList = new HashSet<string>(),
-				EnumList = new HashSet<string>()
+				EnumList = new HashSet<string>(),
 			};
 			var tree = CSharpSyntaxTree.ParseText(await File.ReadAllTextAsync(path));
 			var compilationUnit = tree.GetCompilationUnitRoot();
@@ -120,7 +120,7 @@ namespace Api.Services
 			var enums = compilationUnit.GetDeclarationSyntaxes<EnumDeclarationSyntax>();
 			foreach (var enumNode in enums)
 			{
-				var e = maid.Enums.FirstOrDefault(x => x.Name == enumNode.Identifier.ValueText);
+				var e = maid.Enums.FirstOrDefault(x => x.Name.Equals(enumNode.Identifier.ValueText, StringComparison.OrdinalIgnoreCase));
 				if (e == null)
 				{
 					e = CreateEnumEntity(enumNode);
@@ -168,7 +168,7 @@ namespace Api.Services
 			List<TypeDeclarationSyntax> classes = compilationUnit.GetDeclarationSyntaxes<TypeDeclarationSyntax>();
 			foreach (var classNode in classes)
 			{
-				var c = maid.Classes.FirstOrDefault(x => x.Name == classNode.Identifier.ValueText);
+				var c = maid.Classes.FirstOrDefault(x => x.Name.Equals(classNode.Identifier.ValueText, StringComparison.OrdinalIgnoreCase));
 				if (c == null)
 				{
 					c = CreateClassEntity(classNode);

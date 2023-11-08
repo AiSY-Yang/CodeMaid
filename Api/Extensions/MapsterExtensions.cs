@@ -1,19 +1,15 @@
-﻿using Mapster;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
-
-namespace Microsoft.Extensions.DependencyInjection
+/// <summary>
+/// IServiceCollection扩展
+/// </summary>
+public static class MapsterExtensions
 {
 	/// <summary>
-	/// IServiceCollection扩展
+	/// 添加Mapster配置
 	/// </summary>
-	public static class MapsterExtensions
+	/// <param name="serviceCollection"></param>
+	public static void AddMapster(this IServiceCollection serviceCollection)
 	{
-		/// <summary>
-		/// 添加Mapster配置
-		/// </summary>
-		/// <param name="serviceCollection"></param>
-		public static void AddMapster(this IServiceCollection serviceCollection)
-		{
-		}
 	}
 }

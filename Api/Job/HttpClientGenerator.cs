@@ -40,6 +40,7 @@ namespace Api.Job
 		public HttpClientGenerator(HttpClient httpClient, ILogger<HttpClientGenerator> logger)
 		{
 			this.httpClient = httpClient;
+			this.httpClient.Timeout = TimeSpan.FromSeconds(10);
 			this.logger = logger;
 		}
 
@@ -53,7 +54,22 @@ namespace Api.Job
 			string json;
 			if (Uri.TryCreate(maid.SourcePath, UriKind.Absolute, out var uri))
 			{
-				json = await httpClient.GetStringAsync(uri);
+				try
+				{
+					var res = await httpClient.GetAsync(uri);
+					if (!res.IsSuccessStatusCode)
+					{
+
+						logger.LogError("生成HTTP客户端错误,maid{maid},{url}返回状态码为{StatusCode}", maid.Name, uri, res.StatusCode);
+						return;
+					}
+					json = await res.Content.ReadAsStringAsync();
+				}
+				catch (Exception ex)
+				{
+					logger.LogError(ex, "生成HTTP客户端错误,maid{maid},{url}", maid.Name, uri);
+					return;
+				}
 			}
 			else
 			{
@@ -83,8 +99,7 @@ namespace Api.Job
 					modelUnit = CSharpSyntaxTree.ParseText($$"""
 				#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 				using System.Text.Json.Serialization;
-				namespace RestfulClient.{{restfulApiDocument.PropertyStyleName}}Model;
-				
+				{{(setting.CreateModel ? $"namespace RestfulClient.{restfulApiDocument.PropertyStyleName}Model;{Environment.NewLine}" : "")}}				
 				#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 				""").GetCompilationUnitRoot();
 				var modelUnitNew = modelUnit;
@@ -121,18 +136,39 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 {
 	private readonly HttpClient httpClient;
 
-	public {{restfulApiDocument.PropertyStyleName}}(HttpClient httpClient)
+	public {{restfulApiDocument.PropertyStyleName}}(HttpClient httpClient, ILogger<{{restfulApiDocument.PropertyStyleName}}> logger)
 	{
 		httpClient.BaseAddress = new Uri("http://localhost:5000");
-#if DEBUG
-		httpClient.BaseAddress = new Uri("http://localhost:5000");
-#endif
 		httpClient.Timeout = TimeSpan.FromMinutes(5);
 		this.httpClient = httpClient;
 	}
-	public static async Task<T> GetResult<T>(HttpRequestMessage request, HttpResponseMessage response)
+	public async Task<T> GetResult<T>(HttpRequestMessage request, HttpResponseMessage response)
 	{
-		return (await response.Content.ReadFromJsonAsync<T>())!;
+		try
+		{
+			response.EnsureSuccessStatusCode();
+			return (await response.Content.ReadFromJsonAsync<T>())!;
+		}
+		catch (HttpRequestException ex)
+		{
+			logger.LogError(ex, "{name}请求失败:,请求地址{address},状态码{statusCode},参数{body}响应{s2}"
+				, nameof({{restfulApiDocument.PropertyStyleName}})
+				, request.RequestUri
+				, response.StatusCode
+				, request.Content == null ? null : await request.Content.ReadAsStringAsync()
+				, await response.Content.ReadAsStringAsync());
+			throw;
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, "{name}请求失败:,请求地址{address},状态码{statusCode},参数{body}响应{s2}"
+				, nameof({{restfulApiDocument.PropertyStyleName}})
+				, request.RequestUri
+				, response.StatusCode
+				, request.Content == null ? null : await request.Content.ReadAsStringAsync()
+				, await response.Content.ReadAsStringAsync());
+			throw;
+		}
 	}
 }
 """;
@@ -358,7 +394,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		{
 			var enumName = PropertyStyle(Name);
 			StringBuilder stringBuilder = new StringBuilder();
-			if (SchemaType == "string") stringBuilder.AppendLine($"[JsonConverter(typeof(JsonStringEnumConverter))]");
+			if (SchemaType == "string") stringBuilder.AppendLine($"[JsonConverter(typeof(JsonEnumMemberJsonConverter))]");
 			stringBuilder.AppendLine($"public enum {enumName}");
 			stringBuilder.AppendLine("{");
 			foreach (var item in EnumFields)
@@ -429,6 +465,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			string Content(string s) => Type.Type switch
 			{
 				"Stream" => Type.CanBeNull ? $"content.Add({name}{s}.content, nameof({name}), {name}{s}.fileName)" : $"content.Add({name}{s}.content, nameof({name}), {name}{s}.fileName)",
+				"Guid" => $"content.Add(new StringContent({name}{s}.ToString()), nameof({name}))",
 				"string" => $"content.Add(new StringContent({name}), nameof({name}))",
 				"bool" or "int" or "long" => $"content.Add(JsonContent.Create({name}{s}), nameof({name}))",
 				_ => $"content.Add(JsonContent.Create({name}), nameof({name}))",
@@ -553,7 +590,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// <summary>
 		/// 无效的符号
 		/// </summary>
-		static readonly char[] InvalidChars = new[] { '<', '>' };
+		static readonly char[] InvalidChars = new[] { '<', '>', '{', '}' };
 		public string MethodName
 		{
 			get => Id is null
