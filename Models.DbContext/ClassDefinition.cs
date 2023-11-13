@@ -1,4 +1,4 @@
-﻿using Mapster;
+using Mapster;
 
 using Models.CodeMaid;
 
@@ -64,6 +64,7 @@ namespace Models.CodeMaid
 	/// <summary>
 	/// 成员类型
 	/// </summary>
+	/// <remarks>0-类,1-接口,2-记录,3-结构体</remarks>
 	public enum MemberType
 	{
 		/// <summary>

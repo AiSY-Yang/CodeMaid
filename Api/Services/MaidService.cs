@@ -252,6 +252,11 @@ namespace Api.Services
 					break;
 			}
 		}
+		/// <summary>
+		/// Generate Masstransit Consumer
+		/// </summary>
+		/// <param name="maid"></param>
+		/// <returns></returns>
 		public static async Task MasstransitConsumerSync(Maid maid)
 		{
 			var setting = maid.Setting.Deserialize<ConfigurationSyncSetting>() ?? new ConfigurationSyncSetting();
@@ -425,6 +430,17 @@ namespace Api.Services
 				"""");
 			//当有基类的时候要调用基类的方法
 			if (hasBase) stringBuilder.AppendLine($"\t\tbase.Configure(builder);");
+			stringBuilder.AppendLine($"\t\tConfigureComment(builder);");
+			stringBuilder.AppendLine("\t}");
+			stringBuilder.AppendLine("\t/// <summary>");
+			stringBuilder.AppendLine("\t/// Automatically generated comment configuration");
+			stringBuilder.AppendLine("\t/// </summary>");
+			//stringBuilder.AppendLine("\t/// <param name=\"builder\"></param>");
+			if (hasBase)
+				stringBuilder.AppendLine($"\tstatic void ConfigureComment(EntityTypeBuilder<{classDefinition.Name}> builder)");
+			else
+				stringBuilder.AppendLine($"\tstatic void ConfigureComment(EntityTypeBuilder<TEntity> builder)");
+			stringBuilder.AppendLine("\t{");
 			//当不是抽象类的时候要设置表名
 			if (!isAbstract) stringBuilder.AppendLine($"\t\tbuilder.Metadata.SetComment(\"{classDefinition.Summary}\");");
 			//设置属性
@@ -490,9 +506,26 @@ namespace Api.Services
 		/// <returns></returns>
 		private static ClassDeclarationSyntax UpdateConfigurationNode(ClassDeclarationSyntax classNode, ClassDefinition classDefinition)
 		{
-			var methodCode = classNode.ChildNodes().First(x => x is MethodDeclarationSyntax);
+
+			/*
+			中断性变更 替换代码如下 使用正则替换 建议使用rider
+Configure(\(EntityTypeBuilder<\w*> builder\))\s*\{\s*base.Configure\(builder\);
+
+Configure$1
+	{
+		base.Configure(builder);
+		ConfigureComment(builder);
+	}
+	/// <summary>
+	/// Automatically generated comment configuration
+	/// </summary>
+	/// <param name="builder"></param>
+	public static void ConfigureComment$1
+	{
+			*/
+			var methodCode = classNode.ChildNodes().OfType<MethodDeclarationSyntax>().First(x => x.Identifier.Text == "ConfigureComment");
 			//此处要保留原有块信息引用 以在后面可以替换节点
-			var blockCode = methodCode.ChildNodes().First(x => x is BlockSyntax);
+			var blockCode = methodCode.ChildNodes().OfType<BlockSyntax>().First();
 			var newBlockCode = (BlockSyntax)blockCode;
 			//只有映射到数据库的字段才会更新配置
 			foreach (var item in classDefinition.Properties.Where(CanBeMapToDataBase))
@@ -579,7 +612,10 @@ namespace Api.Services
 			//读取设置
 			var setting = maid.Setting.Deserialize<DtoSyncSetting>() ?? Default;
 			//所有的类都进行更新
-			foreach (var c in maid.Classes.Where(x => x.UpdateTime > DateTimeOffset.Now.AddMinutes(-1)))
+			foreach (var c in maid.Classes
+				.Where(x => !x.IsAbstract)
+				.Where(x => x.UpdateTime > DateTimeOffset.Now.AddMinutes(-1))
+				)
 			{
 				if (setting.CreateDirectory)
 				{
@@ -702,17 +738,18 @@ namespace Api.Services
 		/// <returns></returns>
 		static List<PropertyDefinition> GetClassesFromFlatteningClassName(Maid maid, ClassDefinition c, string name)
 		{
-			//直接在类本身里寻找这个属性
-			var absoluteProp = c.Properties.FirstOrDefault(x => name == x.Name);
-			//在基类中找可能的属性 因为如果属于基类的话 则也属于这个类 应该直接返回对应的属性
-			var baseProp = maid.Classes.Where(x => x.Name == c.Base).SelectMany(x => x.Properties).FirstOrDefault(x => name == x.Name);
-			//如果以上两个任意一个找到的话 取其中未被删除的属性返回 如果都删除的话任意返回一个
-			if (absoluteProp != null || baseProp != null)
+			List<ClassDefinition> GetSubClass(Maid maid, ClassDefinition c)
 			{
-				return absoluteProp == null ? new List<PropertyDefinition> { baseProp! }
-					: baseProp == null ? new List<PropertyDefinition> { absoluteProp }
-					: absoluteProp.IsDeleted ? new List<PropertyDefinition> { baseProp }
-					: new List<PropertyDefinition> { absoluteProp };
+				var res = new List<ClassDefinition> { c };
+				var sub = maid.Classes.FirstOrDefault(x => x.Name == c.Base);
+				if (sub != null) res.AddRange(GetSubClass(maid, sub));
+				return res;
+			}
+			//在类和它的基类里寻找这个属性
+			var prop = GetSubClass(maid, c).SelectMany(x => x.Properties).OrderBy(x => x.IsDeleted).FirstOrDefault(x => name == x.Name);
+			if (prop != null)
+			{
+				return new List<PropertyDefinition> { prop };
 			}
 
 			var res = new List<PropertyDefinition>();
