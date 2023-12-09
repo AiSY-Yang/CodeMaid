@@ -1,0 +1,281 @@
+LogRecord.Timestamp:               2023-11-27T02:41:19.0794924Z
+LogRecord.TraceId:                 0db3f850d5dc382b984ee621c3103742
+LogRecord.SpanId:                  4389ba0161810db7
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.Severity:                Info
+LogRecord.SeverityText:            Information
+LogRecord.FormattedMessage:        Executed DbCommand (48ms) [Parameters=[@__form_Title_0='1.3.5内置“是”启用“是”', @__form_Version_1='1.3.5', @__id_2='05258f3a-4ba4-4efe-ae0c-344552ac8340'], CommandType='Text', CommandTimeout='20']
+SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."CategoryId", t."CategoryName", t."Command", t."CreateUserId", t."Description", t."DocumentUrl", t."Enable", t."Inside", t."Path", t."Price", t."Title", t."Version"
+FROM "ToolLibraries" AS t
+WHERE NOT (t."IsDeleted") AND t."Title" = @__form_Title_0 AND t."Version" = @__form_Version_1 AND t."Id" <> @__id_2
+LIMIT 1
+LogRecord.Body:                    Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.Attributes (Key:Value):
+    elapsed: 48
+    parameters: @__form_Title_0='1.3.5内置“是”启用“是”', @__form_Version_1='1.3.5', @__id_2='05258f3a-4ba4-4efe-ae0c-344552ac8340'
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."CategoryId", t."CategoryName", t."Command", t."CreateUserId", t."Description", t."DocumentUrl", t."Enable", t."Inside", t."Path", t."Price", t."Title", t."Version"
+FROM "ToolLibraries" AS t
+WHERE NOT (t."IsDeleted") AND t."Title" = @__form_Title_0 AND t."Version" = @__form_Version_1 AND t."Id" <> @__id_2
+LIMIT 1
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: 4389ba0161810db7
+[Scope.0]:TraceId: 0db3f850d5dc382b984ee621c3103742
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMVEU8AQOGVK
+[Scope.2]:RequestId: 0HMVEU8AQOGVK:00000003
+[Scope.2]:RequestPath: /api/admin/ToolLibrary/05258f3a-4ba4-4efe-ae0c-344552ac8340
+[Scope.3]:ActionId: 4e62707a-d995-41dc-adb8-7854f6bfae5f
+[Scope.3]:ActionName: Http.API.Controllers.AdminControllers.ToolLibraryController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+Environment: Development
+service.name: GenarsA-API
+service.instance.id: Yangkai
+telemetry.sdk.name: opentelemetry
+telemetry.sdk.language: dotnet
+telemetry.sdk.version: 1.6.0
+
+LogRecord.Timestamp:               2023-11-27T02:41:19.1291664Z
+LogRecord.TraceId:                 0db3f850d5dc382b984ee621c3103742
+LogRecord.SpanId:                  4389ba0161810db7
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.Severity:                Info
+LogRecord.SeverityText:            Information
+LogRecord.FormattedMessage:        Executed DbCommand (49ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT p."Id", p."CreatedTime", p."IsDeleted", p."UpdatedTime", p."CategoryId", p."CategoryName", p."CreateUserId", p."Description", p."DocumentUrl", p."ImageData", p."Path", p."Price", p."Title", p."Version"
+FROM "PublicDataResources" AS p
+WHERE NOT (p."IsDeleted")
+LogRecord.Body:                    Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.Attributes (Key:Value):
+    elapsed: 49
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT p."Id", p."CreatedTime", p."IsDeleted", p."UpdatedTime", p."CategoryId", p."CategoryName", p."CreateUserId", p."Description", p."DocumentUrl", p."ImageData", p."Path", p."Price", p."Title", p."Version"
+FROM "PublicDataResources" AS p
+WHERE NOT (p."IsDeleted")
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: 4389ba0161810db7
+[Scope.0]:TraceId: 0db3f850d5dc382b984ee621c3103742
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMVEU8AQOGVK
+[Scope.2]:RequestId: 0HMVEU8AQOGVK:00000003
+[Scope.2]:RequestPath: /api/admin/ToolLibrary/05258f3a-4ba4-4efe-ae0c-344552ac8340
+[Scope.3]:ActionId: 4e62707a-d995-41dc-adb8-7854f6bfae5f
+[Scope.3]:ActionName: Http.API.Controllers.AdminControllers.ToolLibraryController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+Environment: Development
+service.name: GenarsA-API
+service.instance.id: Yangkai
+telemetry.sdk.name: opentelemetry
+telemetry.sdk.language: dotnet
+telemetry.sdk.version: 1.6.0
+
+LogRecord.Timestamp:               2023-11-27T02:41:19.1799396Z
+LogRecord.TraceId:                 0db3f850d5dc382b984ee621c3103742
+LogRecord.SpanId:                  4389ba0161810db7
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.Severity:                Info
+LogRecord.SeverityText:            Information
+LogRecord.FormattedMessage:        Executed DbCommand (50ms) [Parameters=[@__id_0='05258f3a-4ba4-4efe-ae0c-344552ac8340'], CommandType='Text', CommandTimeout='20']
+SELECT t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."CategoryId", t0."CategoryName", t0."Command", t0."CreateUserId", t0."Description", t0."DocumentUrl", t0."Enable", t0."Inside", t0."Path", t0."Price", t0."Title", t0."Version", t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."CanEqualMax", t1."CanEqualMin", t1."DataType", t1."Default", t1."IsArray", t1."MatchId", t1."Max", t1."Min", t1."Name", t1."NestedArray", t1."ParameterLocation", t1."ParameterType", t1."Regex", t1."Remark", t1."SelectItem", t1."Sort", t1."ToolLibraryId", t3."Id", t3."CreatedTime", t3."IsDeleted", t3."UpdatedTime", t3."ChildId", t3."ParentId"
+FROM (
+    SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."CategoryId", t."CategoryName", t."Command", t."CreateUserId", t."Description", t."DocumentUrl", t."Enable", t."Inside", t."Path", t."Price", t."Title", t."Version"
+    FROM "ToolLibraries" AS t
+    WHERE NOT (t."IsDeleted") AND t."Id" = @__id_0
+    LIMIT 1
+) AS t0
+LEFT JOIN (
+    SELECT t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."CanEqualMax", t2."CanEqualMin", t2."DataType", t2."Default", t2."IsArray", t2."MatchId", t2."Max", t2."Min", t2."Name", t2."NestedArray", t2."ParameterLocation", t2."ParameterType", t2."Regex", t2."Remark", t2."SelectItem", t2."Sort", t2."ToolLibraryId"
+    FROM "ToolLibraryParameters" AS t2
+    WHERE NOT (t2."IsDeleted")
+) AS t1 ON t0."Id" = t1."ToolLibraryId"
+LEFT JOIN (
+    SELECT t4."Id", t4."CreatedTime", t4."IsDeleted", t4."UpdatedTime", t4."ChildId", t4."ParentId"
+    FROM "ToolLibraryChildren" AS t4
+    WHERE NOT (t4."IsDeleted")
+) AS t3 ON t0."Id" = t3."ParentId"
+ORDER BY t0."Id", t1."Id"
+LogRecord.Body:                    Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.Attributes (Key:Value):
+    elapsed: 50
+    parameters: @__id_0='05258f3a-4ba4-4efe-ae0c-344552ac8340'
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."CategoryId", t0."CategoryName", t0."Command", t0."CreateUserId", t0."Description", t0."DocumentUrl", t0."Enable", t0."Inside", t0."Path", t0."Price", t0."Title", t0."Version", t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."CanEqualMax", t1."CanEqualMin", t1."DataType", t1."Default", t1."IsArray", t1."MatchId", t1."Max", t1."Min", t1."Name", t1."NestedArray", t1."ParameterLocation", t1."ParameterType", t1."Regex", t1."Remark", t1."SelectItem", t1."Sort", t1."ToolLibraryId", t3."Id", t3."CreatedTime", t3."IsDeleted", t3."UpdatedTime", t3."ChildId", t3."ParentId"
+FROM (
+    SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."CategoryId", t."CategoryName", t."Command", t."CreateUserId", t."Description", t."DocumentUrl", t."Enable", t."Inside", t."Path", t."Price", t."Title", t."Version"
+    FROM "ToolLibraries" AS t
+    WHERE NOT (t."IsDeleted") AND t."Id" = @__id_0
+    LIMIT 1
+) AS t0
+LEFT JOIN (
+    SELECT t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."CanEqualMax", t2."CanEqualMin", t2."DataType", t2."Default", t2."IsArray", t2."MatchId", t2."Max", t2."Min", t2."Name", t2."NestedArray", t2."ParameterLocation", t2."ParameterType", t2."Regex", t2."Remark", t2."SelectItem", t2."Sort", t2."ToolLibraryId"
+    FROM "ToolLibraryParameters" AS t2
+    WHERE NOT (t2."IsDeleted")
+) AS t1 ON t0."Id" = t1."ToolLibraryId"
+LEFT JOIN (
+    SELECT t4."Id", t4."CreatedTime", t4."IsDeleted", t4."UpdatedTime", t4."ChildId", t4."ParentId"
+    FROM "ToolLibraryChildren" AS t4
+    WHERE NOT (t4."IsDeleted")
+) AS t3 ON t0."Id" = t3."ParentId"
+ORDER BY t0."Id", t1."Id"
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: 4389ba0161810db7
+[Scope.0]:TraceId: 0db3f850d5dc382b984ee621c3103742
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMVEU8AQOGVK
+[Scope.2]:RequestId: 0HMVEU8AQOGVK:00000003
+[Scope.2]:RequestPath: /api/admin/ToolLibrary/05258f3a-4ba4-4efe-ae0c-344552ac8340
+[Scope.3]:ActionId: 4e62707a-d995-41dc-adb8-7854f6bfae5f
+[Scope.3]:ActionName: Http.API.Controllers.AdminControllers.ToolLibraryController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+Environment: Development
+service.name: GenarsA-API
+service.instance.id: Yangkai
+telemetry.sdk.name: opentelemetry
+telemetry.sdk.language: dotnet
+telemetry.sdk.version: 1.6.0
+
+LogRecord.Timestamp:               2023-11-27T02:41:19.2377928Z
+LogRecord.TraceId:                 0db3f850d5dc382b984ee621c3103742
+LogRecord.SpanId:                  4389ba0161810db7
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.Severity:                Info
+LogRecord.SeverityText:            Information
+LogRecord.FormattedMessage:        Executed DbCommand (42ms) [Parameters=[@__form_ChildrenId_0={  } (DbType = Object)], CommandType='Text', CommandTimeout='20']
+SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."CategoryId", t."CategoryName", t."Command", t."CreateUserId", t."Description", t."DocumentUrl", t."Enable", t."Inside", t."Path", t."Price", t."Title", t."Version"
+FROM "ToolLibraries" AS t
+WHERE NOT (t."IsDeleted") AND t."Id" = ANY (@__form_ChildrenId_0)
+LogRecord.Body:                    Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.Attributes (Key:Value):
+    elapsed: 42
+    parameters: @__form_ChildrenId_0={  } (DbType = Object)
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."CategoryId", t."CategoryName", t."Command", t."CreateUserId", t."Description", t."DocumentUrl", t."Enable", t."Inside", t."Path", t."Price", t."Title", t."Version"
+FROM "ToolLibraries" AS t
+WHERE NOT (t."IsDeleted") AND t."Id" = ANY (@__form_ChildrenId_0)
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: 4389ba0161810db7
+[Scope.0]:TraceId: 0db3f850d5dc382b984ee621c3103742
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMVEU8AQOGVK
+[Scope.2]:RequestId: 0HMVEU8AQOGVK:00000003
+[Scope.2]:RequestPath: /api/admin/ToolLibrary/05258f3a-4ba4-4efe-ae0c-344552ac8340
+[Scope.3]:ActionId: 4e62707a-d995-41dc-adb8-7854f6bfae5f
+[Scope.3]:ActionName: Http.API.Controllers.AdminControllers.ToolLibraryController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+Environment: Development
+service.name: GenarsA-API
+service.instance.id: Yangkai
+telemetry.sdk.name: opentelemetry
+telemetry.sdk.language: dotnet
+telemetry.sdk.version: 1.6.0
+
+LogRecord.Timestamp:               2023-11-27T02:41:19.2862282Z
+LogRecord.TraceId:                 0db3f850d5dc382b984ee621c3103742
+LogRecord.SpanId:                  4389ba0161810db7
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.Severity:                Info
+LogRecord.SeverityText:            Information
+LogRecord.FormattedMessage:        Executed DbCommand (43ms) [Parameters=[@p2='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p0='dsadsa
+sas
+asa1', @p1='2023-11-27T02:41:19.2398759+00:00' (DbType = DateTime), @p3='628c22d6-d7bb-4f08-8ab7-fa84e473a061', @p4='94d7c0bc-31ed-4f01-b3de-dc0641ca9a5c', @p5='b67bcd21-3cc3-4f1a-897a-d92c7f0da2fd', @p6='eb1b55e3-fd77-4dc7-acb4-d3c6302e5221', @p7='1e52a6c1-c057-472e-8e24-55d4e4bbea60', @p8='True', @p9='True', @p10='2023-11-27T02:41:19.2383652+00:00' (DbType = DateTime), @p11='1', @p12='4', @p13='False', @p14='False', @p15=NULL, @p16='30' (Nullable = true), @p17='1' (Nullable = true), @p18='cpus' (Nullable = false), @p19='0', @p20='3', @p21='0', @p22=NULL, @p23='cpu大小' (Nullable = false), @p24=NULL, @p25='2', @p26='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p27='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p28='4bf6b8fa-45d8-438c-9984-67e582514b19', @p29='False', @p30='False', @p31='2023-11-27T02:41:19.2383639+00:00' (DbType = DateTime), @p32='0', @p33='10', @p34='False', @p35='False', @p36='aa', @p37=NULL (DbType = Decimal), @p38=NULL (DbType = Decimal), @p39='参数名称输出456' (Nullable = false), @p40='0', @p41='1', @p42='2', @p43=NULL, @p44='提示456' (Nullable = false), @p45=NULL, @p46='1', @p47='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p48='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p49='67a22fd5-100b-48d6-bb9a-7a6521ec6926', @p50='False', @p51='False', @p52='2023-11-27T02:41:19.2383552+00:00' (DbType = DateTime), @p53='0', @p54=NULL, @p55='False', @p56='False', @p57='aa', @p58='20' (Nullable = true), @p59='1' (Nullable = true), @p60='参数名称输入123' (Nullable = false), @p61='0', @p62='0', @p63='2', @p64=NULL, @p65='提示123' (Nullable = false), @p66=NULL, @p67='0', @p68='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p69='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p70='cea4d5dd-af37-40bd-92ac-bc51124858ae', @p71='False', @p72='False', @p73='2023-11-27T02:41:19.2383663+00:00' (DbType = DateTime), @p74='1', @p75='13', @p76='False', @p77='False', @p78=NULL, @p79='20' (Nullable = true), @p80='1' (Nullable = true), @p81='参数名称command789' (Nullable = false), @p82='0', @p83='2', @p84='0', @p85=NULL, @p86='提示789' (Nullable = false), @p87=NULL, @p88='3', @p89='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p90='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime)], CommandType='Text', CommandTimeout='20']
+UPDATE "ToolLibraries" SET "Description" = @p0, "UpdatedTime" = @p1
+WHERE "Id" = @p2;
+DELETE FROM "ToolLibraryParameters"
+WHERE "Id" = @p3;
+DELETE FROM "ToolLibraryParameters"
+WHERE "Id" = @p4;
+DELETE FROM "ToolLibraryParameters"
+WHERE "Id" = @p5;
+DELETE FROM "ToolLibraryParameters"
+WHERE "Id" = @p6;
+INSERT INTO "ToolLibraryParameters" ("Id", "CanEqualMax", "CanEqualMin", "CreatedTime", "DataType", "Default", "IsArray", "IsDeleted", "MatchId", "Max", "Min", "Name", "NestedArray", "ParameterLocation", "ParameterType", "Regex", "Remark", "SelectItem", "Sort", "ToolLibraryId", "UpdatedTime")
+VALUES (@p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21, @p22, @p23, @p24, @p25, @p26, @p27);
+INSERT INTO "ToolLibraryParameters" ("Id", "CanEqualMax", "CanEqualMin", "CreatedTime", "DataType", "Default", "IsArray", "IsDeleted", "MatchId", "Max", "Min", "Name", "NestedArray", "ParameterLocation", "ParameterType", "Regex", "Remark", "SelectItem", "Sort", "ToolLibraryId", "UpdatedTime")
+VALUES (@p28, @p29, @p30, @p31, @p32, @p33, @p34, @p35, @p36, @p37, @p38, @p39, @p40, @p41, @p42, @p43, @p44, @p45, @p46, @p47, @p48);
+INSERT INTO "ToolLibraryParameters" ("Id", "CanEqualMax", "CanEqualMin", "CreatedTime", "DataType", "Default", "IsArray", "IsDeleted", "MatchId", "Max", "Min", "Name", "NestedArray", "ParameterLocation", "ParameterType", "Regex", "Remark", "SelectItem", "Sort", "ToolLibraryId", "UpdatedTime")
+VALUES (@p49, @p50, @p51, @p52, @p53, @p54, @p55, @p56, @p57, @p58, @p59, @p60, @p61, @p62, @p63, @p64, @p65, @p66, @p67, @p68, @p69);
+INSERT INTO "ToolLibraryParameters" ("Id", "CanEqualMax", "CanEqualMin", "CreatedTime", "DataType", "Default", "IsArray", "IsDeleted", "MatchId", "Max", "Min", "Name", "NestedArray", "ParameterLocation", "ParameterType", "Regex", "Remark", "SelectItem", "Sort", "ToolLibraryId", "UpdatedTime")
+VALUES (@p70, @p71, @p72, @p73, @p74, @p75, @p76, @p77, @p78, @p79, @p80, @p81, @p82, @p83, @p84, @p85, @p86, @p87, @p88, @p89, @p90);
+LogRecord.Body:                    Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.Attributes (Key:Value):
+    elapsed: 43
+    parameters: @p2='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p0='dsadsa
+sas
+asa1', @p1='2023-11-27T02:41:19.2398759+00:00' (DbType = DateTime), @p3='628c22d6-d7bb-4f08-8ab7-fa84e473a061', @p4='94d7c0bc-31ed-4f01-b3de-dc0641ca9a5c', @p5='b67bcd21-3cc3-4f1a-897a-d92c7f0da2fd', @p6='eb1b55e3-fd77-4dc7-acb4-d3c6302e5221', @p7='1e52a6c1-c057-472e-8e24-55d4e4bbea60', @p8='True', @p9='True', @p10='2023-11-27T02:41:19.2383652+00:00' (DbType = DateTime), @p11='1', @p12='4', @p13='False', @p14='False', @p15=NULL, @p16='30' (Nullable = true), @p17='1' (Nullable = true), @p18='cpus' (Nullable = false), @p19='0', @p20='3', @p21='0', @p22=NULL, @p23='cpu大小' (Nullable = false), @p24=NULL, @p25='2', @p26='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p27='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p28='4bf6b8fa-45d8-438c-9984-67e582514b19', @p29='False', @p30='False', @p31='2023-11-27T02:41:19.2383639+00:00' (DbType = DateTime), @p32='0', @p33='10', @p34='False', @p35='False', @p36='aa', @p37=NULL (DbType = Decimal), @p38=NULL (DbType = Decimal), @p39='参数名称输出456' (Nullable = false), @p40='0', @p41='1', @p42='2', @p43=NULL, @p44='提示456' (Nullable = false), @p45=NULL, @p46='1', @p47='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p48='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p49='67a22fd5-100b-48d6-bb9a-7a6521ec6926', @p50='False', @p51='False', @p52='2023-11-27T02:41:19.2383552+00:00' (DbType = DateTime), @p53='0', @p54=NULL, @p55='False', @p56='False', @p57='aa', @p58='20' (Nullable = true), @p59='1' (Nullable = true), @p60='参数名称输入123' (Nullable = false), @p61='0', @p62='0', @p63='2', @p64=NULL, @p65='提示123' (Nullable = false), @p66=NULL, @p67='0', @p68='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p69='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p70='cea4d5dd-af37-40bd-92ac-bc51124858ae', @p71='False', @p72='False', @p73='2023-11-27T02:41:19.2383663+00:00' (DbType = DateTime), @p74='1', @p75='13', @p76='False', @p77='False', @p78=NULL, @p79='20' (Nullable = true), @p80='1' (Nullable = true), @p81='参数名称command789' (Nullable = false), @p82='0', @p83='2', @p84='0', @p85=NULL, @p86='提示789' (Nullable = false), @p87=NULL, @p88='3', @p89='05258f3a-4ba4-4efe-ae0c-344552ac8340', @p90='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime)
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: UPDATE "ToolLibraries" SET "Description" = @p0, "UpdatedTime" = @p1
+WHERE "Id" = @p2;
+DELETE FROM "ToolLibraryParameters"
+WHERE "Id" = @p3;
+DELETE FROM "ToolLibraryParameters"
+WHERE "Id" = @p4;
+DELETE FROM "ToolLibraryParameters"
+WHERE "Id" = @p5;
+DELETE FROM "ToolLibraryParameters"
+WHERE "Id" = @p6;
+INSERT INTO "ToolLibraryParameters" ("Id", "CanEqualMax", "CanEqualMin", "CreatedTime", "DataType", "Default", "IsArray", "IsDeleted", "MatchId", "Max", "Min", "Name", "NestedArray", "ParameterLocation", "ParameterType", "Regex", "Remark", "SelectItem", "Sort", "ToolLibraryId", "UpdatedTime")
+VALUES (@p7, @p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21, @p22, @p23, @p24, @p25, @p26, @p27);
+INSERT INTO "ToolLibraryParameters" ("Id", "CanEqualMax", "CanEqualMin", "CreatedTime", "DataType", "Default", "IsArray", "IsDeleted", "MatchId", "Max", "Min", "Name", "NestedArray", "ParameterLocation", "ParameterType", "Regex", "Remark", "SelectItem", "Sort", "ToolLibraryId", "UpdatedTime")
+VALUES (@p28, @p29, @p30, @p31, @p32, @p33, @p34, @p35, @p36, @p37, @p38, @p39, @p40, @p41, @p42, @p43, @p44, @p45, @p46, @p47, @p48);
+INSERT INTO "ToolLibraryParameters" ("Id", "CanEqualMax", "CanEqualMin", "CreatedTime", "DataType", "Default", "IsArray", "IsDeleted", "MatchId", "Max", "Min", "Name", "NestedArray", "ParameterLocation", "ParameterType", "Regex", "Remark", "SelectItem", "Sort", "ToolLibraryId", "UpdatedTime")
+VALUES (@p49, @p50, @p51, @p52, @p53, @p54, @p55, @p56, @p57, @p58, @p59, @p60, @p61, @p62, @p63, @p64, @p65, @p66, @p67, @p68, @p69);
+INSERT INTO "ToolLibraryParameters" ("Id", "CanEqualMax", "CanEqualMin", "CreatedTime", "DataType", "Default", "IsArray", "IsDeleted", "MatchId", "Max", "Min", "Name", "NestedArray", "ParameterLocation", "ParameterType", "Regex", "Remark", "SelectItem", "Sort", "ToolLibraryId", "UpdatedTime")
+VALUES (@p70, @p71, @p72, @p73, @p74, @p75, @p76, @p77, @p78, @p79, @p80, @p81, @p82, @p83, @p84, @p85, @p86, @p87, @p88, @p89, @p90);
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: 4389ba0161810db7
+[Scope.0]:TraceId: 0db3f850d5dc382b984ee621c3103742
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMVEU8AQOGVK
+[Scope.2]:RequestId: 0HMVEU8AQOGVK:00000003
+[Scope.2]:RequestPath: /api/admin/ToolLibrary/05258f3a-4ba4-4efe-ae0c-344552ac8340
+[Scope.3]:ActionId: 4e62707a-d995-41dc-adb8-7854f6bfae5f
+[Scope.3]:ActionName: Http.API.Controllers.AdminControllers.ToolLibraryController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+Environment: Development
+service.name: GenarsA-API
+service.instance.id: Yangkai
+telemetry.sdk.name: opentelemetry
+telemetry.sdk.language: dotnet
+telemetry.sdk.version: 1.6.0
+

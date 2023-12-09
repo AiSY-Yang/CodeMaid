@@ -1,0 +1,1377 @@
+-------------------------------------------------------------------
+You may only use the Microsoft .NET Core Debugger (vsdbg) with
+Visual Studio Code, Visual Studio or Visual Studio for Mac software
+to help you develop and test your applications.
+-------------------------------------------------------------------
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Private.CoreLib.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Controllers\ToolLibraryFileController.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Http.API\Controllers\AdminControllers\ToolLibraryFileController.cs:64
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Controllers\ToolLibraryFileController.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Http.API\Controllers\AdminControllers\ToolLibraryFileController.cs:59
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Controllers\ToolLibraryController.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Http.API\Controllers\AdminControllers\ToolLibraryController.cs:109
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Controllers\SystemController.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Http.API\Controllers\AdminControllers\SystemController.cs:35
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Controllers\TeamController.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Http.API\Controllers\AdminControllers\TeamController.cs:153
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Program.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Microservice\Setup\Program.cs:34
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Http.API.dll”。已加载符号。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+单步执行: 正在逐过程执行非用户代码“Program.<Main>”
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.DependencyInjection.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+单步执行: 正在逐过程执行非用户代码“Program.<Main>$”
+单步执行: 正在逐过程执行非用户代码“Program.<<Main>$>d__0..ctor”
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ComponentModel.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Hosting.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Http.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Routing.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Features.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Application.dll”。已加载符号。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EPPlus.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Http.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EntityFramework.dll”。已加载符号。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Core.dll”。已加载符号。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Options.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Options.ConfigurationExtensions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.Binder.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Hosting.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Http.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Share.dll”。已加载符号。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authentication.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authorization.Policy.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authorization.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Exporter.OpenTelemetryProtocol.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Api.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authentication.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Cors.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.ApiExplorer.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Swashbuckle.AspNetCore.SwaggerGen.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.Kestrel.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EasyCaching.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.HttpOverrides.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Diagnostics.HealthChecks.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Hosting.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.StaticFiles.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Diagnostics.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Diagnostics.HealthChecks.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Swashbuckle.AspNetCore.Swagger.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Swashbuckle.AspNetCore.SwaggerUI.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+单步执行: 正在逐过程执行非用户代码“Program.<>c__DisplayClass0_0..ctor”
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Hosting.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Threading.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.EnvironmentVariables.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.FileProviders.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.FileProviders.Physical.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.FileExtensions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.Json.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Linq.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.IO.FileSystem.Watcher.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ComponentModel.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.Concurrent.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Memory.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Text.Json.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Text.Encoding.Extensions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Numerics.Vectors.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.UserSecrets.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.Configuration.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.Console.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.Debug.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.EventSource.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Diagnostics.Tracing.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.DependencyInjection.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.Kestrel.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.Kestrel.Transport.Quic.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Quic.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.InteropServices.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.IIS.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.IISIntegration.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.FileProviders.Composite.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Text.Encodings.Web.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Intrinsics.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Diagnostics.DiagnosticSource.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Connections.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Hosting.Server.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.HostFiltering.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.ObjectPool.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Routing.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ObjectModel.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.Relational.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Data.Common.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Linq.Expressions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Caching.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Transactions.Local.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.Immutable.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Mapster.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/netstandard.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Mapster.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Http.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ComponentModel.TypeConverter.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Private.Uri.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Extensions.Hosting.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Diagnostics.Process.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.IO.MemoryMappedFiles.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Extensions.DependencyInjection.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Instrumentation.Http.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Instrumentation.AspNetCore.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Instrumentation.SqlClient.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authentication.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Claims.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.DataProtection.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.DataProtection.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Cryptography.Internal.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.WebEncoders.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.OpenApi.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EasyCaching.Serialization.Json.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EasyCaching.Redis.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Newtonsoft.Json.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Loader.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Swashbuckle.AspNetCore.Annotations.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.Cors.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.DataAnnotations.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Localization.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.Razor.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Http.Extensions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Exporter.OpenTelemetryProtocol.Logs.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Exporter.Console.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Google.Protobuf.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Grpc.Core.Api.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Grpc.Net.Client.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Grpc.Net.Common.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.InteropServices.RuntimeInformation.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.IO.Compression.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Threading.Thread.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Sockets.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Threading.ThreadPool.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/System.IO.Pipelines.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Reflection.Emit.Lightweight.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Reflection.Emit.ILGeneration.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Reflection.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Net.Http.Headers.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Http.Features.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Numerics.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Metadata.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/AlibabaCloud.SDK.Dysmsapi20170525.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Tea.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/AWSSDK.S3.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/AWSSDK.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ComponentModel.Annotations.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Linq.Queryable.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Text.RegularExpressions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Security.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Cryptography.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Xml.XDocument.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Private.Xml.Linq.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Private.Xml.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Npgsql.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“Anonymously Hosted DynamicMethods Assembly”。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.FileProviders.Embedded.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Diagnostics.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.NonGeneric.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Diagnostics.TraceSource.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Console.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/Microsoft.Win32.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+LogRecord.Timestamp:               2023-09-19T05:49:26.5462075Z
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Formats.Asn1.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Infrastructure
+LogRecord.LogLevel:                Warning
+LogRecord.FormattedMessage:        'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+LogRecord.StateValues (Key:Value):
+    OriginalFormat (a.k.a Body): 'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+LogRecord.EventId:                 10410
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Infrastructure.RedundantAddServicesCallWarning
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:26.5462215Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Infrastructure
+LogRecord.LogLevel:                Warning
+LogRecord.FormattedMessage:        'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+LogRecord.StateValues (Key:Value):
+    OriginalFormat (a.k.a Body): 'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+LogRecord.EventId:                 10410
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Infrastructure.RedundantAddServicesCallWarning
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Xml.ReaderWriter.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+LogRecord.Timestamp:               2023-09-19T05:49:26.7825116Z
+LogRecord.CategoryName:            Microsoft.Hosting.Lifetime
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Now listening on: http://localhost:5002
+LogRecord.StateValues (Key:Value):
+    address: http://localhost:5002
+    OriginalFormat (a.k.a Body): Now listening on: {address}
+LogRecord.EventId:                 14
+LogRecord.EventName:               ListeningOnAddress
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:26.7830166Z
+LogRecord.CategoryName:            Microsoft.Hosting.Lifetime
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Now listening on: https://localhost:15002
+LogRecord.StateValues (Key:Value):
+    address: https://localhost:15002
+    OriginalFormat (a.k.a Body): Now listening on: {address}
+LogRecord.EventId:                 14
+LogRecord.EventName:               ListeningOnAddress
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:26.7838530Z
+LogRecord.CategoryName:            Microsoft.Hosting.Lifetime
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Application started. Press Ctrl+C to shut down.
+LogRecord.StateValues (Key:Value):
+    OriginalFormat (a.k.a Body): Application started. Press Ctrl+C to shut down.
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:26.7840836Z
+LogRecord.CategoryName:            Microsoft.Hosting.Lifetime
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Hosting environment: Development
+LogRecord.StateValues (Key:Value):
+    EnvName: Development
+    OriginalFormat (a.k.a Body): Hosting environment: {EnvName}
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:26.7842350Z
+LogRecord.CategoryName:            Microsoft.Hosting.Lifetime
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Content root path: /mnt/d/Work/A/src/Http.API
+LogRecord.StateValues (Key:Value):
+    ContentRoot: /mnt/d/Work/A/src/Http.API
+    OriginalFormat (a.k.a Body): Content root path: {ContentRoot}
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.NetworkInformation.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Caching.Memory.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+LogRecord.Timestamp:               2023-09-19T05:49:29.3311935Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Model.Validation
+LogRecord.LogLevel:                Warning
+LogRecord.FormattedMessage:        Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+LogRecord.StateValues (Key:Value):
+    OriginalFormat (a.k.a Body): Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+LogRecord.EventId:                 10400
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Infrastructure.SensitiveDataLoggingEnabledWarning
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:30.0814640Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Model.Validation
+LogRecord.LogLevel:                Warning
+LogRecord.FormattedMessage:        Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+LogRecord.StateValues (Key:Value):
+    OriginalFormat (a.k.a Body): Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+LogRecord.EventId:                 10400
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Infrastructure.SensitiveDataLoggingEnabledWarning
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Threading.Channels.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.NameResolution.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+Caught exception: Resource temporarily unavailable 111.42.223.4:14125
+Caught exception: Resource temporarily unavailable 111.42.223.4:14125
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.WebSockets.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.WebUtilities.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Xml.XPath.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/System.IdentityModel.Tokens.Jwt.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Tokens.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Protocols.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Logging.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.JsonWebTokens.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Cryptography.X509Certificates.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+LogRecord.Timestamp:               2023-09-19T05:49:31.1315177Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Query
+LogRecord.LogLevel:                Warning
+LogRecord.FormattedMessage:        The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+LogRecord.StateValues (Key:Value):
+    OriginalFormat (a.k.a Body): The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+LogRecord.EventId:                 10102
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Query.RowLimitingOperationWithoutOrderByWarning
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Serialization.Formatters.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Serialization.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Cryptography.Algorithms.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Cryptography.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.CompilerServices.Unsafe.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.Specialized.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+Caught exception: Resource temporarily unavailable 111.42.223.4:14125
+LogRecord.Timestamp:               2023-09-19T05:49:31.7523514Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (131ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Description", s."IsCurrent", s."Name", s."OpenDate", s."Path", s."ResourceProductId", s."ResourceProductStatus", s."Size", s."TeamId", s."UsedSize"
+FROM "StoreResources" AS s
+WHERE FALSE
+LogRecord.StateValues (Key:Value):
+    elapsed: 131
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Description", s."IsCurrent", s."Name", s."OpenDate", s."Path", s."ResourceProductId", s."ResourceProductStatus", s."Size", s."TeamId", s."UsedSize"
+FROM "StoreResources" AS s
+WHERE FALSE
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:32.0582253Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (58ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT p."Id", p."CreatedTime", p."IsDeleted", p."UpdatedTime", p."CompleteRule", p."CreateUserId", p."Description", p."FileType", p."Path", p."ProjectId", p."ProjectSampleSetId", p."Storage", p."Task", p."TaskResource", p."TaskWorkflowId", p."Title", p."TotalRule", p."TotalTime"
+FROM "ProjectTasks" AS p
+WHERE NOT (p."IsDeleted") AND p."Task" = 1
+LogRecord.StateValues (Key:Value):
+    elapsed: 58
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT p."Id", p."CreatedTime", p."IsDeleted", p."UpdatedTime", p."CompleteRule", p."CreateUserId", p."Description", p."FileType", p."Path", p."ProjectId", p."ProjectSampleSetId", p."Storage", p."Task", p."TaskResource", p."TaskWorkflowId", p."Title", p."TotalRule", p."TotalTime"
+FROM "ProjectTasks" AS p
+WHERE NOT (p."IsDeleted") AND p."Task" = 1
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:32.0604564Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (65ms) [Parameters=[@__p_0='100'], CommandType='Text', CommandTimeout='20']
+SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Exist", s."FileType", s."GenomeVersion", s."MatchId", s."Path", s."SampleId", s."Size"
+FROM "SampleFiles" AS s
+WHERE NOT (s."IsDeleted") AND (s."Size" IS NULL) AND (s."Exist" IS NULL)
+LIMIT @__p_0
+LogRecord.StateValues (Key:Value):
+    elapsed: 65
+    parameters: @__p_0='100'
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Exist", s."FileType", s."GenomeVersion", s."MatchId", s."Path", s."SampleId", s."Size"
+FROM "SampleFiles" AS s
+WHERE NOT (s."IsDeleted") AND (s."Size" IS NULL) AND (s."Exist" IS NULL)
+LIMIT @__p_0
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:32.2038370Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (92ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+LogRecord.StateValues (Key:Value):
+    elapsed: 92
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+Caught exception: Resource temporarily unavailable 111.42.223.4:14125
+LogRecord.Timestamp:               2023-09-19T05:49:32.2667441Z
+LogRecord.TraceId:                 dd47e751e0c186fc679c326c1277e3eb
+LogRecord.SpanId:                  3d3c51a3df0d12b9
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (63ms) [Parameters=[@__dto_MemberId_0='62995ae3-963c-4ebd-a0f3-fd0f9e544c36'], CommandType='Text', CommandTimeout='20']
+SELECT m."Id", m."CreatedTime", m."IsDeleted", m."UpdatedTime", m."Argument1", m."Argument2", m."Argument3", m."DataPermissionId", m."MemberId", m."PhenotypeType", m."TeamId"
+FROM "MemberDataPermissions" AS m
+INNER JOIN (
+    SELECT m0."Id"
+    FROM "Members" AS m0
+    WHERE NOT (m0."IsDeleted")
+) AS t ON m."MemberId" = t."Id"
+WHERE NOT (m."IsDeleted") AND t."Id" = @__dto_MemberId_0
+LogRecord.StateValues (Key:Value):
+    elapsed: 63
+    parameters: @__dto_MemberId_0='62995ae3-963c-4ebd-a0f3-fd0f9e544c36'
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT m."Id", m."CreatedTime", m."IsDeleted", m."UpdatedTime", m."Argument1", m."Argument2", m."Argument3", m."DataPermissionId", m."MemberId", m."PhenotypeType", m."TeamId"
+FROM "MemberDataPermissions" AS m
+INNER JOIN (
+    SELECT m0."Id"
+    FROM "Members" AS m0
+    WHERE NOT (m0."IsDeleted")
+) AS t ON m."MemberId" = t."Id"
+WHERE NOT (m."IsDeleted") AND t."Id" = @__dto_MemberId_0
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: 3d3c51a3df0d12b9
+[Scope.0]:TraceId: dd47e751e0c186fc679c326c1277e3eb
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMTOQGOO7LFS
+[Scope.2]:RequestId: 0HMTOQGOO7LFS:00000001
+[Scope.2]:RequestPath: /api/MemberDataPermission/Update
+[Scope.3]:ActionId: 098f379e-7b4b-4d03-aa5f-82f8149c2a99
+[Scope.3]:ActionName: Http.API.Controllers.MemberDataPermissionController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+LogRecord.Timestamp:               2023-09-19T05:49:32.8298401Z
+LogRecord.TraceId:                 dd47e751e0c186fc679c326c1277e3eb
+LogRecord.SpanId:                  3d3c51a3df0d12b9
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Error
+LogRecord.FormattedMessage:        Failed executing DbCommand (133ms) [Parameters=[@p0='16741b58-5101-477f-974f-3e975ca87870', @p1=NULL (DbType = Object), @p2=NULL (DbType = Object), @p3=NULL (DbType = Object), @p4='2023-09-19T05:49:32.2745375+00:00' (DbType = DateTime), @p5='6777b417-1137-4ffe-bb69-dc1ce5e21e83', @p6='False', @p7='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p8='0', @p9='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p10='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p11='354ac0bb-3c58-4843-b989-725a436c48f2', @p12=NULL (DbType = Object), @p13=NULL (DbType = Object), @p14=NULL (DbType = Object), @p15='2023-09-19T05:49:32.2736341+00:00' (DbType = DateTime), @p16='736ae604-3910-4e2e-9589-fe19037320d6', @p17='False', @p18='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p19='0', @p20='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p21='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p22='3963febb-e635-40b4-82b3-4fd8952b42c8', @p23=NULL (DbType = Object), @p24=NULL (DbType = Object), @p25=NULL (DbType = Object), @p26='2023-09-19T05:49:32.2745388+00:00' (DbType = DateTime), @p27='26846fd9-eeff-4a9c-aacb-5914f4442257', @p28='False', @p29='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p30='0', @p31='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p32='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p33='6d270140-9be8-45d9-8d68-009d7ebfb7bc', @p34=NULL (DbType = Object), @p35=NULL (DbType = Object), @p36=NULL (DbType = Object), @p37='2023-09-19T05:49:32.2744089+00:00' (DbType = DateTime), @p38='50b84561-bd5b-4731-9ee8-55c4985149e8', @p39='False', @p40='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p41='0', @p42='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p43='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p44='d54ac084-8d94-4b8d-928f-b8301d4a114e', @p45=NULL (DbType = Object), @p46=NULL (DbType = Object), @p47=NULL (DbType = Object), @p48='2023-09-19T05:49:32.2745384+00:00' (DbType = DateTime), @p49='b4dc80e0-7eb7-41d5-b62c-4d0c386f1216', @p50='False', @p51='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p52='0', @p53='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p54='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime)], CommandType='Text', CommandTimeout='20']
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p22, @p23, @p24, @p25, @p26, @p27, @p28, @p29, @p30, @p31, @p32);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p33, @p34, @p35, @p36, @p37, @p38, @p39, @p40, @p41, @p42, @p43);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p44, @p45, @p46, @p47, @p48, @p49, @p50, @p51, @p52, @p53, @p54);
+LogRecord.StateValues (Key:Value):
+    elapsed: 133
+    parameters: @p0='16741b58-5101-477f-974f-3e975ca87870', @p1=NULL (DbType = Object), @p2=NULL (DbType = Object), @p3=NULL (DbType = Object), @p4='2023-09-19T05:49:32.2745375+00:00' (DbType = DateTime), @p5='6777b417-1137-4ffe-bb69-dc1ce5e21e83', @p6='False', @p7='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p8='0', @p9='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p10='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p11='354ac0bb-3c58-4843-b989-725a436c48f2', @p12=NULL (DbType = Object), @p13=NULL (DbType = Object), @p14=NULL (DbType = Object), @p15='2023-09-19T05:49:32.2736341+00:00' (DbType = DateTime), @p16='736ae604-3910-4e2e-9589-fe19037320d6', @p17='False', @p18='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p19='0', @p20='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p21='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p22='3963febb-e635-40b4-82b3-4fd8952b42c8', @p23=NULL (DbType = Object), @p24=NULL (DbType = Object), @p25=NULL (DbType = Object), @p26='2023-09-19T05:49:32.2745388+00:00' (DbType = DateTime), @p27='26846fd9-eeff-4a9c-aacb-5914f4442257', @p28='False', @p29='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p30='0', @p31='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p32='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p33='6d270140-9be8-45d9-8d68-009d7ebfb7bc', @p34=NULL (DbType = Object), @p35=NULL (DbType = Object), @p36=NULL (DbType = Object), @p37='2023-09-19T05:49:32.2744089+00:00' (DbType = DateTime), @p38='50b84561-bd5b-4731-9ee8-55c4985149e8', @p39='False', @p40='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p41='0', @p42='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p43='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p44='d54ac084-8d94-4b8d-928f-b8301d4a114e', @p45=NULL (DbType = Object), @p46=NULL (DbType = Object), @p47=NULL (DbType = Object), @p48='2023-09-19T05:49:32.2745384+00:00' (DbType = DateTime), @p49='b4dc80e0-7eb7-41d5-b62c-4d0c386f1216', @p50='False', @p51='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p52='0', @p53='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p54='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime)
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p22, @p23, @p24, @p25, @p26, @p27, @p28, @p29, @p30, @p31, @p32);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p33, @p34, @p35, @p36, @p37, @p38, @p39, @p40, @p41, @p42, @p43);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p44, @p45, @p46, @p47, @p48, @p49, @p50, @p51, @p52, @p53, @p54);
+    OriginalFormat (a.k.a Body): Failed executing DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20102
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandError
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: 3d3c51a3df0d12b9
+[Scope.0]:TraceId: dd47e751e0c186fc679c326c1277e3eb
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMTOQGOO7LFS
+[Scope.2]:RequestId: 0HMTOQGOO7LFS:00000001
+[Scope.2]:RequestPath: /api/MemberDataPermission/Update
+[Scope.3]:ActionId: 098f379e-7b4b-4d03-aa5f-82f8149c2a99
+[Scope.3]:ActionName: Http.API.Controllers.MemberDataPermissionController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Diagnostics.StackTrace.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Reflection.Metadata.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+LogRecord.Timestamp:               2023-09-19T05:49:32.9054560Z
+LogRecord.TraceId:                 dd47e751e0c186fc679c326c1277e3eb
+LogRecord.SpanId:                  3d3c51a3df0d12b9
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Update
+LogRecord.LogLevel:                Error
+LogRecord.FormattedMessage:        An exception occurred in the database while saving changes for context type 'EntityFramework.CommandDbContext'.
+Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Npgsql.PostgresException (0x80004005): 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.<ReadMessage>g__ReadMessageLong|222_0(NpgsqlConnector connector, Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+  Exception data:
+    Severity: ERROR
+    SqlState: 23502
+    MessageText: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    SchemaName: public
+    TableName: MemberDataPermissions
+    ColumnName: Argument1
+    File: execMain.c
+    Line: 1883
+    Routine: ExecConstraints
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+LogRecord.StateValues (Key:Value):
+    contextType: EntityFramework.CommandDbContext
+    newline: 
+
+    error: Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Npgsql.PostgresException (0x80004005): 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.<ReadMessage>g__ReadMessageLong|222_0(NpgsqlConnector connector, Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+  Exception data:
+    Severity: ERROR
+    SqlState: 23502
+    MessageText: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    SchemaName: public
+    TableName: MemberDataPermissions
+    ColumnName: Argument1
+    File: execMain.c
+    Line: 1883
+    Routine: ExecConstraints
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+    OriginalFormat (a.k.a Body): An exception occurred in the database while saving changes for context type '{contextType}'.{newline}{error}
+LogRecord.EventId:                 10000
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Update.SaveChangesFailed
+LogRecord.Exception:               Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Npgsql.PostgresException (0x80004005): 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.<ReadMessage>g__ReadMessageLong|222_0(NpgsqlConnector connector, Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+  Exception data:
+    Severity: ERROR
+    SqlState: 23502
+    MessageText: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    SchemaName: public
+    TableName: MemberDataPermissions
+    ColumnName: Argument1
+    File: execMain.c
+    Line: 1883
+    Routine: ExecConstraints
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: 3d3c51a3df0d12b9
+[Scope.0]:TraceId: dd47e751e0c186fc679c326c1277e3eb
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMTOQGOO7LFS
+[Scope.2]:RequestId: 0HMTOQGOO7LFS:00000001
+[Scope.2]:RequestPath: /api/MemberDataPermission/Update
+[Scope.3]:ActionId: 098f379e-7b4b-4d03-aa5f-82f8149c2a99
+[Scope.3]:ActionName: Http.API.Controllers.MemberDataPermissionController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+引发的异常:“Microsoft.EntityFrameworkCore.DbUpdateException”(位于 System.Private.CoreLib.dll 中)
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+引发的异常:“Microsoft.EntityFrameworkCore.DbUpdateException”(位于 System.Private.CoreLib.dll 中)
+LogRecord.Timestamp:               2023-09-19T05:49:33.0045296Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (94ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+LogRecord.StateValues (Key:Value):
+    elapsed: 94
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+引发的异常:“Microsoft.EntityFrameworkCore.DbUpdateException”(位于 System.Private.CoreLib.dll 中)
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+LogRecord.Timestamp:               2023-09-19T05:49:33.0687719Z
+LogRecord.TraceId:                 dd47e751e0c186fc679c326c1277e3eb
+LogRecord.SpanId:                  3d3c51a3df0d12b9
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware
+LogRecord.LogLevel:                Error
+LogRecord.FormattedMessage:        An unhandled exception has occurred while executing the request.
+LogRecord.StateValues (Key:Value):
+    OriginalFormat (a.k.a Body): An unhandled exception has occurred while executing the request.
+LogRecord.EventId:                 1
+LogRecord.EventName:               UnhandledException
+LogRecord.Exception:               Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Npgsql.PostgresException (0x80004005): 23502: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.<ReadMessage>g__ReadMessageLong|222_0(NpgsqlConnector connector, Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+  Exception data:
+    Severity: ERROR
+    SqlState: 23502
+    MessageText: null value in column "Argument1" of relation "MemberDataPermissions" violates not-null constraint
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    SchemaName: public
+    TableName: MemberDataPermissions
+    ColumnName: Argument1
+    File: execMain.c
+    Line: 1883
+    Routine: ExecConstraints
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Application.Implement.CommandStoreBase`2.SaveChangeAsync() in D:\Work\A\src\Application\Implement\CommandStoreBase.cs:line 35
+   at Http.API.Controllers.MemberDataPermissionController.UpdateAsync(MemberDataPermissionUpdateDto dto) in D:\Work\A\src\Http.API\Controllers\MemberDataPermissionController.cs:line 161
+   at lambda_method1623(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Logged|12_1(ControllerActionInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at SampleAuthorizationMiddlewareResultHandler.HandleAsync(RequestDelegate next, HttpContext context, AuthorizationPolicy policy, PolicyAuthorizationResult authorizeResult) in D:\Work\A\src\Http.API\Middleware\DebugAuthenticationHandler.cs:line 39
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddlewareImpl.<Invoke>g__Awaited|8_0(ExceptionHandlerMiddlewareImpl middleware, HttpContext context, Task task)
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: 3d3c51a3df0d12b9
+[Scope.0]:TraceId: dd47e751e0c186fc679c326c1277e3eb
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMTOQGOO7LFS
+[Scope.2]:RequestId: 0HMTOQGOO7LFS:00000001
+[Scope.2]:RequestPath: /api/MemberDataPermission/Update
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:33.1629292Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (83ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+LogRecord.StateValues (Key:Value):
+    elapsed: 83
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:33.2423841Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Migrations
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Applying migration '20230919054910_20230919-134849'.
+LogRecord.StateValues (Key:Value):
+    migration: 20230919054910_20230919-134849
+    OriginalFormat (a.k.a Body): Applying migration '{migration}'.
+LogRecord.EventId:                 20402
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Migrations.MigrationApplying
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:33.7814056Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (117ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+ALTER TABLE "MemberDataPermissions" ALTER COLUMN "Argument3" DROP NOT NULL;
+LogRecord.StateValues (Key:Value):
+    elapsed: 117
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: ALTER TABLE "MemberDataPermissions" ALTER COLUMN "Argument3" DROP NOT NULL;
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:33.8446829Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (63ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+ALTER TABLE "MemberDataPermissions" ALTER COLUMN "Argument2" DROP NOT NULL;
+LogRecord.StateValues (Key:Value):
+    elapsed: 63
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: ALTER TABLE "MemberDataPermissions" ALTER COLUMN "Argument2" DROP NOT NULL;
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:33.9306957Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (86ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+ALTER TABLE "MemberDataPermissions" ALTER COLUMN "Argument1" DROP NOT NULL;
+LogRecord.StateValues (Key:Value):
+    elapsed: 86
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: ALTER TABLE "MemberDataPermissions" ALTER COLUMN "Argument1" DROP NOT NULL;
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:33.9786261Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (48ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20230919054910_20230919-134849', '7.0.0');
+LogRecord.StateValues (Key:Value):
+    elapsed: 48
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+VALUES ('20230919054910_20230919-134849', '7.0.0');
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:34.8793402Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (95ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Icon", s."IsSystem", s."Name", s."NameValue", s."PermissionId"
+FROM "SystemRoles" AS s
+WHERE NOT (s."IsDeleted") AND lower(s."Name") = 'admin'
+LIMIT 2
+LogRecord.StateValues (Key:Value):
+    elapsed: 95
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Icon", s."IsSystem", s."Name", s."NameValue", s."PermissionId"
+FROM "SystemRoles" AS s
+WHERE NOT (s."IsDeleted") AND lower(s."Name") = 'admin'
+LIMIT 2
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+LogRecord.Timestamp:               2023-09-19T05:49:35.0163143Z
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (119ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT w."Id", w."CreatedTime", w."IsDeleted", w."UpdatedTime", w."Description", w."GroupName", w."IsSystem", w."Key", w."Remark", w."SortCode", w."Valid", w."Value"
+FROM "WebConfigs" AS w
+WHERE NOT (w."IsDeleted") AND w."Key" = 'Version'
+LIMIT 1
+LogRecord.StateValues (Key:Value):
+    elapsed: 119
+    parameters: 
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT w."Id", w."CreatedTime", w."IsDeleted", w."UpdatedTime", w."Description", w."GroupName", w."IsSystem", w."Key", w."Remark", w."SortCode", w."Valid", w."Value"
+FROM "WebConfigs" AS w
+WHERE NOT (w."IsDeleted") AND w."Key" = 'Version'
+LIMIT 1
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+当前版本:2211219.01
+LogRecord.Timestamp:               2023-09-19T05:49:39.7982534Z
+LogRecord.TraceId:                 92ccdffdc1b734b642da132ec3b5c906
+LogRecord.SpanId:                  c9edac20e1adccb2
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Information
+LogRecord.FormattedMessage:        Executed DbCommand (118ms) [Parameters=[@__dto_MemberId_0='62995ae3-963c-4ebd-a0f3-fd0f9e544c36'], CommandType='Text', CommandTimeout='20']
+SELECT m."Id", m."CreatedTime", m."IsDeleted", m."UpdatedTime", m."Argument1", m."Argument2", m."Argument3", m."DataPermissionId", m."MemberId", m."PhenotypeType", m."TeamId"
+FROM "MemberDataPermissions" AS m
+INNER JOIN (
+    SELECT m0."Id"
+    FROM "Members" AS m0
+    WHERE NOT (m0."IsDeleted")
+) AS t ON m."MemberId" = t."Id"
+WHERE NOT (m."IsDeleted") AND t."Id" = @__dto_MemberId_0
+LogRecord.StateValues (Key:Value):
+    elapsed: 118
+    parameters: @__dto_MemberId_0='62995ae3-963c-4ebd-a0f3-fd0f9e544c36'
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: SELECT m."Id", m."CreatedTime", m."IsDeleted", m."UpdatedTime", m."Argument1", m."Argument2", m."Argument3", m."DataPermissionId", m."MemberId", m."PhenotypeType", m."TeamId"
+FROM "MemberDataPermissions" AS m
+INNER JOIN (
+    SELECT m0."Id"
+    FROM "Members" AS m0
+    WHERE NOT (m0."IsDeleted")
+) AS t ON m."MemberId" = t."Id"
+WHERE NOT (m."IsDeleted") AND t."Id" = @__dto_MemberId_0
+    OriginalFormat (a.k.a Body): Executed DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20101
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: c9edac20e1adccb2
+[Scope.0]:TraceId: 92ccdffdc1b734b642da132ec3b5c906
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMTOQGOO7LFS
+[Scope.2]:RequestId: 0HMTOQGOO7LFS:00000002
+[Scope.2]:RequestPath: /api/MemberDataPermission/Update
+[Scope.3]:ActionId: 098f379e-7b4b-4d03-aa5f-82f8149c2a99
+[Scope.3]:ActionName: Http.API.Controllers.MemberDataPermissionController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+LogRecord.Timestamp:               2023-09-19T05:49:40.0223267Z
+LogRecord.TraceId:                 92ccdffdc1b734b642da132ec3b5c906
+LogRecord.SpanId:                  c9edac20e1adccb2
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Database.Command
+LogRecord.LogLevel:                Error
+LogRecord.FormattedMessage:        Failed executing DbCommand (221ms) [Parameters=[@p0='4e3efa41-5f4a-44ac-abfd-836a32424223', @p1=NULL (DbType = Object), @p2=NULL (DbType = Object), @p3=NULL (DbType = Object), @p4='2023-09-19T05:49:39.7986774+00:00' (DbType = DateTime), @p5='b4dc80e0-7eb7-41d5-b62c-4d0c386f1216', @p6='False', @p7='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p8='0', @p9='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p10='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p11='9fabf64f-1067-4a46-9770-f82b9452bc4d', @p12=NULL (DbType = Object), @p13=NULL (DbType = Object), @p14=NULL (DbType = Object), @p15='2023-09-19T05:49:39.7986762+00:00' (DbType = DateTime), @p16='50b84561-bd5b-4731-9ee8-55c4985149e8', @p17='False', @p18='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p19='0', @p20='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p21='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p22='b427b87a-25cc-4a90-8963-857958389dcb', @p23=NULL (DbType = Object), @p24=NULL (DbType = Object), @p25=NULL (DbType = Object), @p26='2023-09-19T05:49:39.7986778+00:00' (DbType = DateTime), @p27='26846fd9-eeff-4a9c-aacb-5914f4442257', @p28='False', @p29='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p30='0', @p31='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p32='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p33='df4e8d00-aa07-4749-9cb1-78c0ccad4637', @p34=NULL (DbType = Object), @p35=NULL (DbType = Object), @p36=NULL (DbType = Object), @p37='2023-09-19T05:49:39.7986734+00:00' (DbType = DateTime), @p38='736ae604-3910-4e2e-9589-fe19037320d6', @p39='False', @p40='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p41='0', @p42='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p43='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p44='f9afde41-c5e1-4b0f-8a91-a75c771d79e3', @p45=NULL (DbType = Object), @p46=NULL (DbType = Object), @p47=NULL (DbType = Object), @p48='2023-09-19T05:49:39.7986767+00:00' (DbType = DateTime), @p49='6777b417-1137-4ffe-bb69-dc1ce5e21e83', @p50='False', @p51='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p52='0', @p53='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p54='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime)], CommandType='Text', CommandTimeout='20']
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p22, @p23, @p24, @p25, @p26, @p27, @p28, @p29, @p30, @p31, @p32);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p33, @p34, @p35, @p36, @p37, @p38, @p39, @p40, @p41, @p42, @p43);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p44, @p45, @p46, @p47, @p48, @p49, @p50, @p51, @p52, @p53, @p54);
+LogRecord.StateValues (Key:Value):
+    elapsed: 221
+    parameters: @p0='4e3efa41-5f4a-44ac-abfd-836a32424223', @p1=NULL (DbType = Object), @p2=NULL (DbType = Object), @p3=NULL (DbType = Object), @p4='2023-09-19T05:49:39.7986774+00:00' (DbType = DateTime), @p5='b4dc80e0-7eb7-41d5-b62c-4d0c386f1216', @p6='False', @p7='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p8='0', @p9='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p10='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p11='9fabf64f-1067-4a46-9770-f82b9452bc4d', @p12=NULL (DbType = Object), @p13=NULL (DbType = Object), @p14=NULL (DbType = Object), @p15='2023-09-19T05:49:39.7986762+00:00' (DbType = DateTime), @p16='50b84561-bd5b-4731-9ee8-55c4985149e8', @p17='False', @p18='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p19='0', @p20='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p21='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p22='b427b87a-25cc-4a90-8963-857958389dcb', @p23=NULL (DbType = Object), @p24=NULL (DbType = Object), @p25=NULL (DbType = Object), @p26='2023-09-19T05:49:39.7986778+00:00' (DbType = DateTime), @p27='26846fd9-eeff-4a9c-aacb-5914f4442257', @p28='False', @p29='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p30='0', @p31='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p32='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p33='df4e8d00-aa07-4749-9cb1-78c0ccad4637', @p34=NULL (DbType = Object), @p35=NULL (DbType = Object), @p36=NULL (DbType = Object), @p37='2023-09-19T05:49:39.7986734+00:00' (DbType = DateTime), @p38='736ae604-3910-4e2e-9589-fe19037320d6', @p39='False', @p40='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p41='0', @p42='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p43='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime), @p44='f9afde41-c5e1-4b0f-8a91-a75c771d79e3', @p45=NULL (DbType = Object), @p46=NULL (DbType = Object), @p47=NULL (DbType = Object), @p48='2023-09-19T05:49:39.7986767+00:00' (DbType = DateTime), @p49='6777b417-1137-4ffe-bb69-dc1ce5e21e83', @p50='False', @p51='62995ae3-963c-4ebd-a0f3-fd0f9e544c36', @p52='0', @p53='9311ba46-b694-48e3-9a00-5b3a12dcbaf0', @p54='1970-01-01T00:00:00.0000000+00:00' (DbType = DateTime)
+    commandType: Text
+    commandTimeout: 20
+    newLine: 
+
+    commandText: INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7, @p8, @p9, @p10);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p11, @p12, @p13, @p14, @p15, @p16, @p17, @p18, @p19, @p20, @p21);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p22, @p23, @p24, @p25, @p26, @p27, @p28, @p29, @p30, @p31, @p32);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p33, @p34, @p35, @p36, @p37, @p38, @p39, @p40, @p41, @p42, @p43);
+INSERT INTO "MemberDataPermissions" ("Id", "Argument1", "Argument2", "Argument3", "CreatedTime", "DataPermissionId", "IsDeleted", "MemberId", "PhenotypeType", "TeamId", "UpdatedTime")
+VALUES (@p44, @p45, @p46, @p47, @p48, @p49, @p50, @p51, @p52, @p53, @p54);
+    OriginalFormat (a.k.a Body): Failed executing DbCommand ({elapsed}ms) [Parameters=[{parameters}], CommandType='{commandType}', CommandTimeout='{commandTimeout}']{newLine}{commandText}
+LogRecord.EventId:                 20102
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Database.Command.CommandError
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: c9edac20e1adccb2
+[Scope.0]:TraceId: 92ccdffdc1b734b642da132ec3b5c906
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMTOQGOO7LFS
+[Scope.2]:RequestId: 0HMTOQGOO7LFS:00000002
+[Scope.2]:RequestPath: /api/MemberDataPermission/Update
+[Scope.3]:ActionId: 098f379e-7b4b-4d03-aa5f-82f8149c2a99
+[Scope.3]:ActionName: Http.API.Controllers.MemberDataPermissionController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+LogRecord.Timestamp:               2023-09-19T05:49:40.0936257Z
+LogRecord.TraceId:                 92ccdffdc1b734b642da132ec3b5c906
+LogRecord.SpanId:                  c9edac20e1adccb2
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.EntityFrameworkCore.Update
+LogRecord.LogLevel:                Error
+LogRecord.FormattedMessage:        An exception occurred in the database while saving changes for context type 'EntityFramework.CommandDbContext'.
+Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Npgsql.PostgresException (0x80004005): 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.<ReadMessage>g__ReadMessageLong|222_0(NpgsqlConnector connector, Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+  Exception data:
+    Severity: ERROR
+    SqlState: 23503
+    MessageText: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    SchemaName: public
+    TableName: MemberDataPermissions
+    ConstraintName: FK_MemberDataPermissions_Members_MemberId
+    File: ri_triggers.c
+    Line: 2528
+    Routine: ri_ReportViolation
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+LogRecord.StateValues (Key:Value):
+    contextType: EntityFramework.CommandDbContext
+    newline: 
+
+    error: Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Npgsql.PostgresException (0x80004005): 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.<ReadMessage>g__ReadMessageLong|222_0(NpgsqlConnector connector, Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+  Exception data:
+    Severity: ERROR
+    SqlState: 23503
+    MessageText: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    SchemaName: public
+    TableName: MemberDataPermissions
+    ConstraintName: FK_MemberDataPermissions_Members_MemberId
+    File: ri_triggers.c
+    Line: 2528
+    Routine: ri_ReportViolation
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+    OriginalFormat (a.k.a Body): An exception occurred in the database while saving changes for context type '{contextType}'.{newline}{error}
+LogRecord.EventId:                 10000
+LogRecord.EventName:               Microsoft.EntityFrameworkCore.Update.SaveChangesFailed
+LogRecord.Exception:               Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Npgsql.PostgresException (0x80004005): 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.<ReadMessage>g__ReadMessageLong|222_0(NpgsqlConnector connector, Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+  Exception data:
+    Severity: ERROR
+    SqlState: 23503
+    MessageText: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    SchemaName: public
+    TableName: MemberDataPermissions
+    ConstraintName: FK_MemberDataPermissions_Members_MemberId
+    File: ri_triggers.c
+    Line: 2528
+    Routine: ri_ReportViolation
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: c9edac20e1adccb2
+[Scope.0]:TraceId: 92ccdffdc1b734b642da132ec3b5c906
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMTOQGOO7LFS
+[Scope.2]:RequestId: 0HMTOQGOO7LFS:00000002
+[Scope.2]:RequestPath: /api/MemberDataPermission/Update
+[Scope.3]:ActionId: 098f379e-7b4b-4d03-aa5f-82f8149c2a99
+[Scope.3]:ActionName: Http.API.Controllers.MemberDataPermissionController.UpdateAsync (Http.API)
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+引发的异常:“Microsoft.EntityFrameworkCore.DbUpdateException”(位于 System.Private.CoreLib.dll 中)
+引发的异常:“Microsoft.EntityFrameworkCore.DbUpdateException”(位于 System.Private.CoreLib.dll 中)
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+引发的异常:“Microsoft.EntityFrameworkCore.DbUpdateException”(位于 System.Private.CoreLib.dll 中)
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+Caught exception: An error occurred while saving the entity changes. See the inner exception for details.
+LogRecord.Timestamp:               2023-09-19T05:49:40.1638007Z
+LogRecord.TraceId:                 92ccdffdc1b734b642da132ec3b5c906
+LogRecord.SpanId:                  c9edac20e1adccb2
+LogRecord.TraceFlags:              Recorded
+LogRecord.CategoryName:            Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware
+LogRecord.LogLevel:                Error
+LogRecord.FormattedMessage:        An unhandled exception has occurred while executing the request.
+LogRecord.StateValues (Key:Value):
+    OriginalFormat (a.k.a Body): An unhandled exception has occurred while executing the request.
+LogRecord.EventId:                 1
+LogRecord.EventName:               UnhandledException
+LogRecord.Exception:               Microsoft.EntityFrameworkCore.DbUpdateException: An error occurred while saving the entity changes. See the inner exception for details.
+ ---> Npgsql.PostgresException (0x80004005): 23503: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.<ReadMessage>g__ReadMessageLong|222_0(NpgsqlConnector connector, Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(CommandBehavior behavior, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteReaderAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+  Exception data:
+    Severity: ERROR
+    SqlState: 23503
+    MessageText: insert or update on table "MemberDataPermissions" violates foreign key constraint "FK_MemberDataPermissions_Members_MemberId"
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    SchemaName: public
+    TableName: MemberDataPermissions
+    ConstraintName: FK_MemberDataPermissions_Members_MemberId
+    File: ri_triggers.c
+    Line: 2528
+    Routine: ri_ReportViolation
+   --- End of inner exception stack trace ---
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.ExecuteAsync(IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.ExecuteAsync(IEnumerable`1 commandBatches, IRelationalConnection connection, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(IList`1 entriesToSave, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChangesAsync(StateManager stateManager, Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync(Boolean acceptAllChangesOnSuccess, CancellationToken cancellationToken)
+   at Application.Implement.CommandStoreBase`2.SaveChangeAsync() in D:\Work\A\src\Application\Implement\CommandStoreBase.cs:line 35
+   at Http.API.Controllers.MemberDataPermissionController.UpdateAsync(MemberDataPermissionUpdateDto dto) in D:\Work\A\src\Http.API\Controllers\MemberDataPermissionController.cs:line 161
+   at lambda_method1623(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Logged|12_1(ControllerActionInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|6_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at SampleAuthorizationMiddlewareResultHandler.HandleAsync(RequestDelegate next, HttpContext context, AuthorizationPolicy policy, PolicyAuthorizationResult authorizeResult) in D:\Work\A\src\Http.API\Middleware\DebugAuthenticationHandler.cs:line 39
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddlewareImpl.<Invoke>g__Awaited|8_0(ExceptionHandlerMiddlewareImpl middleware, HttpContext context, Task task)
+LogRecord.ScopeValues (Key:Value):
+[Scope.0]:SpanId: c9edac20e1adccb2
+[Scope.0]:TraceId: 92ccdffdc1b734b642da132ec3b5c906
+[Scope.0]:ParentId: 0000000000000000
+[Scope.1]:ConnectionId: 0HMTOQGOO7LFS
+[Scope.2]:RequestId: 0HMTOQGOO7LFS:00000002
+[Scope.2]:RequestPath: /api/MemberDataPermission/Update
+
+Resource associated with LogRecord:
+service.name: GenarsA-API
+service.instance.id: Yangkai
+
