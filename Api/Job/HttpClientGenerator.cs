@@ -86,7 +86,7 @@ namespace Api.Job
 			}
 			var setting = maid.Setting.Deserialize<HttpClientSyncSetting>() ?? new HttpClientSyncSetting();
 			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out _);
-			RestfulApiDocument restfulApiDocument = new RestfulApiDocument(openApiDocument);
+			RestfulApiDocument restfulApiDocument = new(openApiDocument);
 			#region create model file
 			if (setting.CreateModel)
 			{
@@ -257,7 +257,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 					var enums = new List<EnumField>();
 					for (int i = 0; i < item.Value.Enum.Count; i++)
 					{
-						EnumField enumField = new EnumField()
+						EnumField enumField = new()
 						{
 							Name = item.Value.Extensions.ContainsKey("x-enumNames")
 							? (item.Value.Extensions["x-enumNames"] as OpenApiArray)![i] switch
@@ -317,7 +317,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 						//log
 						continue;
 					}
-					RestfulApiModel restfulApiModel = new RestfulApiModel()
+					RestfulApiModel restfulApiModel = new()
 					{
 						Path = item.Key,
 						Method = operation.Key,
@@ -367,7 +367,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		public override string ToString()
 		{
 			var className = PropertyStyle(Name);
-			StringBuilder stringBuilder = new StringBuilder();
+			StringBuilder stringBuilder = new();
 			stringBuilder.AppendLine($"/// <summary>");
 			stringBuilder.AppendLine($"/// {Summary}");
 			stringBuilder.AppendLine($"/// </summary>");
@@ -393,7 +393,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		public override string ToString()
 		{
 			var enumName = PropertyStyle(Name);
-			StringBuilder stringBuilder = new StringBuilder();
+			StringBuilder stringBuilder = new();
 			if (SchemaType == "string") stringBuilder.AppendLine($"[JsonConverter(typeof(JsonEnumMemberJsonConverter))]");
 			stringBuilder.AppendLine($"public enum {enumName}");
 			stringBuilder.AppendLine("{");
@@ -561,11 +561,11 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// <summary>
 		/// 接口路径
 		/// </summary>
-		public required string Path;
+		public required string Path { get; set; }
 		/// <summary>
 		/// Http方法
 		/// </summary>
-		public required OperationType Method;
+		public required OperationType Method { get; set; }
 		/// <summary>
 		/// 响应类型
 		/// </summary>
@@ -573,15 +573,15 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// <summary>
 		/// 是否会有null响应 响应码为204
 		/// </summary>
-		public required bool MaybeReturnNull;
+		public required bool MaybeReturnNull { get; set; }
 		/// <summary>
 		/// 注释
 		/// </summary>
-		public required string Summary;
+		public required string Summary { get; set; }
 		/// <summary>
 		/// body参数
 		/// </summary>
-		public required List<BodyContent>? BodyParameter;
+		public required List<BodyContent>? BodyParameter { get; set; }
 
 		/// <summary>
 		/// Operation Id
@@ -622,20 +622,15 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			foreach (var parameter in PathParameter)
 				url = url.Replace($"{{{parameter.Name}}}", $"{{{parameter.Name.ToNamingConvention(NamingConvention.camelCase)}}}");
 			//添加查询参数
-			if (QueryParameter.Count > 0) url += "?";
+			var queryParameters = new List<string>();
+			foreach (var item in QueryParameter)
 			{
-				var paraList = new List<string>();
-				foreach (var item in QueryParameter)
-				{
-					string equal = item.Type.Type.StartsWith("List<")
-						? $"{{string.Join('&', {VariableStyle(item.Name)}.Select(x => $\"{UrlEncoder.Default.Encode(item.Name)}={{UrlEncoder.Default.Encode(x)}}\"))}}"
-						: $"{UrlEncoder.Default.Encode(item.Name)}={{{VariableStyle(item.Name)}}}";
-					if (item.Type.Required)
-						paraList.Add(equal);
-					else
-						paraList.Add($"{{({VariableStyle(item.Name)} == null ? \"\" : $\"{equal}\")}}");
-				}
-				url += string.Join('&', paraList);
+				if (item.GetParameter().StartsWith("List<"))
+					queryParameters.Add($"queryParameters.Add(string.Join('&', {VariableStyle(item.Name)}.Select(x => $\"{VariableStyle(item.Name)}={{x}}\")));");
+				else
+					queryParameters.Add($"queryParameters.Add($\"{UrlEncoder.Default.Encode(item.Name)}={{{VariableStyle(item.Name)}}}\");");
+				if (item.Type.CanBeNull || !item.Type.Required)
+					queryParameters[^1] = $"if ({VariableStyle(item.Name)} != null) " + queryParameters[^1];
 			}
 			//合并所有参数 作为方法的入参
 			var para = PathParameter.Union(QueryParameter).Union(HeaderParameter).ToList();
@@ -658,16 +653,17 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			//确定body内容
 			var body = BodyParameter?.FirstOrDefault();
 			var argument = string.Join(", ", para.Select(x => x.GetParameter()));
+			var queryParametersCode = queryParameters.Count > 0 ? $"		var queryParameters = new List<string>();\r\n{string.Concat(queryParameters.Select(x => $"\t\t{x}\r\n"))}" : "";
+			var urlQueryParametersCode = queryParameters.Count > 0 ? "{(queryParameters.Count > 0 ? \"?\" + string.Join('&', queryParameters) : \"\")}" : "";
+			var paramNamesXml = string.Concat(para.Select(x => $"	/// <param name=\"{x.Name.ToNamingConvention(NamingConvention.camelCase)}\">{x.Summary}</param>{Environment.NewLine}"));
 			return $$"""
 					/// <summary>
 					/// {{Summary}}
 					/// </summary>
 					/// <returns></returns>
-				{{string.Concat(para.Select(x => $"	/// <param name=\"{x.Name.ToNamingConvention(NamingConvention.camelCase)}\">{x.Summary}</param>{Environment.NewLine}"))
-				//拼接参数信息
-				}}	public async Task<{{ResponseType.ReturnCode}}{{(MaybeReturnNull ? "?" : "")}}> {{MethodName}}({{argument}})
+				{{paramNamesXml}}	public async Task<{{ResponseType.ReturnCode}}{{(MaybeReturnNull ? "?" : "")}}> {{MethodName}}({{argument}})
 					{
-				{{(body != null
+				{{queryParametersCode}}{{(body != null
 				? body.HasJsonContentType
 					? $"		var content = JsonContent.Create(body);\r\n"
 					: $"""
@@ -680,7 +676,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 				}}		var httpRequestMessage = new HttpRequestMessage()
 						{
 							Method = HttpMethod.{{Method}},
-							RequestUri = new Uri($"{{url}}", UriKind.Relative),{{(body != null ? "\r\n\t\t\tContent = content," : "")}}
+							RequestUri = new Uri($"{{url}}{{urlQueryParametersCode}}", UriKind.Relative),{{(body != null ? "\r\n\t\t\tContent = content," : "")}}
 						};
 						{{
 						//如果返回的是流的话 默认提前响应
