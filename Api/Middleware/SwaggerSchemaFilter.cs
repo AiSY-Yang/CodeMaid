@@ -1,15 +1,11 @@
-﻿using System.Reflection;
-
-using ExtensionMethods;
+﻿using ExtensionMethods;
 
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 
-using ServicesModels.Results;
-
 namespace Swashbuckle.AspNetCore.SwaggerGen;
 /// <summary>
-/// 增加枚举的字符串表示和注释信息 字符串为x-enumNames 注释为x-enumSummarys
+/// 增加枚举的字符串表示和注释信息 字符串为x-enumNames 注释为x-enumSummaries
 /// </summary>
 public class EnumSchemaFilter : ISchemaFilter
 {
@@ -18,7 +14,7 @@ public class EnumSchemaFilter : ISchemaFilter
 	{
 		if (context.Type.IsEnum)
 		{
-			var name = new Microsoft.OpenApi.Any.OpenApiArray();
+			var name = new OpenApiArray();
 			Enum.GetNames(context.Type)
 				.ToList()
 				.ForEach(n =>
@@ -29,7 +25,7 @@ public class EnumSchemaFilter : ISchemaFilter
 			//XML注释
 			try
 			{
-				var desp = new Microsoft.OpenApi.Any.OpenApiArray();
+				var desp = new OpenApiArray();
 				foreach (var enumName in context.Type.GetEnumNames())
 				{
 					var fullName = "F:" + context.Type.FullName + "." + enumName;
@@ -40,7 +36,7 @@ public class EnumSchemaFilter : ISchemaFilter
 					};
 					desp.Add(obj);
 				}
-				model.Extensions.Add("x-enumSummarys", desp);
+				model.Extensions.Add("x-enumSummaries", desp);
 			}
 			catch (Exception)
 			{

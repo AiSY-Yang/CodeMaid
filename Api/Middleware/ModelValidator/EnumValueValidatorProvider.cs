@@ -13,7 +13,7 @@
 				context.Results.Add(new ValidatorItem() { Validator = validator });
 			}
 		}
-		static readonly EnumValueModelValidator validator = new EnumValueModelValidator();
+		static readonly EnumValueModelValidator validator = new();
 	}
 	/// <summary>
 	/// 验证枚举是否是有效的值

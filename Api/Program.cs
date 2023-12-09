@@ -147,21 +147,24 @@ namespace Api
 					catch (Exception)
 					{
 					}
-				x.OperationFilter<AddBusinessExceptionResponse>();
-				x.OperationFilter<Add204ResponseWhenReturnMaybeNull>();
+				x.ParameterFilter<SwaggerNullableQueryParameterFilter>();
+				x.RequestBodyFilter<SwaggerNullableBodyFilter>();
 				x.SchemaFilter<EnumSchemaFilter>();
 				x.SchemaFilter<InheritInterfaceXmlCommentSchemaFilter>();
+				x.OperationFilter<AddBusinessExceptionResponse>();
+				x.OperationFilter<Add204ResponseWhenReturnMaybeNull>();
 				//参数采用小驼峰
 				x.DescribeAllParametersInCamelCase();
 				//添加文档
-				x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "默认文档" });
+				x.SwaggerDoc("default", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "默认文档" });
+				x.SwaggerDoc("test", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "默认文档" });
 				//添加DataOnly和TimeOnly的字符串支持
 				x.UseDateOnlyTimeOnlyStringConverters();
 			});
 			//文件提供器
 			Directory.CreateDirectory("/files");
-			var filePrevider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider("/files");
-			builder.Services.AddSingleton(filePrevider);
+			var fileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider("/files");
+			builder.Services.AddSingleton(fileProvider);
 			//添加消息总线
 			builder.Services.AddMassTransit(x =>
 			{
@@ -267,7 +270,7 @@ namespace Api
 			{
 				//swagger配置
 				app.UseSwagger();
-				app.UseSwaggerUI();
+				app.UseSwaggerUI(x => { });
 			}
 			//请求日志记录
 			app.Use(async (context, next) =>
@@ -334,24 +337,30 @@ namespace Api
 #if DEBUG
 			await Task.Run(async () =>
 					{
-						var scope = app.Services.CreateScope();
-						var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-						var x = context.Maids.First(x => x.Id == 16);
-						x.Setting = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(System.Text.Json.JsonSerializer.Serialize(ControllerSetting.Default));
-						context.SaveChanges();
-
-						//File.WriteAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs", " " + File.ReadAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs"));
-						File.Delete("D:\\Code\\Test\\WebDemo\\ProjectService.cs");
-						File.Delete("D:\\Code\\Test\\WebDemo\\ProjectController.cs");
-						await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(new ControllerCreateEvent()
+						try
 						{
-							MaidId = 16,
-							ServicePath = "D:\\Code\\Test\\WebDemo\\ProjectService.cs",
-							ControllerPath = "D:\\Code\\Test\\WebDemo\\ProjectController.cs",
-							EntityName = "Project",
-							EntityPath = "D:\\Code\\Template.WebApi\\Models.DbContext\\Project.cs",
-						});
 
+							var scope = app.Services.CreateScope();
+							var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
+							var x = context.Maids.First(x => x.Id == 16);
+							x.Setting = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(System.Text.Json.JsonSerializer.Serialize(ControllerSetting.Default));
+							context.SaveChanges();
+
+							//File.WriteAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs", " " + File.ReadAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs"));
+							//File.Delete("D:\\Code\\Test\\WebDemo\\ProjectService.cs");
+							//File.Delete("D:\\Code\\Test\\WebDemo\\ProjectController.cs");
+							await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(new ControllerCreateEvent()
+							{
+								MaidId = 16,
+								ServicePath = "D:\\Code\\Test\\WebDemo\\ProjectService.cs",
+								ControllerPath = "D:\\Code\\Test\\WebDemo\\ProjectController.cs",
+								EntityName = "Project",
+								EntityPath = "D:\\Code\\Template.WebApi\\Models.DbContext\\Project.cs",
+							});
+						}
+						catch (Exception)
+						{
+						}
 					});
 #endif
 

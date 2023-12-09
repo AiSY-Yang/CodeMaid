@@ -10,6 +10,7 @@ internal abstract class DatabaseEntityConfiguration<TEntity> : IEntityTypeConfig
 	public virtual void Configure(EntityTypeBuilder<TEntity> builder)
 	{
 		ConfigureComment(builder);
+		builder.HasKey(x => x.Id);
 	}
 	/// <summary>
 	/// Automatically generated comment configuration

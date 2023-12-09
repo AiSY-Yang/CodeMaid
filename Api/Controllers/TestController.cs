@@ -1,9 +1,4 @@
 #pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
-using System.Runtime.CompilerServices;
-using System.Text;
-
-using Mapster;
-
 using Microsoft.AspNetCore.Mvc;
 
 using ServicesModels.Methods;
@@ -16,7 +11,8 @@ namespace Api.Controllers
 
 	[ApiController]
 	[Route("[controller]/[action]")]
-	public class TestController : ControllerBase, IAdd<object, bool>
+	[ApiExplorerSettings(GroupName = "test")]
+	public class TestController : Microsoft.AspNetCore.Mvc.ControllerBase, IAdd<object, bool>
 	{
 		private readonly ILogger<TestController> logger;
 

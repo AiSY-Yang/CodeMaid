@@ -1,9 +1,5 @@
 using MaidContexts;
 
-using Microsoft.AspNetCore.Mvc;
-
-using ServicesModels.Methods;
-
 namespace Api.Services
 {
 	public class ProjectService

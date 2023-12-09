@@ -1,8 +1,9 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using ExtensionMethods;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using ExtensionMethods;
-using System;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using Models.CodeMaid;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;

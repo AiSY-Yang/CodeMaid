@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Api.Tools
 {

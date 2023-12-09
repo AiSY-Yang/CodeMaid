@@ -1,12 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using ExtensionMethods;
-using System;
-using Models.CodeMaid;
-
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 
 namespace Api.Extensions
 {

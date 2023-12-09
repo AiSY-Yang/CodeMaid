@@ -16,8 +16,7 @@ namespace Api.Controllers;
 /// <summary>
 /// 系统控制器
 /// </summary>
-[ApiController]
-[Route("[controller]")]
+[AllowAnonymous]
 public class SystemController : ControllerBase
 {
 	private readonly ILogger<SystemController> logger;
@@ -36,7 +35,6 @@ public class SystemController : ControllerBase
 	/// </summary>
 	/// <returns></returns>
 	[HttpGet("[action]")]
-	[AllowAnonymous]
 	[Produces(typeof(Dictionary<string, List<(string description, string value)>>))]
 	public JsonObject GetEnumDictionaries()
 	{
@@ -46,7 +44,7 @@ public class SystemController : ControllerBase
 		types = types.Union(typeof(MaidWork).Assembly.GetTypes().Where(x => x.IsEnum));
 		foreach (var type in types)
 		{
-			Dictionary<int, JsonObject> objects = new Dictionary<int, JsonObject>();
+			Dictionary<int, JsonObject> objects = new();
 			foreach (var item in type.GetFields(BindingFlags.Public | BindingFlags.Static)
 				.Where(x => x.GetCustomAttribute<System.Text.Json.Serialization.JsonIgnoreAttribute>() == null))
 			{
@@ -100,10 +98,10 @@ public class SystemController : ControllerBase
 		{
 			if (IsController(type))
 			{
-				ControllerInfo info = new ControllerInfo() { Name = type.Name, ActionList = new List<ActionInfo>() };
+				ControllerInfo info = new() { Name = type.Name, ActionList = new List<ActionInfo>() };
 				foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
 				{
-					ActionInfo actionInfo = new ActionInfo() { Name = method.Name, ParamList = new List<ParameterInfo>() };
+					ActionInfo actionInfo = new() { Name = method.Name, ParamList = new List<ParameterInfo>() };
 					actionInfo.ParamList.AddRange(method.GetParameters().ToList().Select(item => new ParameterInfo
 					{
 						Name = item.Name!,
@@ -157,6 +155,40 @@ public class SystemController : ControllerBase
 		var res = new ObjectResult(req);
 		if (statusCode != null) res.StatusCode = statusCode;
 		return res;
+	}
+	/// <summary>
+	/// 转发
+	/// </summary>
+	/// <param name="httpClientFactory"></param>
+	/// <param name="forward">转发地址</param>
+	/// <returns></returns>
+	[HttpGet("[action]")]
+	[HttpPost("[action]")]
+	[HttpPut("[action]")]
+	[HttpDelete("[action]")]
+	[HttpHead("[action]")]
+	[HttpOptions("[action]")]
+	[HttpPatch("[action]")]
+	public async Task Forward([FromServices] IHttpClientFactory httpClientFactory, string forward)
+	{
+		var client = httpClientFactory.CreateClient();
+		client.BaseAddress = new Uri(forward);
+		var msg = new HttpRequestMessage()
+		{
+			Method = new HttpMethod(HttpContext.Request.Method),
+			Content = new StreamContent(HttpContext.Request.Body),
+		};
+		foreach (var item in HttpContext.Request.Headers)
+		{
+			msg.Headers.Add(item.Key, item.Value.Select(x => x));
+		}
+		if (HttpContext.Request.ContentType != null)
+		{
+			msg.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(HttpContext.Request.ContentType);
+		}
+		var res = client.Send(msg);
+		HttpContext.Response.Body = await res.Content.ReadAsStreamAsync();
+		await HttpContext.Response.CompleteAsync();
 	}
 }
 

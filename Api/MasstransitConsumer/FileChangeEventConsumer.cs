@@ -80,7 +80,7 @@ namespace Api.MasstransitConsumer
 	public class FileChangeEventConsumerDefinition : ConsumerDefinition<FileChangeEventConsumer>
 	{
 		///<inheritdoc/>
-		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<FileChangeEventConsumer> consumerConfigurator)
+		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<FileChangeEventConsumer> consumerConfigurator, IRegistrationContext context)
 		{
 			endpointConfigurator.ConcurrentMessageLimit = 1;
 		}

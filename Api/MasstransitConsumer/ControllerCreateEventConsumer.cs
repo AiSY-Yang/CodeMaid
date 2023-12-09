@@ -290,8 +290,9 @@ namespace Api.MasstransitConsumer
 	public class ControllerCreateEventConsumerDefinition : ConsumerDefinition<ControllerCreateEventConsumer>
 	{
 		///<inheritdoc/>
-		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<ControllerCreateEventConsumer> consumerConfigurator)
+		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<ControllerCreateEventConsumer> consumerConfigurator, IRegistrationContext context)
 		{
+			base.ConfigureConsumer(endpointConfigurator, consumerConfigurator, context);
 		}
 	}
 }

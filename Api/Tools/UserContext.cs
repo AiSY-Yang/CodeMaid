@@ -1,7 +1,5 @@
 using System.Security.Claims;
 
-using Microsoft.AspNetCore.Http;
-
 namespace Application.Implement;
 
 /// <summary>

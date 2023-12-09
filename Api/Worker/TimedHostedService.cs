@@ -25,7 +25,11 @@ namespace Api.Worker
 		{
 			try
 			{
-				_timer = new Timer(RunAsync, null, TimeSpan.Zero, TimeSpan.FromSeconds(10));
+#if DEBUG
+				_timer = new Timer(RunAsync, null, TimeSpan.Zero, TimeSpan.FromSeconds(600000));
+#else
+				_timer = new Timer(RunAsync, null, TimeSpan.Zero, TimeSpan.FromSeconds(60));
+#endif
 				return Task.CompletedTask;
 			}
 			catch (Exception ex)
@@ -56,10 +60,30 @@ namespace Api.Worker
 					.Where(x => !x.IsDeleted)
 					.Include(x => x.Project)
 					.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync);
+				//using Activity activityMain = new Activity("test");
+				//activityMain.Start();
+				//activityMain.DisplayName = "test";
+				//var a = new ActivitySource("qq");
+				//a.StartActivity(ActivityKind.Client, activity.Context, null, null, DateTimeOffset.Now, "");
+				//using var l = new ActivityListener();
+				//l.ActivityStarted = (x) =>
+				//{
+				//	Console.WriteLine(x.DisplayName);
+				//};
+				//l.ShouldListenTo = (x) => { Console.WriteLine(x.Name); return true; };
+
 				foreach (var maid in maids)
 				{
+					//activity.SetParentId(activityMain.TraceId, activity.SpanId);
 					await scope.ServiceProvider.GetRequiredService<HttpClientGenerator>().ExecuteAsync(maid);
 				}
+				//activity.Stop();
+				//activity.ActivityTraceFlags = ActivityTraceFlags.None;
+				//foreach (var item in activity.Events)
+				//{
+				//	await Console.Out.WriteLineAsync(item.Name);
+				//}
+				//activityMain.Stop();
 			}
 			catch (Exception ex)
 			{

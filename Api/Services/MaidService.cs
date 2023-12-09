@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
 using Api.Extensions;
@@ -294,7 +293,7 @@ namespace Api.Services
 							public class {{classDefinition.Name}}ConsumerDefinition : ConsumerDefinition<{{classDefinition.Name}}Consumer>
 							{
 								///<inheritdoc/>
-								protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<{{classDefinition.Name}}Consumer> consumerConfigurator)
+								protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<{{classDefinition.Name}}Consumer> consumerConfigurator, IRegistrationContext context)
 								{
 								}
 							}
@@ -436,10 +435,7 @@ namespace Api.Services
 			stringBuilder.AppendLine("\t/// Automatically generated comment configuration");
 			stringBuilder.AppendLine("\t/// </summary>");
 			//stringBuilder.AppendLine("\t/// <param name=\"builder\"></param>");
-			if (hasBase)
-				stringBuilder.AppendLine($"\tstatic void ConfigureComment(EntityTypeBuilder<{classDefinition.Name}> builder)");
-			else
-				stringBuilder.AppendLine($"\tstatic void ConfigureComment(EntityTypeBuilder<TEntity> builder)");
+			stringBuilder.AppendLine($"\tstatic void ConfigureComment(EntityTypeBuilder<TEntity> builder)");
 			stringBuilder.AppendLine("\t{");
 			//当不是抽象类的时候要设置表名
 			if (!isAbstract) stringBuilder.AppendLine($"\t\tbuilder.Metadata.SetComment(\"{classDefinition.Summary}\");");
@@ -509,6 +505,7 @@ namespace Api.Services
 
 			/*
 			中断性变更 替换代码如下 使用正则替换 建议使用rider
+			有基类
 Configure(\(EntityTypeBuilder<\w*> builder\))\s*\{\s*base.Configure\(builder\);
 
 Configure$1
@@ -522,11 +519,24 @@ Configure$1
 	/// <param name="builder"></param>
 	public static void ConfigureComment$1
 	{
+			无基类
+Configure(\(EntityTypeBuilder<TEntity> builder\))\s*\{\s*
+
+Configure$1
+	{
+		ConfigureComment(builder);
+	}
+	/// <summary>
+	/// Automatically generated comment configuration
+	/// </summary>
+	/// <param name="builder"></param>
+	public static void ConfigureComment$1
+	{
 			*/
 			var methodCode = classNode.ChildNodes().OfType<MethodDeclarationSyntax>().First(x => x.Identifier.Text == "ConfigureComment");
 			//此处要保留原有块信息引用 以在后面可以替换节点
 			var blockCode = methodCode.ChildNodes().OfType<BlockSyntax>().First();
-			var newBlockCode = (BlockSyntax)blockCode;
+			var newBlockCode = blockCode;
 			//只有映射到数据库的字段才会更新配置
 			foreach (var item in classDefinition.Properties.Where(CanBeMapToDataBase))
 			{
@@ -975,7 +985,9 @@ public class {className}
 		private static bool IsCanHaveMaxLength(string type)
 		{
 			return new string[] { "string", "string?", }.Contains(type)
-				|| type.StartsWith("List<");
+				|| type.StartsWith("List<")
+				|| type.EndsWith("[]")
+				|| type.EndsWith("[]?");
 		}
 
 		/// <summary>
