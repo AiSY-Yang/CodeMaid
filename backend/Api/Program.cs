@@ -51,37 +51,36 @@ namespace Api
 				//从配置文件读取日志规则
 				config.ReadFrom.Configuration(context.Configuration)
 				//写入OpenTelemetry
-				.WriteTo.OpenTelemetry(x =>
+				.WriteTo.OpenTelemetry(sinkOptions =>
 				{
-					x.Endpoint = openTelemetryEndpoint;
-					x.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
+					sinkOptions.Endpoint = openTelemetryEndpoint;
+					sinkOptions.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
 				})
 				;
 			});
 			builder.Services.AddHttpLogging(x => { });
 
 			//配置服务器
-			builder.WebHost.UseKestrel((c, x) =>
+			builder.WebHost.UseKestrel((context, options) =>
 			{
-				x.ListenAnyIP(5241);
-				x.AddServerHeader = false;
+				options.ListenAnyIP(5241);
+				options.AddServerHeader = false;
 			});
 			//添加映射配置
 			builder.Services.AddMapster();
 			//添加数据库
 			string? connectionString = builder.Configuration.GetConnectionString("MaidContext");
-			builder.Services.AddDbContextPool<MaidContext>((serviceProvider, x) =>
-				x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), x => x
+			builder.Services.AddDbContextPool<MaidContext>((serviceProvider, dbContextBuilder) =>
+							dbContextBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder => builder
 #if DEBUG
-					.EnableRetryOnFailure(0)
+								.EnableRetryOnFailure(0)
 #endif
-					.EnableIndexOptimizedBooleanColumns()
-				)
+							)
 #if DEBUG
-				.EnableDetailedErrors()
-				.EnableSensitiveDataLogging()
+							.EnableDetailedErrors()
+							.EnableSensitiveDataLogging()
 #endif
-				.UseInternalServiceProvider(serviceProvider)
+							.UseInternalServiceProvider(serviceProvider)
 			);
 			//添加基础组件
 			builder.Services.AddEntityFrameworkMySql();
@@ -94,16 +93,16 @@ namespace Api
 			builder.Services.AddScoped<HttpClientGenerator>();
 
 			//添加控制器
-			builder.Services.AddControllers(x =>
+			builder.Services.AddControllers(options =>
 			{
 				//将业务异常转化为自定义信息
-				x.Filters.Add<HttpResponseExceptionFilter>();
+				options.Filters.Add<HttpResponseExceptionFilter>();
 				//支持从body直接接收string参数
-				x.InputFormatters.Add(new TextFormatter());
+				options.InputFormatters.Add(new TextFormatter());
 			})
-				.ConfigureApiBehaviorOptions(x =>
+				.ConfigureApiBehaviorOptions(options =>
 				{
-					x.InvalidModelStateResponseFactory = x =>
+					options.InvalidModelStateResponseFactory = x =>
 					{
 						var error = new ExceptionResult("ParameterError", string.Join(';', x.ModelState.Values.Select(x => x.Errors.FirstOrDefault()?.ErrorMessage).ToList()));
 						return new ObjectResult(error) { StatusCode = 400 };
@@ -127,14 +126,14 @@ namespace Api
 			builder.Services.AddResponseCaching();
 			//添加swagger
 			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwaggerGen(x =>
+			builder.Services.AddSwaggerGen(options =>
 			{
 				//支持可空引用类型
-				x.SupportNonNullableReferenceTypes();
+				options.SupportNonNullableReferenceTypes();
 				//自定义schema名称 RapiDoc不支持使用带+号的schemaName
-				x.CustomSchemaIds((x) => x.FullName!.Replace("+", "_"));
+				options.CustomSchemaIds(type => type.FullName!.Replace("+", "_"));
 				//自定义唯一ID
-				x.CustomOperationIds(apiDescription =>
+				options.CustomOperationIds(apiDescription =>
 				{
 					return apiDescription.TryGetMethodInfo(out System.Reflection.MethodInfo methodInfo) ? methodInfo.Name : null;
 				});
@@ -142,36 +141,36 @@ namespace Api
 				foreach (var item in Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly))
 					try
 					{
-						x.IncludeXmlComments(item);
+						options.IncludeXmlComments(item);
 					}
 					catch (Exception)
 					{
 					}
-				x.ParameterFilter<SwaggerNullableQueryParameterFilter>();
-				x.RequestBodyFilter<SwaggerNullableBodyFilter>();
-				x.SchemaFilter<EnumSchemaFilter>();
-				x.SchemaFilter<InheritInterfaceXmlCommentSchemaFilter>();
-				x.OperationFilter<AddBusinessExceptionResponse>();
-				x.OperationFilter<Add204ResponseWhenReturnMaybeNull>();
+				options.ParameterFilter<SwaggerNullableQueryParameterFilter>();
+				options.RequestBodyFilter<SwaggerNullableBodyFilter>();
+				options.SchemaFilter<EnumSchemaFilter>();
+				options.SchemaFilter<InheritInterfaceXmlCommentSchemaFilter>();
+				options.OperationFilter<AddBusinessExceptionResponse>();
+				options.OperationFilter<Add204ResponseWhenReturnMaybeNull>();
 				//参数采用小驼峰
-				x.DescribeAllParametersInCamelCase();
+				options.DescribeAllParametersInCamelCase();
 				//添加文档
-				x.SwaggerDoc("default", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "默认文档" });
-				x.SwaggerDoc("test", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "默认文档" });
+				options.SwaggerDoc("default", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "默认文档" });
+				options.SwaggerDoc("test", new Microsoft.OpenApi.Models.OpenApiInfo() { Title = "默认文档" });
 				//添加DataOnly和TimeOnly的字符串支持
-				x.UseDateOnlyTimeOnlyStringConverters();
+				options.UseDateOnlyTimeOnlyStringConverters();
 			});
 			//文件提供器
 			Directory.CreateDirectory("/files");
 			var fileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider("/files");
 			builder.Services.AddSingleton(fileProvider);
 			//添加消息总线
-			builder.Services.AddMassTransit(x =>
+			builder.Services.AddMassTransit(configurator =>
 			{
 				//添加所有消费者
-				x.AddConsumers(System.Reflection.Assembly.GetExecutingAssembly());
+				configurator.AddConsumers(System.Reflection.Assembly.GetExecutingAssembly());
 				//使用内存队列
-				x.UsingInMemory((context, cfg) =>
+				configurator.UsingInMemory((context, cfg) =>
 				{
 					cfg.ConfigureEndpoints(context);
 				});
@@ -183,7 +182,7 @@ namespace Api
 				.ConfigureResource(resourceBuilder)
 				.WithTracing(config =>
 				{
-					//记录对外Httpclient请求
+					//记录对外HttpClient请求
 					config.AddHttpClientInstrumentation(options =>
 					{
 						var maxLength = 10 * 1024;
