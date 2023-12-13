@@ -128,6 +128,9 @@ namespace Api.Job
 using System.Net.Http.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+
+using Microsoft.Extensions.Logging;
+
 using RestfulClient.{{restfulApiDocument.PropertyStyleName}}Model;
 
 namespace RestfulClient;
@@ -135,12 +138,14 @@ namespace RestfulClient;
 public partial class {{restfulApiDocument.PropertyStyleName}}
 {
 	private readonly HttpClient httpClient;
+	private readonly ILogger<HarborApi> logger;
 
 	public {{restfulApiDocument.PropertyStyleName}}(HttpClient httpClient, ILogger<{{restfulApiDocument.PropertyStyleName}}> logger)
 	{
 		httpClient.BaseAddress = new Uri("http://localhost:5000");
 		httpClient.Timeout = TimeSpan.FromMinutes(5);
 		this.httpClient = httpClient;
+		this.logger = logger;
 	}
 	public async Task<T> GetResult<T>(HttpRequestMessage request, HttpResponseMessage response)
 	{
@@ -201,6 +206,15 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	{
 		public static OpenApiSchemaInfo GetTypeInfo(this OpenApiSchema OpenApiSchema)
 		{
+			if (OpenApiSchema is null) return new OpenApiSchemaInfo()
+			{
+				CanBeNull = false,
+				Required = false,
+				Type = "Stream",
+				IsArray = false,
+				Item = null,
+				IsRef = false,
+			};
 			var type = OpenApiSchema.Reference?.Id ?? OpenApiSchema.Type switch
 			{
 				"string" => OpenApiSchema.Format switch
@@ -312,18 +326,16 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 				foreach (var operation in item.Value.Operations)
 				{
 					//如果响应不包含200则不进行记录
-					if (!operation.Value.Responses.Any(x => x.IsSuccessResponse()))
-					{
-						//log
-						continue;
-					}
+					if (!operation.Value.Responses.Any(x => x.IsSuccessResponse())) continue;
+					var successResponse = operation.Value.Responses.Where(x => x.IsSuccessResponse()).First();
+					var responseType = successResponse.Value != null && successResponse.Value.Content.Any() ?
+								successResponse.Value.Content.First().Value.Schema.GetTypeInfo()
+								: new OpenApiSchemaInfo() { CanBeNull = false, Type = OpenApiSchemaInfo.stream, IsArray = false, IsRef = false, Required = true };
 					RestfulApiModel restfulApiModel = new()
 					{
 						Path = item.Key,
 						Method = operation.Key,
-						ResponseType = operation.Value.Responses.Where(x => x.IsSuccessResponse()).First().Value.Content.Any() ?
-								operation.Value.Responses.Where(x => x.IsSuccessResponse()).First().Value.Content.FirstOrDefault().Value.Schema.GetTypeInfo()
-								: new OpenApiSchemaInfo() { CanBeNull = false, Type = OpenApiSchemaInfo.stream, IsArray = false, IsRef = false, Required = true },
+						ResponseType = responseType,
 						MaybeReturnNull = operation.Value.Responses.Any(x => x.Key == "204"),
 						Id = operation.Value.OperationId,
 						Summary = operation.Value.Summary,
