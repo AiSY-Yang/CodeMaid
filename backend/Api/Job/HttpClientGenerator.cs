@@ -129,9 +129,6 @@ namespace Api.Job
 using System.Net.Http.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-
-using Microsoft.Extensions.Logging;
-
 using RestfulClient.{{restfulApiDocument.PropertyStyleName}}Model;
 
 namespace RestfulClient;
@@ -147,7 +144,6 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		httpClient.BaseAddress = new Uri(url);
 		httpClient.Timeout = TimeSpan.FromMinutes(5);
 		this.httpClient = httpClient;
-		this.logger = logger;
 	}
 	public async Task<T> GetResult<T>(HttpRequestMessage request, HttpResponseMessage response)
 	{
@@ -208,15 +204,6 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	{
 		public static OpenApiSchemaInfo GetTypeInfo(this OpenApiSchema OpenApiSchema)
 		{
-			if (OpenApiSchema is null) return new OpenApiSchemaInfo()
-			{
-				CanBeNull = false,
-				Required = false,
-				Type = "Stream",
-				IsArray = false,
-				Item = null,
-				IsRef = false,
-			};
 			var type = OpenApiSchema.Reference?.Id ?? OpenApiSchema.Type switch
 			{
 				"string" => OpenApiSchema.Format switch
@@ -260,6 +247,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		{
 			Title = openApiDocument.Info.Title;
 			Description = openApiDocument.Info.Description;
+			openApiDocument.ba
 			//Gets all schemas for class generation
 			foreach (var item in openApiDocument.Components.Schemas)
 			{
@@ -328,16 +316,18 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 				foreach (var operation in item.Value.Operations)
 				{
 					//如果响应不包含200则不进行记录
-					if (!operation.Value.Responses.Any(x => x.IsSuccessResponse())) continue;
-					var successResponse = operation.Value.Responses.Where(x => x.IsSuccessResponse()).First();
-					var responseType = successResponse.Value != null && successResponse.Value.Content.Any() ?
-								successResponse.Value.Content.First().Value.Schema.GetTypeInfo()
-								: new OpenApiSchemaInfo() { CanBeNull = false, Type = OpenApiSchemaInfo.stream, IsArray = false, IsRef = false, Required = true };
+					if (!operation.Value.Responses.Any(x => x.IsSuccessResponse()))
+					{
+						//log
+						continue;
+					}
 					RestfulApiModel restfulApiModel = new()
 					{
 						Path = item.Key,
 						Method = operation.Key,
-						ResponseType = responseType,
+						ResponseType = operation.Value.Responses.Where(x => x.IsSuccessResponse()).First().Value.Content.Any() ?
+								operation.Value.Responses.Where(x => x.IsSuccessResponse()).First().Value.Content.FirstOrDefault().Value.Schema.GetTypeInfo()
+								: new OpenApiSchemaInfo() { CanBeNull = false, Type = OpenApiSchemaInfo.stream, IsArray = false, IsRef = false, Required = true },
 						MaybeReturnNull = operation.Value.Responses.Any(x => x.Key == "204"),
 						Id = operation.Value.OperationId,
 						Summary = operation.Value.Summary,
@@ -581,13 +571,11 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// </summary>
 		public required OperationType Method { get; set; }
 		/// <summary>
-		/// 响应类型
-		/// </summary>
-		public required OpenApiSchemaInfo ResponseType { get; set; }
-		/// <summary>
 		/// 是否会有null响应 响应码为204
 		/// </summary>
 		public required bool MaybeReturnNull { get; set; }
+		public required List<RestfulApiResponse> RestfulApiResponses { get; set; }
+
 		/// <summary>
 		/// 注释
 		/// </summary>
@@ -710,6 +698,16 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 
 				""";
 		}
+	}
+
+	class RestfulApiResponse
+	{
+		public required string HttpStatusCode { get; set; }
+		/// <summary>
+		/// 响应类型
+		/// </summary>
+		public required OpenApiSchemaInfo ResponseType { get; set; }
+
 	}
 	/// <summary>
 	/// Body内容
