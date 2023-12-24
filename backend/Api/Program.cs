@@ -85,6 +85,7 @@ namespace Api
 			//添加基础组件
 			builder.Services.AddEntityFrameworkMySql();
 			builder.Services.AddHttpClient();
+			builder.Services.AddHttpClient("ignoreCertificate").ConfigureHttpMessageHandlerBuilder(x => x.PrimaryHandler = new HttpClientHandler() { ServerCertificateCustomValidationCallback = (a, b, c, d) => true });
 			//添加后台服务
 			builder.Services.AddHostedService<TimedHostedService>();
 			//添加仓储

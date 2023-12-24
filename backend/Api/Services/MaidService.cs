@@ -435,7 +435,7 @@ namespace Api.Services
 			stringBuilder.AppendLine("\t/// Automatically generated comment configuration");
 			stringBuilder.AppendLine("\t/// </summary>");
 			//stringBuilder.AppendLine("\t/// <param name=\"builder\"></param>");
-			stringBuilder.AppendLine($"\tstatic void ConfigureComment(EntityTypeBuilder<TEntity> builder)");
+			stringBuilder.AppendLine($"\tstatic void ConfigureComment(EntityTypeBuilder<{classDefinition.Name}> builder)");
 			stringBuilder.AppendLine("\t{");
 			//当不是抽象类的时候要设置表名
 			if (!isAbstract) stringBuilder.AppendLine($"\t\tbuilder.Metadata.SetComment(\"{classDefinition.Summary}\");");

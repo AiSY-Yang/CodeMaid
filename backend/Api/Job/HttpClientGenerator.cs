@@ -35,11 +35,11 @@ namespace Api.Job
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="httpClient"></param>
+		/// <param name="httpClientFactory"></param>
 		/// <param name="logger"></param>
-		public HttpClientGenerator(HttpClient httpClient, ILogger<HttpClientGenerator> logger)
+		public HttpClientGenerator(IHttpClientFactory httpClientFactory, ILogger<HttpClientGenerator> logger)
 		{
-			this.httpClient = httpClient;
+			this.httpClient = httpClientFactory.CreateClient("ignoreCertificate");
 			this.httpClient.Timeout = TimeSpan.FromSeconds(10);
 			this.logger = logger;
 		}
@@ -85,7 +85,7 @@ namespace Api.Job
 				Md5s[maid.SourcePath] = md5;
 			}
 			var setting = maid.Setting.Deserialize<HttpClientSyncSetting>() ?? new HttpClientSyncSetting();
-			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out _);
+			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out var diagnostic);
 			RestfulApiDocument restfulApiDocument = new(openApiDocument);
 			#region create model file
 			if (setting.CreateModel)
@@ -124,6 +124,7 @@ namespace Api.Job
 			}
 			else
 			{
+				var server = openApiDocument.Servers.FirstOrDefault()?.Url ?? "http://localhost:5000";
 				var text = $$"""
 using System.Net.Http.Json;
 using System.Text.Encodings.Web;
@@ -138,11 +139,12 @@ namespace RestfulClient;
 public partial class {{restfulApiDocument.PropertyStyleName}}
 {
 	private readonly HttpClient httpClient;
-	private readonly ILogger<HarborApi> logger;
+	private readonly ILogger<{{restfulApiDocument.PropertyStyleName}}> logger;
 
-	public {{restfulApiDocument.PropertyStyleName}}(HttpClient httpClient, ILogger<{{restfulApiDocument.PropertyStyleName}}> logger)
+	public {{restfulApiDocument.PropertyStyleName}}(HttpClient httpClient, ILogger<{{restfulApiDocument.PropertyStyleName}}> logger, IOptions<{{restfulApiDocument.PropertyStyleName}}Options> options)
 	{
-		httpClient.BaseAddress = new Uri("http://localhost:5000");
+		var url = options.Value.Url;
+		httpClient.BaseAddress = new Uri(url);
 		httpClient.Timeout = TimeSpan.FromMinutes(5);
 		this.httpClient = httpClient;
 		this.logger = logger;
@@ -629,7 +631,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		public string CreateMethod()
 		{
 			//组装请求url
-			var url = Path;
+			var url = Path.TrimStart('/');
 			//更改路由参数命名规则
 			foreach (var parameter in PathParameter)
 				url = url.Replace($"{{{parameter.Name}}}", $"{{{parameter.Name.ToNamingConvention(NamingConvention.camelCase)}}}");
