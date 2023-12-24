@@ -19,6 +19,8 @@ namespace Models.CodeMaid
 		/// 所属项目
 		/// </summary>
 		public required Project Project { get; set; }
+		/// <inheritdoc cref="Project"/>
+		public long ProjectId { get; set; }
 		/// <summary>
 		/// 功能
 		/// </summary>

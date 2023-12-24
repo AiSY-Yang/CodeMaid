@@ -12,7 +12,7 @@ namespace Microsoft.EntityFrameworkCore.Storage.ValueConversion
 	/// </summary>
 	public sealed class DateTimeOffsetConverter : ValueConverter<DateTimeOffset, DateTimeOffset>
 	{
-		public DateTimeOffsetConverter() : base(v => v, v => v.ToLocalTime())
+		public DateTimeOffsetConverter() : base(v => v.ToUniversalTime(), v => v.ToLocalTime())
 		{
 		}
 	}

@@ -30,7 +30,7 @@ internal class Program
 		//var portForwarded = new ForwardedPortLocal("127.0.0.1", 15432, "127.0.0.1", 15432);
 		//client.AddForwardedPort(portForwarded);
 		//portForwarded.Start();
-		Console.WriteLine("ssh隧道已连接");
+		//Console.WriteLine("ssh隧道已连接");
 		#endregion
 		#region 开启数据库连接
 		var sourceConnectString = @"Server=localhost;Database=api;User Id=root;Password=123456;";
@@ -60,16 +60,16 @@ internal class Program
 	/// </summary>
 	/// <typeparam name="T">原对象和复制到的对象</typeparam>
 	/// <typeparam name="T2">多对多关联的对象</typeparam>
-	/// <param name="testContext">数据库上下文</param>
+	/// <param name="targetContext">数据库上下文</param>
 	/// <param name="data">要同步的数据</param>
 	/// <param name="include">选择多对多关系的表达式</param>
 	/// <param name="action">重新建立关系的表达式 参数为新对象 源对象 多对多关系的数据列表</param>
-	static void SyncMany<T, T2>(DbContext testContext, IEnumerable<T> data, Expression<Func<T, IEnumerable<T2>>> include, Action<T, T, List<T2>> action) where T : DatabaseEntity where T2 : DatabaseEntity
+	static void SyncMany<T, T2>(DbContext targetContext, IEnumerable<T> data, Expression<Func<T, IEnumerable<T2>>> include, Action<T, T, List<T2>> action) where T : DatabaseEntity where T2 : DatabaseEntity
 	{
 		Console.Write($"同步{typeof(T).Name}表");
 		var ids = data.Select(x => x.Id).ToList();
 		Console.Write($",一共{ids.Count}条数据");
-		var has = testContext.Set<T>().Include(include).Where(x => ids.Contains(x.Id)).ToList();
+		var has = targetContext.Set<T>().Include(include).Where(x => ids.Contains(x.Id)).ToList();
 		Console.Write($",其中更新{has.Count}条,新增{ids.Count - has.Count}条");
 		Console.WriteLine();
 		Stopwatch stopwatch = new();
@@ -77,7 +77,7 @@ internal class Program
 		var i = 0;
 		var func = include.Compile();
 		var relativeIds = data.SelectMany(x => func(x)).Select(x => x.Id).ToList();
-		var relativeData = testContext.Set<T2>().Where(x => relativeIds.Contains(x.Id)).ToList();
+		var relativeData = targetContext.Set<T2>().Where(x => relativeIds.Contains(x.Id)).ToList();
 		foreach (var item in relativeData)
 		{
 			Console.SetCursorPosition(0, Console.CursorTop);
@@ -87,7 +87,7 @@ internal class Program
 			{
 				testData = item.Adapt<T2>();
 				relativeData.Add(testData);
-				testContext.Set<T2>().Add(testData);
+				targetContext.Set<T2>().Add(testData);
 			}
 			else
 			{
@@ -102,7 +102,7 @@ internal class Program
 			var testData = has.FirstOrDefault(x => x.Id == item.Id);
 			if (testData is null)
 			{
-				testContext.Set<T>().Add(item.Adapt<T>());
+				targetContext.Set<T>().Add(item.Adapt<T>());
 			}
 			else
 			{
@@ -112,7 +112,7 @@ internal class Program
 			var x = relativeData.Where(x => func(item).Select(x => x.Id).Contains(x.Id)).ToList();
 			action(testData!, item, relativeData);
 		}
-		testContext.SaveChanges();
+		targetContext.SaveChanges();
 		Console.WriteLine($"执行完成,耗时{stopwatch.ElapsedMilliseconds / 1000}秒");
 		Console.WriteLine();
 	}
@@ -120,14 +120,14 @@ internal class Program
 	/// 复制数据
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	/// <param name="testContext">要写入数据的数据库</param>
+	/// <param name="targetContext">要写入数据的数据库</param>
 	/// <param name="data">要被写入的数据</param>
-	static void Sync<T>(DbContext testContext, IEnumerable<T> data, params IEnumerable<T>[] many2ManyData) where T : DatabaseEntity
+	static void Sync<T>(DbContext targetContext, IEnumerable<T> data, params IEnumerable<T>[] many2ManyData) where T : DatabaseEntity
 	{
 		Console.Write($"同步{typeof(T).Name}表");
 		var ids = data.Select(x => x.Id).ToList();
 		Console.Write($",一共{ids.Count}条数据");
-		var has = testContext.Set<T>().Where(x => ids.Contains(x.Id)).ToList();
+		var has = targetContext.Set<T>().Where(x => ids.Contains(x.Id)).ToList();
 		Console.Write($",其中更新{has.Count}条,新增{ids.Count - has.Count}条");
 		Console.WriteLine();
 		Stopwatch stopwatch = new();
@@ -141,14 +141,14 @@ internal class Program
 			var testData = has.FirstOrDefault(x => x.Id == item.Id);
 			if (testData is null)
 			{
-				testContext.Set<T>().Add(item.Adapt<T>());
+				targetContext.Set<T>().Add(item.Adapt<T>());
 			}
 			else
 			{
 				item.Adapt(testData);
 			}
 		}
-		testContext.SaveChanges();
+		targetContext.SaveChanges();
 		Console.WriteLine($"执行完成,耗时{stopwatch.ElapsedMilliseconds / 1000}秒");
 		Console.WriteLine();
 	}
@@ -167,6 +167,9 @@ internal class Program
 	/// <param name="adapterConfig"></param>
 	public static void ConfigMapsterRule(TypeAdapterConfig adapterConfig)
 	{
+		adapterConfig.ForType<DatabaseEntity, DatabaseEntity>()
+		.AfterMapping(x => x.UpdateTime = null)
+		;
 		//		adapterConfig.ForType<Workflow, Workflow>()
 		//.AfterMapping(x => x.Title = "!!!copy from prod" + x.Title)
 		//.AfterMapping(x => x.CreateUserId = CreateUser ?? x.CreateUserId)

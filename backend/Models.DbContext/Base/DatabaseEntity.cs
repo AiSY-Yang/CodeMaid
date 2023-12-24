@@ -23,7 +23,7 @@ namespace Models.CodeMaid
 		/// 更新时间
 		/// </summary>
 		[AdaptIgnore(MemberSide.Destination)]
-		public DateTimeOffset UpdateTime { get; set; } = DateTimeOffset.Now;
+		public DateTimeOffset? UpdateTime { get; set; }
 		/// <summary>
 		/// 是否有效
 		/// </summary>

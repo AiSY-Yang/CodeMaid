@@ -5,46 +5,53 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace MaidContexts.Migrations
 {
     [DbContext(typeof(MaidContext))]
-    [Migration("20230310085905_20230310-165857")]
-    partial class _20230310165857
+    [Migration("20231224081849_20231224-161837")]
+    partial class _20231224161837
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Models.CodeMaid.AttributeDefinition", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Arguments")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("参数");
 
                     b.Property<string>("ArgumentsText")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("参数文本");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("创建时间");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasComment("是否有效");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("Attribute名称");
 
                     b.Property<long>("PropertyDefinitionId")
@@ -52,64 +59,79 @@ namespace MaidContexts.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("Attribute文本");
 
-                    b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTimeOffset?>("UpdateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("更新时间");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PropertyDefinitionId");
 
-                    b.ToTable("AttributeDefinitions");
-
-                    b.HasComment("类定义");
+                    b.ToTable("AttributeDefinitions", t =>
+                        {
+                            t.HasComment("属性定义");
+                        });
                 });
 
             modelBuilder.Entity("Models.CodeMaid.ClassDefinition", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Base")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("基类或者接口名称");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("创建时间");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasComment("是否有效");
 
                     b.Property<string>("LeadingTrivia")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("前导");
 
                     b.Property<long>("MaidId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasComment("Maid对象Id");
+
+                    b.Property<int>("MemberType")
+                        .HasColumnType("integer")
+                        .HasComment("成员类型(0-类,1-接口,2-记录,3-结构体)");
+
+                    b.Property<string>("Modifiers")
+                        .HasColumnType("text")
+                        .HasComment("修饰符");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(255)")
+                        .HasColumnType("text")
                         .HasComment("类名");
 
                     b.Property<string>("NameSpace")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("命名空间");
 
                     b.Property<string>("Summary")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("注释");
 
-                    b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTimeOffset?>("UpdateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("更新时间");
 
                     b.Property<string>("Using")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("类引用的命名空间");
 
                     b.HasKey("Id");
@@ -119,26 +141,30 @@ namespace MaidContexts.Migrations
                     b.HasIndex("Name", "MaidId")
                         .IsUnique();
 
-                    b.ToTable("ClassDefinitions");
-
-                    b.HasComment("类定义");
+                    b.ToTable("ClassDefinitions", t =>
+                        {
+                            t.HasComment("类定义");
+                        });
                 });
 
             modelBuilder.Entity("Models.CodeMaid.EnumDefinition", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("创建时间");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasComment("是否有效");
 
                     b.Property<string>("LeadingTrivia")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("前导");
 
                     b.Property<long?>("MaidId")
@@ -146,248 +172,271 @@ namespace MaidContexts.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("枚举名");
 
                     b.Property<string>("NameSpace")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("命名空间");
 
                     b.Property<string>("Summary")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("注释");
 
-                    b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTimeOffset?>("UpdateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("更新时间");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MaidId");
 
-                    b.ToTable("EnumDefinitions");
-
-                    b.HasComment("枚举定义");
+                    b.ToTable("EnumDefinitions", t =>
+                        {
+                            t.HasComment("枚举定义");
+                        });
                 });
 
             modelBuilder.Entity("Models.CodeMaid.EnumMemberDefinition", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("创建时间");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("描述");
 
                     b.Property<long?>("EnumDefinitionId")
                         .HasColumnType("bigint");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasComment("是否有效");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("枚举名称");
 
                     b.Property<string>("Summary")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("注释");
 
-                    b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTimeOffset?>("UpdateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("更新时间");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasComment("枚举值");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EnumDefinitionId");
 
-                    b.ToTable("EnumMemberDefinitions");
-
-                    b.HasComment("枚举成员定义");
+                    b.ToTable("EnumMemberDefinitions", t =>
+                        {
+                            t.HasComment("枚举成员定义");
+                        });
                 });
 
             modelBuilder.Entity("Models.CodeMaid.Maid", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("Autonomous")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("boolean")
                         .HasComment("是否自动修复");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("创建时间");
 
                     b.Property<string>("DestinationPath")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("目标路径");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasComment("是否有效");
 
                     b.Property<int>("MaidWork")
-                        .HasColumnType("int")
-                        .HasComment("功能(0-配置同步功能,1-DTO同步,0-sasas,0-,1-test3,40-test4,41-test5,2-枚举remarks标签同步)");
+                        .HasColumnType("integer")
+                        .HasComment("功能(0-配置同步功能,1-DTO同步,2-HTTP客户端生成,3-controller同步,4-生成 Masstransit Consumer)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("名称");
 
                     b.Property<long>("ProjectId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Setting")
-                        .HasColumnType("longtext")
-                        .HasComment("序列化保存的设置");
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasComment("设置");
 
                     b.Property<string>("SourcePath")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("原路径");
 
-                    b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTimeOffset?>("UpdateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("更新时间");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Maids");
-
-                    b.HasComment("功能");
+                    b.ToTable("Maids", t =>
+                        {
+                            t.HasComment("功能");
+                        });
                 });
 
             modelBuilder.Entity("Models.CodeMaid.Project", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<bool>("AddEnumRemark")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("boolean")
                         .HasComment("是否添加枚举的remark信息");
 
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("创建时间");
 
                     b.Property<string>("GitBranch")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("Git分支");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasComment("是否有效");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("项目名");
 
                     b.Property<string>("Path")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("项目路径");
 
-                    b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTimeOffset?>("UpdateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("更新时间");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects");
-
-                    b.HasComment("项目定义");
+                    b.ToTable("Projects", t =>
+                        {
+                            t.HasComment("项目定义");
+                        });
                 });
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasComment("<inheritdoc cref=\"IDatabaseEntity.Id\"/>");
-
-                    b.Property<long>("ClassDefinitionId")
                         .HasColumnType("bigint");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ClassDefinitionId")
+                        .HasColumnType("bigint")
+                        .HasComment("所属类Id");
+
                     b.Property<DateTimeOffset>("CreateTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("创建时间");
 
                     b.Property<long?>("EnumDefinitionId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("FullText")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("完整文本内容");
 
                     b.Property<string>("Get")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("Get方法体");
 
                     b.Property<bool>("HasGet")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("boolean")
                         .HasComment("是否包含Get");
 
                     b.Property<bool>("HasSet")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("boolean")
                         .HasComment("是否包含Set");
 
                     b.Property<string>("Initializer")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("初始化器");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasComment("是否有效");
 
                     b.Property<bool>("IsEnum")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("boolean")
                         .HasComment("是否是枚举");
 
                     b.Property<string>("LeadingTrivia")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("前导");
 
                     b.Property<string>("Modifiers")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("修饰符");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(255)")
+                        .HasColumnType("text")
                         .HasComment("属性名称");
 
                     b.Property<string>("Remark")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("备注");
 
                     b.Property<string>("Set")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("Set方法体");
 
                     b.Property<string>("Summary")
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("注释");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("text")
                         .HasComment("数据类型");
 
-                    b.Property<DateTimeOffset>("UpdateTime")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTimeOffset?>("UpdateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("更新时间");
 
                     b.HasKey("Id");
 
@@ -398,9 +447,10 @@ namespace MaidContexts.Migrations
                     b.HasIndex("Name", "ClassDefinitionId")
                         .IsUnique();
 
-                    b.ToTable("PropertyDefinitions");
-
-                    b.HasComment("类定义");
+                    b.ToTable("PropertyDefinitions", t =>
+                        {
+                            t.HasComment("类定义");
+                        });
                 });
 
             modelBuilder.Entity("Models.CodeMaid.AttributeDefinition", b =>

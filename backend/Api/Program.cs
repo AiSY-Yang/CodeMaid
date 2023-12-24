@@ -71,7 +71,7 @@ namespace Api
 			//添加数据库
 			string? connectionString = builder.Configuration.GetConnectionString("MaidContext");
 			builder.Services.AddDbContextPool<MaidContext>((serviceProvider, dbContextBuilder) =>
-							dbContextBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), builder => builder
+							dbContextBuilder.UseNpgsql(connectionString, builder => builder
 #if DEBUG
 								.EnableRetryOnFailure(0)
 #endif
@@ -83,7 +83,7 @@ namespace Api
 							.UseInternalServiceProvider(serviceProvider)
 			);
 			//添加基础组件
-			builder.Services.AddEntityFrameworkMySql();
+			builder.Services.AddEntityFrameworkNpgsql();
 			builder.Services.AddHttpClient();
 			builder.Services.AddHttpClient("ignoreCertificate").ConfigureHttpMessageHandlerBuilder(x => x.PrimaryHandler = new HttpClientHandler() { ServerCertificateCustomValidationCallback = (a, b, c, d) => true });
 			//添加后台服务
