@@ -107,9 +107,9 @@ namespace Api.Job
 				{
 					var obj = modelUnitNew.GetDeclarationSyntaxes<BaseTypeDeclarationSyntax>().Where(x => x.Identifier.Text == PropertyStyle(item.Name)).FirstOrDefault();
 					if (obj == null)
-						modelUnitNew = modelUnitNew.AddMembers(SyntaxFactory.ParseMemberDeclaration(item.ToString())!);
+						modelUnitNew = modelUnitNew.AddMembers(SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
 					else
-						modelUnitNew = modelUnitNew.ReplaceNode(obj, SyntaxFactory.ParseMemberDeclaration(item.ToString())!);
+						modelUnitNew = modelUnitNew.ReplaceNode(obj, SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
 				}
 				await FileTools.Write(modelPath, modelUnit, modelUnitNew);
 			}
@@ -154,7 +154,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		}
 		catch (HttpRequestException ex)
 		{
-			logger.LogError(ex, "{name}请求失败:,请求地址{address},状态码{statusCode},参数{body}响应{s2}"
+			logger.LogError(ex, "{name}请求失败:请求地址{address},状态码{statusCode},参数{body}响应{s2}"
 				, nameof({{restfulApiDocument.PropertyStyleName}})
 				, request.RequestUri
 				, response.StatusCode
@@ -247,7 +247,6 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		{
 			Title = openApiDocument.Info.Title;
 			Description = openApiDocument.Info.Description;
-			openApiDocument.ba
 			//Gets all schemas for class generation
 			foreach (var item in openApiDocument.Components.Schemas)
 			{
@@ -321,13 +320,20 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 						//log
 						continue;
 					}
+					var restfulApiResponses = new List<RestfulApiResponse>();
+					foreach (var res in operation.Value.Responses)
+					{
+						var content = res.Value.Content.FirstOrDefault().Value;
+						if (content is null)
+							restfulApiResponses.Add(new RestfulApiResponse() { HttpStatusCode = res.Key, ResponseType = new OpenApiSchemaInfo() { CanBeNull = false, Type = OpenApiSchemaInfo.stream, IsArray = false, IsRef = false, Required = true } });
+						else
+							restfulApiResponses.Add(new RestfulApiResponse() { HttpStatusCode = res.Key, ResponseType = res.Value.Content.FirstOrDefault().Value?.Schema?.GetTypeInfo() });
+					}
 					RestfulApiModel restfulApiModel = new()
 					{
 						Path = item.Key,
 						Method = operation.Key,
-						ResponseType = operation.Value.Responses.Where(x => x.IsSuccessResponse()).First().Value.Content.Any() ?
-								operation.Value.Responses.Where(x => x.IsSuccessResponse()).First().Value.Content.FirstOrDefault().Value.Schema.GetTypeInfo()
-								: new OpenApiSchemaInfo() { CanBeNull = false, Type = OpenApiSchemaInfo.stream, IsArray = false, IsRef = false, Required = true },
+						RestfulApiResponses = restfulApiResponses,
 						MaybeReturnNull = operation.Value.Responses.Any(x => x.Key == "204"),
 						Id = operation.Value.OperationId,
 						Summary = operation.Value.Summary,
@@ -368,12 +374,15 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	class RestfulClassModel : RestfulModel
 	{
 		public required List<ClassField> ClassFields { get; set; }
-		public override string ToString()
+		public override string ToCode()
 		{
 			var className = PropertyStyle(Name);
 			StringBuilder stringBuilder = new();
 			stringBuilder.AppendLine($"/// <summary>");
-			stringBuilder.AppendLine($"/// {Summary}");
+			if (Summary is null)
+				stringBuilder.AppendLine($"/// ");
+			else
+				Summary.Split('\n').ToList().ForEach(x => stringBuilder.AppendLine($"/// {x}"));
 			stringBuilder.AppendLine($"/// </summary>");
 			stringBuilder.AppendLine($"public class {className}");
 			stringBuilder.AppendLine("{");
@@ -394,7 +403,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	class RestfulEnumModel : RestfulModel
 	{
 		public required List<EnumField> EnumFields { get; set; }
-		public override string ToString()
+		public override string ToCode()
 		{
 			var enumName = PropertyStyle(Name);
 			StringBuilder stringBuilder = new();
@@ -422,6 +431,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 
 	abstract class RestfulModel : Field
 	{
+		public abstract string ToCode();
 		/// <summary>
 		/// 类型 如果是枚举的话可能自定义类型转换器
 		/// </summary>
@@ -447,11 +457,11 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// 属性类型
 		/// </summary>
 		public required OpenApiSchemaInfo Type { get; set; }
-		private string? summary;
 		/// <summary>
 		/// 字段的注释
 		/// </summary>
 		public required string? Summary { get => summary?.Replace('\n', ' ').Replace('\r', ' '); set => summary = value; }
+		private string? summary;
 
 		#region Method
 		/// <summary>
@@ -549,6 +559,29 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	public static class NamingConvert
 	{
 		static readonly char[] number = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+		static readonly string[] csharpKeywords = {
+	"abstract", "as", "base", "bool", "break",
+	"byte", "case", "catch", "char", "checked",
+	"class", "const", "continue", "decimal", "default",
+	"delegate", "do", "double", "else", "enum",
+	"event", "explicit", "extern", "false", "finally",
+	"fixed", "float", "for", "foreach", "goto",
+	"if", "implicit", "in", "int", "interface",
+	"internal", "is", "lock", "long", "namespace",
+	"new", "null", "object", "operator", "out",
+	"override", "params", "private", "protected", "public",
+	"readonly", "ref", "return", "sbyte", "sealed",
+	"short", "sizeof", "stackalloc", "static", "string",
+	"struct", "switch", "this", "throw", "true",
+	"try", "typeof", "uint", "ulong", "unchecked",
+	"unsafe", "ushort", "using", "virtual", "void",
+	"volatile", "while", "add", "alias", "ascending",
+	"async", "await", "by", "dynamic", "equals",
+	"from", "get", "global", "group", "into",
+	"join", "let", "nameof", "on", "orderby",
+	"partial", "remove", "select", "set", "value",
+	"var", "when", "where", "yield"
+};
 		/// <summary>
 		/// 属性风格名称
 		/// </summary>
@@ -556,7 +589,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// <summary>
 		/// 变量风格名称
 		/// </summary>
-		public static string VariableStyle(string s) => StringExtension.ToNamingConvention(number.Contains(s[0]) ? $"Field_{s}" : s, NamingConvention.camelCase);
+		public static string VariableStyle(string s) => StringExtension.ToNamingConvention(number.Contains(s[0]) ? $"Field_{s}" : csharpKeywords.Contains(s) ? $"@{s}" : s, NamingConvention.camelCase);
 	}
 
 
@@ -622,7 +655,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			var url = Path.TrimStart('/');
 			//更改路由参数命名规则
 			foreach (var parameter in PathParameter)
-				url = url.Replace($"{{{parameter.Name}}}", $"{{{parameter.Name.ToNamingConvention(NamingConvention.camelCase)}}}");
+				url = url.Replace($"{{{parameter.Name}}}", $"{{{VariableStyle(parameter.Name)}}}");
 			//添加查询参数
 			var queryParameters = new List<string>();
 			foreach (var item in QueryParameter)
@@ -658,6 +691,8 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			var queryParametersCode = queryParameters.Count > 0 ? $"		var queryParameters = new List<string>();\r\n{string.Concat(queryParameters.Select(x => $"\t\t{x}\r\n"))}" : "";
 			var urlQueryParametersCode = queryParameters.Count > 0 ? "{(queryParameters.Count > 0 ? \"?\" + string.Join('&', queryParameters) : \"\")}" : "";
 			var paramNamesXml = string.Concat(para.Select(x => $"	/// <param name=\"{x.Name.ToNamingConvention(NamingConvention.camelCase)}\">{x.Summary}</param>{Environment.NewLine}"));
+			var ResponseType = this.RestfulApiResponses.OrderBy(x => x.HttpStatusCode).First(x => x.HttpStatusCode.StartsWith("2")).ResponseType;
+
 			return $$"""
 					/// <summary>
 					/// {{Summary}}
@@ -706,7 +741,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// <summary>
 		/// 响应类型
 		/// </summary>
-		public required OpenApiSchemaInfo ResponseType { get; set; }
+		public required OpenApiSchemaInfo? ResponseType { get; set; }
 
 	}
 	/// <summary>

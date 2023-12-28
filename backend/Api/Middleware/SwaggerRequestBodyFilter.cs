@@ -14,8 +14,11 @@ public class SwaggerNullableBodyFilter : IRequestBodyFilter
 	/// <inheritdoc/>
 	public void Apply(OpenApiRequestBody requestBody, RequestBodyFilterContext context)
 	{
-		var p = _nullabilityContext.Create(context.BodyParameterDescription.ParameterInfo());
-		var maybeNull = p.WriteState is NullabilityState.Nullable;
-		requestBody.Required = !maybeNull;
+		if (context.BodyParameterDescription != null)
+		{
+			var p = _nullabilityContext.Create(context.BodyParameterDescription.ParameterInfo());
+			var maybeNull = p.WriteState is NullabilityState.Nullable;
+			requestBody.Required = !maybeNull;
+		}
 	}
 }

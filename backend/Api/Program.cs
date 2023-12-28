@@ -9,6 +9,7 @@ using MassTransit;
 using MasstransitModels;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,9 +64,13 @@ namespace Api
 			//配置服务器
 			builder.WebHost.UseKestrel((context, options) =>
 			{
+				//放开请求体大小限制
+				options.Limits.MaxRequestBodySize = null;
+				options.Limits.MinRequestBodyDataRate = null;
 				options.ListenAnyIP(5241);
 				options.AddServerHeader = false;
 			});
+			builder.Services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = long.MaxValue);
 			//添加映射配置
 			builder.Services.AddMapster();
 			//添加数据库
@@ -270,7 +275,11 @@ namespace Api
 			{
 				//swagger配置
 				app.UseSwagger();
-				app.UseSwaggerUI(x => { });
+				app.UseSwaggerUI(x =>
+				{
+					x.SwaggerEndpoint("/swagger/default/swagger.json", "default");
+					x.SwaggerEndpoint("/swagger/test/swagger.json", "test");
+				});
 			}
 			//请求日志记录
 			app.Use(async (context, next) =>
