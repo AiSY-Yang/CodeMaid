@@ -18,7 +18,7 @@ enum LogType {
 	OpenTelemetry,
 }
 const { TextArea } = Input
-const pattern = /(@\w+)=\s*'([^']+)'/g
+const pattern = /(@\w+)=\s*('[^']+')?(NULL)?/g
 export default function Page() {
 	const change = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		var s = (e.target as HTMLTextAreaElement).value
@@ -28,7 +28,6 @@ export default function Page() {
 		}
 		var sqlData: SQLLog[] = Array<SQLLog>()
 		var errorMessage: string[] = Array<string>()
-		var tempSQL = ''
 		switch (logType) {
 			case LogType.OpenTelemetry:
 				/**下面的内容是否是sql */
@@ -36,7 +35,8 @@ export default function Page() {
 				var isError: boolean = false
 				var startError: boolean = false
 				var isErrorMessage: boolean
-				var isParameter: boolean
+				var isParameter: boolean = true
+				var tempSQL = ''
 				//匹配到的sql参数
 				var parameters: any = {}
 				var parametersString: string = ''
@@ -44,44 +44,56 @@ export default function Page() {
 					//查找是否开始是sql
 					var isSuccessSql = !isSQL && line.trim().indexOf('LogRecord.FormattedMessage:        Executed DbCommand') == 0
 					var isErrorSql = !isSQL && line.trim().indexOf('LogRecord.FormattedMessage:        Failed executing DbCommand') == 0
+					var lineIsSQL = isSuccessSql || isErrorSql
 					//查找错误消息
 					isError = isError || line.trim().indexOf('LogRecord.LogLevel:                Error') == 0
 					startError = startError || (isError && (line.trim().indexOf('LogRecord.Exception') == 0 || (isError && line.trim().indexOf('LogRecord.FormattedMessage') == 0)))
 					var endError = isError && (line.length == 0 || line.trim().indexOf('LogRecord.ScopeValues') == 0)
-					//sql记录
-					if (isSuccessSql || isErrorSql || isParameter) {
-						//当记录sql的时候不在当作错误消息
-						isError = false
+					//sql参数记录 当上一行不是sql但是这一行是的时候 说明开始是参数了
+					if (!isSQL && lineIsSQL) {
 						isSQL = true
+						isParameter = true
+						//当记录sql的时候不在当作错误消息
+					}
+					//如果是参数 就要开始记录参数字符串用于之后的匹配
+					if (isParameter) {
 						parametersString += line + '\r\n'
-						isParameter = !line.endsWith(']')
+						//判断参数是不是结束了 如果结束了就要提取内容
+						if (/CommandType=\'Text\', CommandTimeout=\'\d+\']$/.test(line)) {
+							isParameter = false
+							let match
+							parameters = {}
+							while ((match = pattern.exec(parametersString)) !== null) {
+								const paramName = match[1]
+								const paramValue = match[2]
+								const NULL = match[3]
+								if (NULL != undefined) parameters[paramName] = "null"
+								if (paramValue != undefined) parameters[paramName] = paramValue
+								// console.debug(`${paramName}=${parameters[paramName]}`)
+							}
+							// console.debug(parameters)
+							parametersString = ''
+						}
 						return
 					}
-					//sql结束
-					if (line.trim().indexOf('LogRecord.') == 0) {
-						isSQL = false
-						console.debug(`${parametersString}`)
-						let match
-						parameters = {}
-						while ((match = pattern.exec(parametersString)) !== null) {
-							const paramName = match[1]
-							const paramValue = match[2]
-							parameters[paramName] = paramValue
-							console.debug(`${paramName}=${paramValue}`)
-						}
-						console.debug(parameters)
-						parametersString = ''
-						if (tempSQL != '') {
-							tempSQL = tempSQL.replaceAll(/@\w+/g, (match) => `'${parameters[match]}'`)
+					if (isSQL && !isParameter) {
+						if (line.trim().indexOf('LogRecord.') == 0) {
+							lineIsSQL = false
+							isSQL = false
+							tempSQL = tempSQL.replaceAll(/@\w+/g, (match) => `${parameters[match]}`)
 							sqlData.push({ Error: isErrorSql, sql: tempSQL.slice(0, -1) })
-							tempSQL = ''
+							// if (tempSQL.indexOf('undefin') > 0) console.debug(tempSQL)
+						} else tempSQL += line + '\n'
+						return
+					}
+					// console.debug(`${parametersString}`)
+
+					tempSQL = ''
+					if (isSQL)
+						if (startError && !endError) {
+							//错误消息记录
+							errorMessage.push(line)
 						}
-					}
-					if (isSQL) tempSQL += line + '\n'
-					//错误消息记录
-					if (startError && !endError) {
-						errorMessage.push(line)
-					}
 				})
 				break
 			default:
