@@ -49,12 +49,17 @@ namespace Api.Controllers
 			return 1;
 		}
 		[HttpPost("[action]")]
-		public async Task<int> Test([FromQuery] int queryInt, [FromQuery] string queryString, [FromBody] BodyClass body)
+		public int Test([FromQuery] int queryInt, [FromQuery] string queryString, [FromBody] BodyClass body)
 		{
 			return 1;
 		}
 		[HttpPost("[action]")]
-		public async Task<int?> TestNullable([FromQuery] int? queryInt, [FromQuery] string? queryString, [FromBody] BodyClass? body)
+		public int? TestNullable([FromQuery] int? queryInt, [FromQuery] string? queryString, [FromBody] BodyClass? body)
+		{
+			return null;
+		}
+		[HttpGet]
+		public BodyClass? TestResponse()
 		{
 			return null;
 		}
@@ -62,7 +67,7 @@ namespace Api.Controllers
 		{
 			public int Int { get; set; }
 			public int? NullableInt { get; set; }
-			public string String { get; set; }
+			public string String { get; set; } = null!;
 			public string? NullableString { get; set; }
 			public required int RequiredInt { get; set; }
 			public required int? RequiredNullableInt { get; set; }

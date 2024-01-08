@@ -113,7 +113,6 @@ public class SystemController : ControllerBase
 						info.ActionList.Add(actionInfo);
 					}
 				}
-
 				controlInfoList.Add(info);
 			}
 		}
@@ -125,6 +124,8 @@ public class SystemController : ControllerBase
 	/// 回显请求信息
 	/// </summary>
 	/// <returns></returns>
+	/// <param name="statusCode">返回的状态码</param>
+	/// <param name="delay">接口返回延迟</param>
 	[HttpGet("[action]")]
 	[HttpPost("[action]")]
 	[HttpPut("[action]")]
@@ -132,8 +133,10 @@ public class SystemController : ControllerBase
 	[HttpHead("[action]")]
 	[HttpOptions("[action]")]
 	[HttpPatch("[action]")]
-	public async Task<object> Echo(int? statusCode)
+	public async Task<object> Echo(int? statusCode, int? delay)
 	{
+		if (delay is not null)
+			await Task.Delay(delay.Value);
 		var req = new
 		{
 			AddressFamily = HttpContext.Connection.RemoteIpAddress?.AddressFamily.ToString(),

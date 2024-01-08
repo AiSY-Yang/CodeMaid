@@ -1,5 +1,6 @@
 using Api.Job;
 using Api.Middleware;
+using Api.Middleware.Swagger;
 using Api.Worker;
 
 using MaidContexts;
@@ -24,6 +25,7 @@ using ServicesModels.Results;
 using ServicesModels.Settings;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
+
 
 namespace Api
 {
@@ -90,7 +92,8 @@ namespace Api
 			//添加基础组件
 			builder.Services.AddEntityFrameworkNpgsql();
 			builder.Services.AddHttpClient();
-			builder.Services.AddHttpClient("ignoreCertificate").ConfigureHttpMessageHandlerBuilder(x => x.PrimaryHandler = new HttpClientHandler() { ServerCertificateCustomValidationCallback = (a, b, c, d) => true });
+			builder.Services.AddHttpClient("ignoreCertificate")
+				.ConfigureHttpMessageHandlerBuilder(x => x.PrimaryHandler = new HttpClientHandler() { ServerCertificateCustomValidationCallback = (a, b, c, d) => true });
 			//添加后台服务
 			builder.Services.AddHostedService<TimedHostedService>();
 			//添加仓储
@@ -277,8 +280,8 @@ namespace Api
 				app.UseSwagger();
 				app.UseSwaggerUI(x =>
 				{
-					x.SwaggerEndpoint("/swagger/default/swagger.json", "default");
-					x.SwaggerEndpoint("/swagger/test/swagger.json", "test");
+					foreach (var doc in app.Services.GetRequiredService<SwaggerGeneratorOptions>().SwaggerDocs)
+						x.SwaggerEndpoint($"/swagger/{doc.Key}/swagger.json", doc.Key);
 				});
 			}
 			//请求日志记录
