@@ -735,7 +735,7 @@ Configure$1
 			//同步Type
 			var p = x.Last();
 			var type = p.Type;
-			if ((IsBaseType(type) || p.IsEnum) && source.Type.ToString().Trim('?') != type.Trim('?'))
+			if ((IsPrimitiveType(type) || p.IsEnum) && source.Type.ToString().Trim('?') != type.Trim('?'))
 				source = source.WithType(ParseTypeName(type + (!type.EndsWith('?') && source.Type.ToString().EndsWith('?') ? "? " : " ")));
 			return source.AddOrReplaceSummary(summary);
 		}
@@ -856,7 +856,7 @@ public class {className}
 				//是否排除复杂类型
 				if (setting.ExcludeComplexTypes)
 				{
-					if (!IsBaseType(newNode.Type.ToString()))
+					if (!IsPrimitiveType(newNode.Type.ToString()))
 						return classDeclarationSyntax;
 				}
 				//是否转换为可空类型
@@ -944,7 +944,7 @@ public class {className}
 		/// </summary>
 		/// <param name="type"></param>
 		/// <returns></returns>
-		private static bool IsBaseType(string type)
+		private static bool IsPrimitiveType(string type)
 		{
 			return new string[] { "int", "int?" , "short", "short?" , "long", "long?","decimal", "decimal?","float", "float?","double", "double?",
 				"string", "string?",
@@ -963,7 +963,7 @@ public class {className}
 		/// <returns></returns>
 		private static bool CanBeMapToDataBase(PropertyDefinition property)
 		{
-			return (property.IsEnum || IsBaseType(RemoveGeneric(property.Type)))
+			return (property.IsEnum || IsPrimitiveType(RemoveGeneric(property.Type)))
 				&& property.HasSet
 				&& !property.Attributes.Any(x => x.Name == "NotMapped");
 			string RemoveGeneric(string type)

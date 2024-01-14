@@ -51,6 +51,7 @@ namespace Api.Job
 		/// <returns></returns>
 		public async Task ExecuteAsync(Maid maid)
 		{
+			var setting = maid.Setting.Deserialize<HttpClientSyncSetting>()!;
 			string json;
 			if (Uri.TryCreate(maid.SourcePath, UriKind.Absolute, out var uri))
 			{
@@ -84,14 +85,15 @@ namespace Api.Job
 			{
 				Md5s[maid.SourcePath] = md5;
 			}
-			var setting = maid.Setting.Deserialize<HttpClientSyncSetting>() ?? new HttpClientSyncSetting();
 			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out var diagnostic);
 			RestfulApiDocument restfulApiDocument = new(openApiDocument);
+			var needCreateModel = !setting.ModelPath.IsNullOrEmpty();
+			var needCreateOptions = !setting.OptionsPath.IsNullOrEmpty();
 			#region create model file
-			if (setting.CreateModel)
+			if (needCreateModel)
 			{
 				//模型文件路径
-				var modelPath = Path.Combine(maid.Project.Path, setting.ModelPath ?? maid.DestinationPath, restfulApiDocument.PropertyStyleName + "Model.cs");
+				var modelPath = Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.cs");
 				CompilationUnitSyntax modelUnit;
 				if (File.Exists(modelPath))
 					modelUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(modelPath)).GetCompilationUnitRoot();
@@ -99,7 +101,7 @@ namespace Api.Job
 					modelUnit = CSharpSyntaxTree.ParseText($$"""
 				#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 				using System.Text.Json.Serialization;
-				{{(setting.CreateModel ? $"namespace RestfulClient.{restfulApiDocument.PropertyStyleName}Model;{Environment.NewLine}" : "")}}				
+				namespace RestfulClient.{{restfulApiDocument.PropertyStyleName}}Model
 				#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 				""").GetCompilationUnitRoot();
 				var modelUnitNew = modelUnit;
@@ -114,23 +116,42 @@ namespace Api.Job
 				await FileTools.Write(modelPath, modelUnit, modelUnitNew);
 			}
 			#endregion
+			if (needCreateOptions)
+			{
+				var optionsPath = Path.Combine(maid.Project.Path, setting.OptionsPath!, restfulApiDocument.PropertyStyleName + "Options.cs");
+				if (!File.Exists(optionsPath))
+				{
+					File.WriteAllText(optionsPath, $$"""
+namespace RestfulClient;
 
+public class {{restfulApiDocument.PropertyStyleName}}Options
+{
+	/// <summary>
+	/// 服务地址
+	/// </summary>
+	public required string Url { get; set; }
+}
+""");
+				}
+			}
 			//文件路径
-			var PATH = Path.Combine(maid.Project.Path, maid.DestinationPath, restfulApiDocument.PropertyStyleName + ".cs");
+			var PATH = Path.Combine(maid.Project.Path, setting.ClientPath, restfulApiDocument.PropertyStyleName + ".cs");
 			CompilationUnitSyntax unit;
+			CompilationUnitSyntax unitNew;
 			if (File.Exists(PATH))
 			{
 				unit = CSharpSyntaxTree.ParseText(File.ReadAllText(PATH)).GetCompilationUnitRoot();
+				unitNew = unit;
 			}
 			else
 			{
 				var server = openApiDocument.Servers.FirstOrDefault()?.Url ?? "http://localhost:5000";
 				var text = $$"""
+using System.CodeDom.Compiler;
 using System.Net.Http.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using RestfulClient.{{restfulApiDocument.PropertyStyleName}}Model;
-
+{{(needCreateModel ? $"using RestfulClient.{restfulApiDocument.PropertyStyleName}Model;\r\n" : "")}}
 namespace RestfulClient;
 
 public partial class {{restfulApiDocument.PropertyStyleName}}
@@ -175,9 +196,10 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	}
 }
 """;
-				unit = CSharpSyntaxTree.ParseText(text).GetCompilationUnitRoot();
+				unit = CSharpSyntaxTree.ParseText("").GetCompilationUnitRoot();
+				unitNew = CSharpSyntaxTree.ParseText(text).GetCompilationUnitRoot();
 			}
-			var c = unit.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
+			var c = unitNew.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
 			var newC = c;
 
 			foreach (var api in restfulApiDocument.Api)
@@ -186,7 +208,8 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 				var m = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().FirstOrDefault(x => x.Identifier.Text == methodName);
 				if (m != null)
 				{
-					newC = newC.ReplaceNode(m, (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod())!);
+					if (m.AttributeLists.Any(x => x.Attributes.Any(x => x.Name.ToString() == "GeneratedCode")))
+						newC = newC.ReplaceNode(m, (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod())!);
 					//当已经存在方法的时候跳过
 					continue;
 				}
@@ -194,51 +217,15 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 				{
 					newC = newC.AddMembers((MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod())!);
 				}
-
 			}
-			await FileTools.Write(PATH, CSharpSyntaxTree.ParseText("").GetCompilationUnitRoot(), unit.ReplaceNode(c, newC));
+			//移除已被删除的接口
+			var methodNode = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().Where(m => m.AttributeLists.Any(x => x.Attributes.Any(x => x.Name.ToString() == "GeneratedCode")));
+			var allMethodName = methodNode.Select(x => x.Identifier.Text).ToList();
+			var removedMethod = methodNode.Where(node => !restfulApiDocument.Api.Any(x => x.MethodName == node.Identifier.Text)).ToList();
+			newC = newC.RemoveNodes(removedMethod, SyntaxRemoveOptions.KeepNoTrivia);
+
+			await FileTools.Write(PATH, unit, unitNew.ReplaceNode(c, newC!));
 			logger.LogInformation("生成{name}Http客户端", restfulApiDocument.PropertyStyleName);
-		}
-	}
-	static class ApiModelExtensions
-	{
-		public static OpenApiSchemaInfo GetTypeInfo(this OpenApiSchema OpenApiSchema)
-		{
-			var type = OpenApiSchema.Reference?.Id ?? OpenApiSchema.Type switch
-			{
-				"string" => OpenApiSchema.Format switch
-				{
-					"uuid" => "Guid",
-					"binary" => "Stream",
-					"date" => "DateOnly",
-					"date-time" => "DateTimeOffset",
-					_ => "string",
-				},
-				"number" => OpenApiSchema.Format switch
-				{
-					"float" => "float",
-					"double" => "double",
-					_ => "decimal",
-				},
-				"integer" => OpenApiSchema.Format switch
-				{
-					"int64" => "long",
-					"int32" => "int",
-					_ => "int",
-				},
-				"boolean" => "bool",
-				"array" => $"array",
-				_ => "JsonElement",
-			};
-			return new OpenApiSchemaInfo()
-			{
-				CanBeNull = OpenApiSchema.Nullable,
-				Required = false,
-				Type = type,
-				IsArray = OpenApiSchema.Type == "array",
-				Item = OpenApiSchema.Items?.GetTypeInfo(),
-				IsRef = OpenApiSchema.Reference != null,
-			};
 		}
 	}
 	class RestfulApiDocument
@@ -334,7 +321,6 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 						Path = item.Key,
 						Method = operation.Key,
 						RestfulApiResponses = restfulApiResponses,
-						MaybeReturnNull = operation.Value.Responses.Any(x => x.Key == "204"),
 						Id = operation.Value.OperationId,
 						Summary = operation.Value.Summary,
 						BodyParameter = operation.Value.RequestBody?.Content.Select(x => new BodyContent()
@@ -551,6 +537,9 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// 是否是模型引用
 		/// </summary>
 		public bool IsRef { get; internal set; }
+		/// <summary>
+		/// 数组item的信息
+		/// </summary>
 		public OpenApiSchemaInfo? Item { get; internal set; }
 	}
 	/// <summary>
@@ -603,10 +592,6 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// Http方法
 		/// </summary>
 		public required OperationType Method { get; set; }
-		/// <summary>
-		/// 是否会有null响应 响应码为204
-		/// </summary>
-		public required bool MaybeReturnNull { get; set; }
 		public required List<RestfulApiResponse> RestfulApiResponses { get; set; }
 
 		/// <summary>
@@ -691,14 +676,19 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			var queryParametersCode = queryParameters.Count > 0 ? $"		var queryParameters = new List<string>();\r\n{string.Concat(queryParameters.Select(x => $"\t\t{x}\r\n"))}" : "";
 			var urlQueryParametersCode = queryParameters.Count > 0 ? "{(queryParameters.Count > 0 ? \"?\" + string.Join('&', queryParameters) : \"\")}" : "";
 			var paramNamesXml = string.Concat(para.Select(x => $"	/// <param name=\"{x.Name.ToNamingConvention(NamingConvention.camelCase)}\">{x.Summary}</param>{Environment.NewLine}"));
-			var ResponseType = this.RestfulApiResponses.OrderBy(x => x.HttpStatusCode).First(x => x.HttpStatusCode.StartsWith("2")).ResponseType;
+			//解析响应类型
+			var successResponses = this.RestfulApiResponses.OrderBy(x => x.HttpStatusCode).Where(x => x.HttpStatusCode.StartsWith("2")).ToList();
+			var hasNullResponse = this.RestfulApiResponses.OrderBy(x => x.HttpStatusCode).Any(x => x.HttpStatusCode.StartsWith("204"));
+
+			var ResponseType = successResponses.First().ResponseType;
 
 			return $$"""
 					/// <summary>
 					/// {{Summary}}
 					/// </summary>
 					/// <returns></returns>
-				{{paramNamesXml}}	public async Task<{{ResponseType.ReturnCode}}{{(MaybeReturnNull ? "?" : "")}}> {{MethodName}}({{argument}})
+				{{paramNamesXml}}	[GeneratedCode("codeMaid", "1.0.0")]
+					public async Task<{{ResponseType.ReturnCode}}{{(hasNullResponse ? "?" : "")}}> {{MethodName}}({{argument}})
 					{
 				{{queryParametersCode}}{{(body != null
 				? body.HasJsonContentType
@@ -722,7 +712,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 							OpenApiSchemaInfo.stream => $"var response = await httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead);",
 							_ => $"var response = await httpClient.SendAsync(httpRequestMessage);"
 						}}}
-						{{(MaybeReturnNull ? "if (response.StatusCode == System.Net.HttpStatusCode.NoContent) return null;" : "")}}
+						{{(hasNullResponse ? "if (response.StatusCode == System.Net.HttpStatusCode.NoContent) return null;" : "")}}
 						{{ResponseType.Type switch
 						{
 							OpenApiSchemaInfo.stream => $"return await response.Content.ReadAsStreamAsync();",

@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 using Api.Job;
 using Api.Middleware;
 using Api.Middleware.Swagger;
@@ -335,17 +337,30 @@ namespace Api
 			//版本信息
 			app.MapGet("/version", () => $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
 			//数据库迁移
-			await Task.Run(() =>
-				{
-					var scope = app.Services.CreateScope();
-					var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-					context.Database.Migrate();
-				});
+			var scope = app.Services.CreateScope();
+			var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
+			context.Database.Migrate();
 			//初始化服务
 			await Task.Run(async () =>
 				{
 					await InitServices.Init(app.Services);
 				});
+			//await Task.Run(async () =>
+			//	{
+			//		var scope = app.Services.CreateScope();
+			//		var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
+			//		var data = context.Maids.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync)
+			//		//.Where(x => x.DestinationPath != "")
+			//		.ToList();
+			//		foreach (var item in data)
+			//		{
+			//			var setting = item.Setting.Deserialize<HttpClientSyncSetting>();
+			//			//setting.ClientPath = item.DestinationPath;
+			//			//item.DestinationPath = "";
+			//			item.Setting = JsonSerializer.SerializeToDocument(setting);
+			//		}
+			//		context.SaveChanges();
+			//	});
 #if DEBUG
 			await Task.Run(async () =>
 					{
@@ -355,7 +370,7 @@ namespace Api
 							var scope = app.Services.CreateScope();
 							var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
 							var x = context.Maids.First(x => x.Id == 16);
-							x.Setting = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(System.Text.Json.JsonSerializer.Serialize(ControllerSetting.Default));
+							//x.Setting = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonDocument>(System.Text.Json.JsonSerializer.Serialize(ControllerSetting.Default));
 							context.SaveChanges();
 
 							//File.WriteAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs", " " + File.ReadAllText("D:\\Code\\Template.WebApi\\Api\\Controllers\\ProjectController.cs"));

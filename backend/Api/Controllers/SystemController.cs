@@ -17,7 +17,7 @@ namespace Api.Controllers;
 /// 系统控制器
 /// </summary>
 [AllowAnonymous]
-public class SystemController : ControllerBase
+public class SystemController : ApiControllerBase
 {
 	private readonly ILogger<SystemController> logger;
 
@@ -135,7 +135,8 @@ public class SystemController : ControllerBase
 	[HttpPatch("[action]")]
 	public async Task<object> Echo(int? statusCode, int? delay)
 	{
-		if (delay is not null)
+        await Console.Out.WriteLineAsync(delay.ToString());
+        if (delay is not null)
 			await Task.Delay(delay.Value);
 		var req = new
 		{

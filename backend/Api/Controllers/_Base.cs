@@ -6,10 +6,10 @@ namespace Api.Controllers
 {
 	/// <inheritdoc/>
 	[ApiController]
-	[Route("[controller]")]
+	[Route("api/[controller]")]
 	[ApiExplorerSettings(GroupName = "default")]
 	[Produces(MediaTypeNames.Application.Json)]
-	public class ControllerBase : Microsoft.AspNetCore.Mvc.ControllerBase
+	public class ApiControllerBase : Microsoft.AspNetCore.Mvc.ControllerBase
 	{
 	}
 }

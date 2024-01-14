@@ -2,6 +2,8 @@
 
 using Microsoft.EntityFrameworkCore;
 
+using ServicesModels.Settings;
+
 namespace Api.Worker
 {
 	/// <summary>
@@ -59,6 +61,7 @@ namespace Api.Worker
 				var maids = context.Maids
 					.Where(x => !x.IsDeleted)
 					.Include(x => x.Project)
+					.Where(x => x.Setting.RootElement.GetProperty(nameof(HttpClientSyncSetting.IsManual)).GetBoolean() == false)
 					.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync);
 				//using Activity activityMain = new Activity("test");
 				//activityMain.Start();

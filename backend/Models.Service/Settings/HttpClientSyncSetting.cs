@@ -13,12 +13,20 @@ namespace ServicesModels.Settings
 	public class HttpClientSyncSetting
 	{
 		/// <summary>
-		/// 是否创建模型
+		/// 是否是手动执行
 		/// </summary>
-		public bool CreateModel { get; set; }
+		public bool IsManual { get; set; }
+		/// <summary>
+		/// 客户端路径
+		/// </summary>
+		public required string ClientPath { get; set; }
 		/// <summary>
 		/// 模型文件路径
 		/// </summary>
 		public string? ModelPath { get; set; }
+		/// <summary>
+		/// 选项的路径
+		/// </summary>
+		public string? OptionsPath { get; set; }
 	}
 }
