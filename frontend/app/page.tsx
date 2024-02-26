@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { cwd } from 'process'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 interface Item {
 	key: string
 	name: string
@@ -39,16 +39,17 @@ function findLastArray(items: Array<Item> | null | undefined, a: Array<string>) 
 
 export default function Home() {
 	const router = useRouter()
-	const query = new URLSearchParams(window.location.search)
+	const query = useSearchParams()
+	console.log('router', router)
 	console.log('query', query.getAll('key'))
 	var items = findLastArray(data, query.getAll('key'))
 	console.log('items', items)
 	if (items == null) return <></>
 	items.map((x) => {
 		if ((x.herf = '.')) {
-			query.set('key', x.key)
-			x.herf = window.location + '?' + query.toString()
-			console.log('x.herf', x.herf)
+			// query.s('key', x.key)
+			x.herf =  query.toString() + '&key=' + x.key
+			// console.log('x.herf', x.herf)
 		}
 	})
 	console.log('items', items)

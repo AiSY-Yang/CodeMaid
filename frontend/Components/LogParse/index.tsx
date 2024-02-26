@@ -67,7 +67,7 @@ export default function Page() {
 								const paramName = match[1]
 								const paramValue = match[2]
 								const NULL = match[3]
-								if (NULL != undefined) parameters[paramName] = "null"
+								if (NULL != undefined) parameters[paramName] = 'null'
 								if (paramValue != undefined) parameters[paramName] = paramValue
 								// console.debug(`${paramName}=${parameters[paramName]}`)
 							}
@@ -82,18 +82,18 @@ export default function Page() {
 							isSQL = false
 							tempSQL = tempSQL.replaceAll(/@\w+/g, (match) => `${parameters[match]}`)
 							sqlData.push({ Error: isErrorSql, sql: tempSQL.slice(0, -1) })
-							// if (tempSQL.indexOf('undefin') > 0) console.debug(tempSQL)
 						} else tempSQL += line + '\n'
 						return
 					}
-					// console.debug(`${parametersString}`)
-
-					tempSQL = ''
-					if (isSQL)
-						if (startError && !endError) {
-							//错误消息记录
-							errorMessage.push(line)
-						}
+					if (line == 'Resource associated with LogRecord:') {
+						tempSQL = ''
+						isError = false
+					}
+					if (line == 'LogRecord.Severity:                Error') isError = true
+					if (isError && line.startsWith('LogRecord.FormattedMessage:')) {
+						//错误消息记录
+						errorMessage.push(line.substring(35))
+					}
 				})
 				break
 			default:
