@@ -15,7 +15,7 @@ const data = [
 	{
 		key: 'clone',
 		name: '赛博分身',
-		desp: '感谢科技',
+		desp: '',
 		herf: '.',
 		child: [
 			{ key: 'mouse', name: '嘴替', desp: '变声,TTS 邀请码 AgTBt0T', herf: 'https://dubbing.tech' },
@@ -48,7 +48,7 @@ export default function Home() {
 	items.map((x) => {
 		if ((x.herf = '.')) {
 			// query.s('key', x.key)
-			x.herf =  query.toString() + '&key=' + x.key
+			x.herf = (query.toString() === '' ? '?' : '&') + 'key=' + x.key
 			// console.log('x.herf', x.herf)
 		}
 	})
