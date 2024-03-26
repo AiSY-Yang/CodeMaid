@@ -46,7 +46,7 @@ export default function Home() {
 	console.log('items', items)
 	if (items == null) return <></>
 	items.map((x) => {
-		if ((x.herf = '.')) {
+		if ((x.herf === '.')) {
 			// query.s('key', x.key)
 			x.herf = (query.toString() === '' ? '?' : '&') + 'key=' + x.key
 			// console.log('x.herf', x.herf)
