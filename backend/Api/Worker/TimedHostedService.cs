@@ -62,6 +62,7 @@ namespace Api.Worker
 					.Where(x => !x.IsDeleted)
 					.Include(x => x.Project)
 					.Where(x => x.Setting.RootElement.GetProperty(nameof(HttpClientSyncSetting.IsManual)).GetBoolean() == false)
+					//.Where(x => x.Id==18)
 					.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync);
 				//using Activity activityMain = new Activity("test");
 				//activityMain.Start();

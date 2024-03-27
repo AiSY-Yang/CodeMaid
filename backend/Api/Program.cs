@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 
 using Api.Job;
@@ -50,7 +51,14 @@ namespace Api
 		{
 			var builder = WebApplication.CreateBuilder(args);
 			var openTelemetryEndpoint = builder.Configuration.GetValue<string>("OpenTelemetryEndpoint")!;
+			//var openTelemetryLogsEndpoint = openTelemetryEndpoint;
+			//var openTelemetryTracesEndpoint = openTelemetryEndpoint;
+			//var openTelemetryMetricsEndpoint = openTelemetryEndpoint;
+			var openTelemetryLogsEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/logs";
+			var openTelemetryTracesEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/traces";
+			var openTelemetryMetricsEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/metrics";
 			//配置使用Serilog记录日志
+			Serilog.Debugging.SelfLog.Enable(Console.Error);
 			builder.Host.UseSerilog((context, services, config) =>
 			{
 				//从配置文件读取日志规则
@@ -58,8 +66,15 @@ namespace Api
 				//写入OpenTelemetry
 				.WriteTo.OpenTelemetry(sinkOptions =>
 				{
-					sinkOptions.Endpoint = openTelemetryEndpoint;
-					sinkOptions.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
+					sinkOptions.Endpoint = openTelemetryLogsEndpoint;
+					//sinkOptions.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
+					sinkOptions.HttpMessageHandler = new HttpClientHandler()
+					{
+						ServerCertificateCustomValidationCallback = (a, b, c, d) => true,
+						UseProxy = true,
+						Proxy = new WebProxy() { BypassProxyOnLocal = true }
+					};
+					sinkOptions.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
 				})
 				;
 			});
@@ -187,7 +202,8 @@ namespace Api
 				});
 			});
 			//添加OpenTelemetry
-			void otlpOptions(OtlpExporterOptions x) => x.Endpoint = new Uri(openTelemetryEndpoint); ;
+			void openTelemetryTracesOptions(OtlpExporterOptions x) { x.Protocol = OtlpExportProtocol.HttpProtobuf; x.Endpoint = new Uri(openTelemetryTracesEndpoint); };
+			void openTelemetryMetricsOptions(OtlpExporterOptions x) { x.Protocol = OtlpExportProtocol.HttpProtobuf; x.Endpoint = new Uri(openTelemetryMetricsEndpoint); };
 			void resourceBuilder(ResourceBuilder x) => x.AddService(ServiceName, serviceInstanceId: Environment.MachineName);
 			builder.Services.AddOpenTelemetry()
 				.ConfigureResource(resourceBuilder)
@@ -254,7 +270,7 @@ namespace Api
 					});
 					config.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
 					config.AddEntityFrameworkCoreInstrumentation();
-					config.AddOtlpExporter(otlpOptions);
+					config.AddOtlpExporter(openTelemetryTracesOptions);
 				})
 				.WithMetrics(config =>
 				{
@@ -269,7 +285,7 @@ namespace Api
 						x.AddEventSources("System.Net.Http");
 					});
 					config.AddRuntimeInstrumentation();
-					config.AddOtlpExporter(otlpOptions);
+					config.AddOtlpExporter(openTelemetryMetricsOptions);
 				})
 				;
 			var app = builder.Build();
@@ -324,7 +340,11 @@ namespace Api
 			//本地化
 			//app.UseRequestLocalization();
 			//跨域配置
-			app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().SetPreflightMaxAge(TimeSpan.FromDays(1)));
+			app.UseCors(x => x
+				.AllowAnyOrigin()
+				.AllowAnyMethod()
+				.WithExposedHeaders("Content-Disposition")
+				.SetPreflightMaxAge(TimeSpan.FromDays(1)));
 			//身份认证
 			app.UseAuthentication();
 			app.UseAuthorization();

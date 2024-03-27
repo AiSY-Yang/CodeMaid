@@ -24,7 +24,12 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 备注
 		/// </summary>
-		public string Remark { get => string.Join(',', EnumMembers.Where(x => !x.IsDeleted).Select(x => $"{x.Value}-{x.Description ?? x.Summary ?? x.Name}")); }
+		public string Remark
+		{
+			get => string.Join(',', EnumMembers.Where(x => !x.IsDeleted)
+																.OrderBy(x => x.Value)
+																.Select(x => $"{x.Value}-{x.Description ?? x.Summary ?? x.Name}"));
+		}
 		/// <summary>
 		/// 前导
 		/// </summary>

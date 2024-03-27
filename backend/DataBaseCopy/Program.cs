@@ -113,8 +113,8 @@ internal class Program
 			action(testData!, item, relativeData);
 		}
 		targetContext.SaveChanges();
+		targetContext.ChangeTracker.Clear();
 		Console.WriteLine($"执行完成,耗时{stopwatch.ElapsedMilliseconds / 1000}秒");
-		Console.WriteLine();
 	}
 	/// <summary>
 	/// 复制数据
@@ -122,7 +122,7 @@ internal class Program
 	/// <typeparam name="T"></typeparam>
 	/// <param name="targetContext">要写入数据的数据库</param>
 	/// <param name="data">要被写入的数据</param>
-	static void Sync<T>(DbContext targetContext, IEnumerable<T> data, params IEnumerable<T>[] many2ManyData) where T : DatabaseEntity
+	static void Sync<T>(DbContext targetContext, IEnumerable<T> data) where T : DatabaseEntity
 	{
 		Console.Write($"同步{typeof(T).Name}表");
 		var ids = data.Select(x => x.Id).ToList();
@@ -149,14 +149,14 @@ internal class Program
 			}
 		}
 		targetContext.SaveChanges();
+		targetContext.ChangeTracker.Clear();
 		Console.WriteLine($"执行完成,耗时{stopwatch.ElapsedMilliseconds / 1000}秒");
-		Console.WriteLine();
 	}
 
 	public static void UseMapster()
 	{
 		TypeAdapterConfig.GlobalSettings.Default
-			.IgnoreMember((x, y) => x.Type == typeof(DatabaseEntity) || x.Type == typeof(IEnumerable<DatabaseEntity>))
+			.IgnoreMember((x, y) => x.Type.IsAssignableTo(typeof(DatabaseEntity)) || x.Type.IsAssignableTo(typeof(IEnumerable<DatabaseEntity>)))
 			.MaxDepth(1);
 		ConfigMapsterRule(TypeAdapterConfig.GlobalSettings.Default.Config);
 

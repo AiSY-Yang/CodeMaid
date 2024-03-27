@@ -16,7 +16,9 @@ namespace Api.Tools
 		/// <returns></returns>
 		public static async Task Write(string path, CompilationUnitSyntax oldCompilationUnitSyntax, CompilationUnitSyntax newCompilationUnitSyntax)
 		{
-			if (oldCompilationUnitSyntax.FullSpan.CompareTo(newCompilationUnitSyntax.FullSpan) == 0)
+			var dirPath = Path.GetDirectoryName(path);
+			if (dirPath != null && !Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+			if (oldCompilationUnitSyntax.IsEquivalentTo(newCompilationUnitSyntax))
 				if (File.Exists(path))
 					return;
 			await File.WriteAllTextAsync(path, newCompilationUnitSyntax.ToFullString());

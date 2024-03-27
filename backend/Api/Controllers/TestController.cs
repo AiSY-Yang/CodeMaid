@@ -1,4 +1,5 @@
 #pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 
 using ExtensionMethods;
@@ -49,15 +50,23 @@ namespace Api.Controllers
 			return 1;
 		}
 		[HttpPost("[action]")]
-		public int Test([FromQuery] int queryInt, [FromQuery] string queryString, [FromBody] BodyClass body)
+		public int Test([FromQuery] int queryInt, [FromQuery][Required] string queryStringRequired, [FromQuery] string queryString, [FromBody] BodyClass body)
 		{
 			return 1;
 		}
 		[HttpPost("[action]")]
-		public int? TestNullable([FromQuery] int? queryInt, [FromQuery] string? queryString, [FromBody] BodyClass? body)
+		public int? TestNullable([FromQuery] int? queryInt, [FromQuery][Required] string? queryStringRequired, [FromQuery] string? queryString, [FromBody] BodyClass? body)
 		{
 			return null;
 		}
+		[HttpPost("[action]")]
+		public int? TestBody([FromBody] BodyClass body) => null;
+		[HttpPost("[action]")]
+		public int? TestNullableBody([FromBody] BodyClass? body) => null;
+		[HttpPost("[action]")]
+		public int? TestRequiredBody([FromBody] BodyClass body) => null;
+		[HttpPost("[action]")]
+		public int? TestRequiredNullableBody([FromBody] BodyClass? body) => null;
 		[HttpGet]
 		public BodyClass? TestResponse()
 		{

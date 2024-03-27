@@ -10,7 +10,7 @@ namespace Models.CodeMaid.Enum
 	/// 性别
 	/// </summary>
 	/// <remarks>1-男,2-女,3-其他</remarks>
-	public enum Sex
+	public enum Gender
 	{
 		/// <summary>
 		/// 男

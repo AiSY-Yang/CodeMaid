@@ -61,14 +61,14 @@ namespace Api.Job
 					if (!res.IsSuccessStatusCode)
 					{
 
-						logger.LogError("生成HTTP客户端错误,maid{maid},{url}返回状态码为{StatusCode}", maid.Name, uri, res.StatusCode);
+						logger.LogError("{maid}生成HTTP客户端错误,{url}返回状态码为{StatusCode}", maid.Name, uri, res.StatusCode);
 						return;
 					}
 					json = await res.Content.ReadAsStringAsync();
 				}
 				catch (Exception ex)
 				{
-					logger.LogError(ex, "生成HTTP客户端错误,maid{maid},{url}", maid.Name, uri);
+					logger.LogError(ex, "{maid}生成HTTP客户端错误,{url}", maid.Name, uri);
 					return;
 				}
 			}
@@ -101,8 +101,9 @@ namespace Api.Job
 					modelUnit = CSharpSyntaxTree.ParseText($$"""
 				#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 				using System.Text.Json.Serialization;
-				namespace RestfulClient.{{restfulApiDocument.PropertyStyleName}}Model
+				namespace RestfulClient.{{restfulApiDocument.PropertyStyleName}}Model;
 				#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
+
 				""").GetCompilationUnitRoot();
 				var modelUnitNew = modelUnit;
 				foreach (var item in restfulApiDocument.Models)
@@ -152,6 +153,10 @@ using System.Net.Http.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 {{(needCreateModel ? $"using RestfulClient.{restfulApiDocument.PropertyStyleName}Model;\r\n" : "")}}
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
 namespace RestfulClient;
 
 public partial class {{restfulApiDocument.PropertyStyleName}}
@@ -165,6 +170,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		httpClient.BaseAddress = new Uri(url);
 		httpClient.Timeout = TimeSpan.FromMinutes(5);
 		this.httpClient = httpClient;
+		this.logger = logger;
 	}
 	public async Task<T> GetResult<T>(HttpRequestMessage request, HttpResponseMessage response)
 	{
@@ -225,7 +231,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			newC = newC.RemoveNodes(removedMethod, SyntaxRemoveOptions.KeepNoTrivia);
 
 			await FileTools.Write(PATH, unit, unitNew.ReplaceNode(c, newC!));
-			logger.LogInformation("生成{name}Http客户端", restfulApiDocument.PropertyStyleName);
+			logger.LogInformation("{maid}生成{name}Http客户端", maid.Name, restfulApiDocument.PropertyStyleName);
 		}
 	}
 	class RestfulApiDocument
@@ -511,7 +517,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// </summary>
 		/// <returns></returns>
 		public string ReturnCode => Code + (CanBeNull ? "?" : "");
-		string Code => (IsRef ? NamingConvert.PropertyStyle(Type)
+		public string Code => (IsRef ? NamingConvert.PropertyStyle(Type)
 			: Item is null ? Type : $"List<{Item.Code}>");
 		/// <summary>
 		/// 流类型
@@ -599,7 +605,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// </summary>
 		public required string Summary { get; set; }
 		/// <summary>
-		/// body参数
+		/// body参数 不可为空的话则有required 没有nullable标记
 		/// </summary>
 		public required List<BodyContent>? BodyParameter { get; set; }
 
@@ -618,11 +624,11 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 				: new string(Id.Where(x => !InvalidChars.Contains(x)).ToArray()).ToNamingConvention(NamingConvention.PascalCase);
 		}
 		/// <summary>
-		/// 查询参数
+		/// 查询参数 默认非required 不可为null
 		/// </summary>
 		public required List<ClassField> QueryParameter { get; internal set; }
 		/// <summary>
-		/// 路由参数
+		/// 路由参数 默认required 不可为null
 		/// </summary>
 		public required List<ClassField> PathParameter { get; internal set; }
 		/// <summary>
@@ -653,29 +659,35 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 					queryParameters[^1] = $"if ({VariableStyle(item.Name)} != null) " + queryParameters[^1];
 			}
 			//合并所有参数 作为方法的入参
-			var para = PathParameter.Union(QueryParameter).Union(HeaderParameter).ToList();
+			List<(string type, string name, string? summary)> argument = new List<(string type, string name, string? summary)>();
+			foreach (var item in PathParameter) argument.Add((item.Type.ParameterCode, VariableStyle(item.Name), item.Summary));
+			foreach (var item in QueryParameter) argument.Add((item.Type.Required || item.Type.CanBeNull ? item.Type.Code : item.Type.Code + "?", VariableStyle(item.Name), item.Summary));
+			//foreach (var item in HeaderParameter) argument.Add((item.Type.Required ? item.Type.Type : item.Type.Type + "?", VariableStyle(item.Name)));
 			//此处只处理一种contentType
 			if (BodyParameter != null)
 			{
 				var item = BodyParameter.First();
 				if (item.HasJsonContentType)
 				{
-					para.Add(new ClassField() { Name = "body", Type = item.BodyType, Summary = null });
+					argument.Add((item.BodyType.Required ? item.BodyType.Code : item.BodyType.Code + "?", "body", null));
 				}
 				else
 				{
 					foreach (var form in item.Form)
 					{
-						para.Add(form);
+						if (form.Type.Type == OpenApiSchemaInfo.stream)
+							argument.Add(("(HttpContent content, string fileName)?", VariableStyle(form.Name), form.Summary));
+						else
+							argument.Add((form.Type.Required || form.Type.CanBeNull ? form.Type.Code : form.Type.Code + "?", VariableStyle(form.Name), form.Summary));
 					}
 				}
 			}
 			//确定body内容
 			var body = BodyParameter?.FirstOrDefault();
-			var argument = string.Join(", ", para.Select(x => x.GetParameter()));
+			var argumentCode = string.Join(", ", argument.Select(x => $"{x.type} {x.name}"));
 			var queryParametersCode = queryParameters.Count > 0 ? $"		var queryParameters = new List<string>();\r\n{string.Concat(queryParameters.Select(x => $"\t\t{x}\r\n"))}" : "";
 			var urlQueryParametersCode = queryParameters.Count > 0 ? "{(queryParameters.Count > 0 ? \"?\" + string.Join('&', queryParameters) : \"\")}" : "";
-			var paramNamesXml = string.Concat(para.Select(x => $"	/// <param name=\"{x.Name.ToNamingConvention(NamingConvention.camelCase)}\">{x.Summary}</param>{Environment.NewLine}"));
+			var paramNamesXml = string.Concat(argument.Select(x => $"	/// <param name=\"{x.name}\">{x.summary}</param>{Environment.NewLine}"));
 			//解析响应类型
 			var successResponses = this.RestfulApiResponses.OrderBy(x => x.HttpStatusCode).Where(x => x.HttpStatusCode.StartsWith("2")).ToList();
 			var hasNullResponse = this.RestfulApiResponses.OrderBy(x => x.HttpStatusCode).Any(x => x.HttpStatusCode.StartsWith("204"));
@@ -688,7 +700,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 					/// </summary>
 					/// <returns></returns>
 				{{paramNamesXml}}	[GeneratedCode("codeMaid", "1.0.0")]
-					public async Task<{{ResponseType.ReturnCode}}{{(hasNullResponse ? "?" : "")}}> {{MethodName}}({{argument}})
+					public async Task<{{ResponseType.ReturnCode}}{{(hasNullResponse ? "?" : "")}}> {{MethodName}}({{argumentCode}})
 					{
 				{{queryParametersCode}}{{(body != null
 				? body.HasJsonContentType
