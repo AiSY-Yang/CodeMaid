@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 
+using Api.Controllers;
 using Api.Job;
 using Api.Middleware;
 using Api.Middleware.Swagger;
@@ -14,6 +15,7 @@ using MasstransitModels;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,6 +40,7 @@ namespace Api
 	public class Program
 	{
 		const string ServiceName = "CodeMaid";
+		static readonly string[] I18N = ["zh-cn", "en-us"];
 		/// <summary>
 		/// root ServiceProvider
 		/// </summary>
@@ -51,9 +54,6 @@ namespace Api
 		{
 			var builder = WebApplication.CreateBuilder(args);
 			var openTelemetryEndpoint = builder.Configuration.GetValue<string>("OpenTelemetryEndpoint")!;
-			//var openTelemetryLogsEndpoint = openTelemetryEndpoint;
-			//var openTelemetryTracesEndpoint = openTelemetryEndpoint;
-			//var openTelemetryMetricsEndpoint = openTelemetryEndpoint;
 			var openTelemetryLogsEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/logs";
 			var openTelemetryTracesEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/traces";
 			var openTelemetryMetricsEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/metrics";
@@ -106,18 +106,6 @@ namespace Api
 #endif
 							.UseInternalServiceProvider(serviceProvider)
 			);
-			//添加基础组件
-			builder.Services.AddEntityFrameworkNpgsql();
-			builder.Services.AddHttpClient();
-			builder.Services.AddHttpClient("ignoreCertificate")
-				.ConfigureHttpMessageHandlerBuilder(x => x.PrimaryHandler = new HttpClientHandler() { ServerCertificateCustomValidationCallback = (a, b, c, d) => true });
-			//添加后台服务
-			builder.Services.AddHostedService<TimedHostedService>();
-			//添加仓储
-			builder.Services.AddMaidRepository();
-			//添加Job
-			builder.Services.AddScoped<HttpClientGenerator>();
-
 			//添加控制器
 			builder.Services.AddControllers(options =>
 			{
@@ -141,7 +129,28 @@ namespace Api
 					options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 					options.JsonSerializerOptions.ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip;
 					options.JsonSerializerOptions.AllowTrailingCommas = true;
-				});
+				}).AddDataAnnotationsLocalization();
+			//i18n
+			builder.Services.AddLocalization();
+			builder.Services.AddRequestLocalization(x =>
+			{
+				x.ApplyCurrentCultureToResponseHeaders = true;
+				x.FallBackToParentCultures = true;
+				x.FallBackToParentUICultures = true;
+				x.AddSupportedUICultures(I18N).AddSupportedCultures(I18N);
+			});
+
+			//添加基础组件
+			builder.Services.AddEntityFrameworkNpgsql();
+			builder.Services.AddHttpClient();
+			builder.Services.AddHttpClient("ignoreCertificate")
+				.ConfigurePrimaryHttpMessageHandler(x => new HttpClientHandler() { ServerCertificateCustomValidationCallback = (a, b, c, d) => true });
+			//添加后台服务
+			builder.Services.AddHostedService<TimedHostedService>();
+			//添加仓储
+			builder.Services.AddMaidRepository();
+			//添加Job
+			builder.Services.AddScoped<HttpClientGenerator>();
 #if DEBUG
 			//调试环境下跳过授权
 			builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SkipAuthorizationMiddleware>();
@@ -330,15 +339,15 @@ namespace Api
 				OnPrepareResponse = context =>
 				{
 					//处理点击劫持漏洞
-					context.Context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+					context.Context.Response.Headers.XFrameOptions = "SAMEORIGIN";
 					//CSP防止XSS
-					context.Context.Response.Headers.Add("Content-Security-Policy", "script-src 'self'");
+					context.Context.Response.Headers.ContentSecurityPolicy = "script-src 'self'";
 				}
 			});
 			//添加路由
 			app.UseRouting();
-			//本地化
-			//app.UseRequestLocalization();
+			//i18n
+			app.UseRequestLocalization();
 			//跨域配置
 			app.UseCors(x => x
 				.AllowAnyOrigin()

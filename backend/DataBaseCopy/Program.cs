@@ -15,6 +15,8 @@ namespace DataBaseSync;
 
 internal class Program
 {
+	const string sourceConnectString = @"Server=localhost;Database=api;User Id=root;Password=123456;";
+	const string targetConnectString = @"Server=localhost;Port=5432;Database=CodeMaid;User Id=postgres;Password=123456;";
 	static void Main(string[] args)
 	{
 		var colorBackup = Console.ForegroundColor;
@@ -25,21 +27,20 @@ internal class Program
 		UseMapster();
 		using SshClient? client = null;
 		#region 开启ssh隧道
-		// var client = new SshClient("remote", 22, "devops", "123456");
+		// var client = new SshClient("remote", 22, "root", "123456");
 		//client.Connect();
-		//var portForwarded = new ForwardedPortLocal("127.0.0.1", 15432, "127.0.0.1", 15432);
+		//var portForwarded = new ForwardedPortLocal("localhost", 15432, "remote", 15432);
 		//client.AddForwardedPort(portForwarded);
 		//portForwarded.Start();
 		//Console.WriteLine("ssh隧道已连接");
 		#endregion
 		#region 开启数据库连接
-		var sourceConnectString = @"Server=localhost;Database=api;User Id=root;Password=123456;";
-		var sourceOptions = new DbContextOptionsBuilder<MaidContext>().UseMySql(sourceConnectString, ServerVersion.AutoDetect(sourceConnectString))
-			.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+		var sourceOptions = new DbContextOptionsBuilder<MaidContext>()
+			.UseMySql(sourceConnectString, ServerVersion.AutoDetect(sourceConnectString))
 			.Options;
 		MaidContext sourceContext = new(sourceOptions);
-		var targetConnectString = @"Server=localhost;Port=5432;Database=CodeMaid;User Id=postgres;Password=123456;";
-		var targetOptions = new DbContextOptionsBuilder<MaidContext>().UseNpgsql(targetConnectString)
+		var targetOptions = new DbContextOptionsBuilder<MaidContext>()
+			.UseNpgsql(targetConnectString)
 			.EnableSensitiveDataLogging()
 			.Options;
 		MaidContext targetContext = new(targetOptions);
@@ -124,8 +125,9 @@ internal class Program
 	/// <param name="data">要被写入的数据</param>
 	static void Sync<T>(DbContext targetContext, IEnumerable<T> data) where T : DatabaseEntity
 	{
+		var list = data.Where(x => x != null).Distinct().ToList();
 		Console.Write($"同步{typeof(T).Name}表");
-		var ids = data.Select(x => x.Id).ToList();
+		var ids = list.Select(x => x.Id).ToList();
 		Console.Write($",一共{ids.Count}条数据");
 		var has = targetContext.Set<T>().Where(x => ids.Contains(x.Id)).ToList();
 		Console.Write($",其中更新{has.Count}条,新增{ids.Count - has.Count}条");
@@ -133,7 +135,7 @@ internal class Program
 		Stopwatch stopwatch = new();
 		stopwatch.Start();
 		var i = 0;
-		foreach (var item in data)
+		foreach (var item in list)
 		{
 			i++;
 			Console.SetCursorPosition(0, Console.CursorTop);

@@ -20,10 +20,26 @@ enum LogType {
 const { TextArea } = Input
 const pattern = /(@\w+)=\s*('[^']+')?(NULL)?/g
 export default function Page() {
+	var [sqlData, setSql] = useState(Array<SQLLog>)
+	var [errorMessageData, setErrorMessageData] = useState(Array<string>)
+	var [logType, setLogType] = useState(0)
+	var [endPoint, setEndpoint] = useState(Array<string>)
+	const logDiv: any = useRef(null)
+	const errorDiv: any = useRef(null)
+	useEffect(() => {
+		if (logDiv.current) {
+			logDiv.current.scrollTop = logDiv.current.scrollHeight
+		}
+	}, [sqlData])
+	useEffect(() => {
+		if (errorDiv.current) {
+			errorDiv.current.scrollTop = errorDiv.current.scrollHeight
+		}
+	}, [errorMessageData])
 	const change = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		var s = (e.target as HTMLTextAreaElement).value
 		//判断日志类型
-		if (s.indexOf('LogRecord') >= 0) {
+		if (s.indexOf('LogRecord.Timestamp') >= 0) {
 			setLogType(LogType.OpenTelemetry)
 		}
 		var sqlData: SQLLog[] = Array<SQLLog>()
@@ -40,13 +56,20 @@ export default function Page() {
 				//匹配到的sql参数
 				var parameters: any = {}
 				var parametersString: string = ''
+				endPoint = []
 				s.split('\n').map((line: string) => {
+					line = line.trim()
+					//判断是否是endpoint
+					if (line.trim().indexOf('LogRecord.FormattedMessage:        Now listening on: ') == 0) {
+						endPoint.push(line.substring(53))
+						return
+					}
 					//查找是否开始是sql
-					var isSuccessSql = !isSQL && line.trim().indexOf('LogRecord.FormattedMessage:        Executed DbCommand') == 0
-					var isErrorSql = !isSQL && line.trim().indexOf('LogRecord.FormattedMessage:        Failed executing DbCommand') == 0
+					var isSuccessSql = !isSQL && line.indexOf('LogRecord.FormattedMessage:        Executed DbCommand') == 0
+					var isErrorSql = !isSQL && line.indexOf('LogRecord.FormattedMessage:        Failed executing DbCommand') == 0
 					var lineIsSQL = isSuccessSql || isErrorSql
 					//查找错误消息
-					isError = isError || line.trim().indexOf('LogRecord.LogLevel:                Error') == 0
+					isError = isError || line.indexOf('LogRecord.LogLevel:                Error') == 0
 					startError = startError || (isError && (line.trim().indexOf('LogRecord.Exception') == 0 || (isError && line.trim().indexOf('LogRecord.FormattedMessage') == 0)))
 					var endError = isError && (line.length == 0 || line.trim().indexOf('LogRecord.ScopeValues') == 0)
 					//sql参数记录 当上一行不是sql但是这一行是的时候 说明开始是参数了
@@ -101,24 +124,10 @@ export default function Page() {
 		}
 		setSql(sqlData)
 		setErrorMessageData(errorMessage)
+		setEndpoint(endPoint)
 		logDiv.current.scrollTop = logDiv.current.scrollHeight
 		errorDiv.current.scrollTop = errorDiv.current.scrollHeight
 	}
-	var [sqlData, setSql] = useState(Array<SQLLog>)
-	var [errorMessageData, setErrorMessageData] = useState(Array<string>)
-	var [logType, setLogType] = useState(0)
-	const logDiv: any = useRef(null)
-	const errorDiv: any = useRef(null)
-	useEffect(() => {
-		if (logDiv.current) {
-			logDiv.current.scrollTop = logDiv.current.scrollHeight
-		}
-	}, [sqlData])
-	useEffect(() => {
-		if (errorDiv.current) {
-			errorDiv.current.scrollTop = errorDiv.current.scrollHeight
-		}
-	}, [errorMessageData])
 
 	return (
 		<>
@@ -128,6 +137,19 @@ export default function Page() {
 					<TextArea id='logInput' autoSize={{ minRows: 10, maxRows: 50 }} placeholder='输入日志' onKeyUp={change} />
 				</div>
 				<div style={{ width: '50%', flex: 1, marginLeft: '50px', maxHeight: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+					<div className='flex'>
+						EndPoint:
+						<div className='inline'>
+							{endPoint.map((x) => (
+								<>
+									<a key={x} href={x}>
+										{x}
+									</a>
+									<br></br>
+								</>
+							))}
+						</div>
+					</div>
 					<div style={{}}>日志形式:{LogType[logType]}</div>
 					<div style={{}}>SQL语句:</div>
 					<div ref={logDiv} style={{ overflowY: 'scroll' }}>

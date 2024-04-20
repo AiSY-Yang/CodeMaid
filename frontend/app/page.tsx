@@ -13,6 +13,28 @@ interface Item {
 const data = [
 	{ key: 'codeTool', name: '代码工具', desp: '一些写代码时用到的小玩意', herf: '.', child: [{ key: 'logparse', name: '日志解析器', desp: '解析C#控制台输出的日志信息,提取其中的SQL语句与报错', herf: './codeTools/logParse' }] },
 	{
+		key: 'onlineIDE',
+		name: '在线IDE',
+		desp: '',
+		herf: '.',
+		child: [
+			{ key: 'sharplab', name: 'sharplab', desp: 'C#在线IDE', herf: 'https://sharplab.io/' },
+			{ key: 'React', name: 'codesandbox', desp: 'React在线IDE', herf: 'https://codesandbox.io/p/sandbox/react-typescript-react-ts' },
+			{ key: 'h5', name: 'codepen', desp: 'H5在线IDE', herf: 'https://codepen.io/pen/' },
+			{ key: 'frontend', name: 'jsfiddle', desp: '前端综合在线IDE', herf: 'https://jsfiddle.net/' },
+		],
+	},
+	{
+		key: 'design',
+		name: '设计参考',
+		desp: '',
+		herf: '.',
+		child: [
+			{ key: 'tailwindawesome', name: 'tailwindawesome', desp: 'tailwindcss 组件库', herf: 'https://www.tailwindawesome.com/?price=free' },
+			{ key: 'tailblocks', name: 'tailblocks', desp: 'tailwindcss 组件库', herf: 'https://tailblocks.cc/' },
+		],
+	},
+	{
 		key: 'clone',
 		name: '赛博分身',
 		desp: '',
@@ -46,7 +68,7 @@ export default function Home() {
 	console.log('items', items)
 	if (items == null) return <></>
 	items.map((x) => {
-		if ((x.herf === '.')) {
+		if (x.herf === '.') {
 			// query.s('key', x.key)
 			x.herf = (query.toString() === '' ? '?' : '&') + 'key=' + x.key
 			// console.log('x.herf', x.herf)
