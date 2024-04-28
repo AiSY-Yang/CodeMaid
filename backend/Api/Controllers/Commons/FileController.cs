@@ -56,8 +56,8 @@ public class FileController : ApiControllerBase
 	/// <returns></returns>
 	[HttpGet("[action]")]
 	[ProducesResponseType(200)]
-	[ProducesResponseType(204)]
-	public FileResult? Download(string path)
+	[ProducesResponseType(404)]
+	public ActionResult? Download(string path)
 	{
 		var file = new FileInfo(path);
 		if (file.Exists)
@@ -65,10 +65,10 @@ public class FileController : ApiControllerBase
 			if (file.LinkTarget != null)
 			{
 				file = file.ResolveLinkTarget(true) as FileInfo;
-				if (file == null) return null;
+				if (file == null) return NotFound();
 			}
 		}
-		else return null;
+		else return NotFound();
 		return File(System.IO.File.OpenRead(file.FullName), MediaTypeNames.Application.Octet);
 	}
 
@@ -111,12 +111,17 @@ public class FileController : ApiControllerBase
 	/// <returns></returns>
 	[HttpPost("[action]")]
 	[RequestSizeLimit(long.MaxValue)]
-	public async Task<string> SyncWrite(string filePath, [BindNever] IFormFile _)
+	public async Task<string> SyncWrite(string filePath, [BindNever] IFormFile file)
 	{
+		logger.LogInformation($"SyncWrite {filePath}");
 		var stream = new FileStream(filePath, FileMode.Create);
+		logger.LogInformation($"SyncWrite {filePath} stream created");
 		await HttpContext.Request.Body.CopyToAsync(stream);
+		logger.LogInformation($"SyncWrite {filePath} stream copied");
 		await stream.FlushAsync();
+		logger.LogInformation($"SyncWrite {filePath} stream flushed");
 		stream.Dispose();
+		logger.LogInformation($"SyncWrite {filePath} stream disposed");
 		return filePath;
 	}
 	/// <summary>
@@ -157,4 +162,29 @@ public class FileController : ApiControllerBase
 		if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
 		return true;
 	}
+	/// <summary>
+	/// 移动文件
+	/// </summary>
+	/// <param name="sourceFileName"></param>
+	/// <param name="destinationFileName"></param>
+	/// <returns></returns>
+	[HttpPut("[action]")]
+	public bool Move(string sourceFileName, string destinationFileName)
+	{
+		System.IO.File.Move(sourceFileName, destinationFileName);
+		return true;
+	}
+	/// <summary>
+	/// 移动文件
+	/// </summary>
+	/// <param name="sourceFileName"></param>
+	/// <param name="destinationFileName"></param>
+	/// <returns></returns>
+	[HttpPut("[action]")]
+	public bool MoveAndOverWrite(string sourceFileName, string destinationFileName)
+	{
+		System.IO.File.Move(sourceFileName, destinationFileName, true);
+		return true;
+	}
+
 }

@@ -164,7 +164,7 @@ namespace Api.Services
 			}
 			#endregion
 			#region 更新类
-			List<TypeDeclarationSyntax> classes = compilationUnit.GetDeclarationSyntaxes<TypeDeclarationSyntax>();
+			List<ClassDeclarationSyntax> classes = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>();
 			foreach (var classNode in classes)
 			{
 				var c = maid.Classes.FirstOrDefault(x => x.Name.Equals(classNode.Identifier.ValueText, StringComparison.OrdinalIgnoreCase));
@@ -405,6 +405,7 @@ namespace Api.Services
 			bool isAbstract = classDefinition.IsAbstract;
 			bool hasBase = classDefinition.Base is not null;
 			StringBuilder stringBuilder = new();
+			var genericType = (!hasBase || isAbstract) ? "TEntity" : classDefinition.Name;
 			stringBuilder.AppendLine($$""""
 				using Microsoft.EntityFrameworkCore;
 				using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -421,9 +422,9 @@ namespace Api.Services
 				: $"internal class {classDefinition.Name}Configuration : {classDefinition.Base}Configuration<{classDefinition.Name}>"
 				)}}
 				{
-					{{(!hasBase ? "public virtual void Configure(EntityTypeBuilder<TEntity> builder)"
-					: isAbstract ? $"public override void Configure(EntityTypeBuilder<TEntity> builder)"
-					: $"public override void Configure(EntityTypeBuilder<{classDefinition.Name}> builder)"
+					{{(!hasBase ? $"public virtual void Configure(EntityTypeBuilder<{genericType}> builder)"
+					: isAbstract ? $"public override void Configure(EntityTypeBuilder<{genericType}> builder)"
+					: $"public override void Configure(EntityTypeBuilder<{genericType}> builder)"
 					)}}
 					{
 				"""");
@@ -435,7 +436,7 @@ namespace Api.Services
 			stringBuilder.AppendLine("\t/// Automatically generated comment configuration");
 			stringBuilder.AppendLine("\t/// </summary>");
 			//stringBuilder.AppendLine("\t/// <param name=\"builder\"></param>");
-			stringBuilder.AppendLine($"\tstatic void ConfigureComment(EntityTypeBuilder<{classDefinition.Name}> builder)");
+			stringBuilder.AppendLine($"\tstatic void ConfigureComment(EntityTypeBuilder<{genericType}> builder)");
 			stringBuilder.AppendLine("\t{");
 			//当不是抽象类的时候要设置表名
 			if (!isAbstract) stringBuilder.AppendLine($"\t\tbuilder.Metadata.SetComment(\"{classDefinition.Summary}\");");

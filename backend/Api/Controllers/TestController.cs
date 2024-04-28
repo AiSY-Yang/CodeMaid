@@ -1,5 +1,6 @@
 #pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Net.Mime;
 
 using ExtensionMethods;
@@ -16,7 +17,7 @@ namespace Api.Controllers
 	}
 
 	[ApiController]
-	[Route("[controller]/[action]")]
+	[Route("[controller]")]
 	[ApiExplorerSettings(GroupName = "test")]
 	public class TestController : Microsoft.AspNetCore.Mvc.ControllerBase, IAdd<object, bool>
 	{
@@ -30,23 +31,29 @@ namespace Api.Controllers
 		//[Consumes(MediaTypeNames.Application.Octet)]
 		public async Task<int> Upload(string fileNme, [FromBody][BindNever] IFormFile file)
 		{
+			string filePath = "d://data/xxx.tmp";
+			long size = HttpContext.Request.Headers.ContentLength!.Value;
+			var queryParameters = new List<string>();
+			if (filePath != null) queryParameters.Add($"filePath={filePath}");
+			var content = new MultipartFormDataContent();
+			if (file is not null) content.Add(new StreamContent(HttpContext.Request.Body), nameof(file), "ignore");
+			var httpRequestMessage = new HttpRequestMessage()
+			{
+				Method = HttpMethod.Post,
+				RequestUri = new Uri($"File/SyncWrite{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+				Content = new StreamContent(HttpContext.Request.Body),
+			};
+			logger.LogCritical("准备请求");
+			var client = new HttpClient();
+			client.BaseAddress = new Uri("http://localhost:5241");
+			logger.LogCritical("准备发送");
+			var response = await client.SendAsync(httpRequestMessage);
+			logger.LogCritical("发送完成 开始读取");
+			var res = await response.Content.ReadAsStringAsync();
+			logger.LogCritical("请求结束");
+			logger.LogCritical(response.StatusCode.ToString());
+			logger.LogCritical(res);
 
-			var path = "D:\\temp\\xx.tmp";
-			if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
-			logger.LogCritical("文件删除完成");
-			FileStream fileStream = new FileStream(path, FileMode.Create);
-			logger.LogCritical("文件创建完成");
-			await HttpContext.Request.Body.CopyToAsync(fileStream);
-			//await HttpContext.Request.Form.Files.First().OpenReadStream().CopyToAsync(fileStream);
-			logger.LogCritical("文件复制完成");
-			await fileStream.FlushAsync();
-			logger.LogCritical("文件刷新完成");
-			await fileStream.DisposeAsync();
-			var sour = System.IO.File.ReadAllBytes("C:\\Users\\kai\\Downloads\\genarsa_bio_argo_qualimap_v1.tar").Hash(HashOption.MD5_32).ToBase64String();
-			await Console.Out.WriteLineAsync(sour);
-			var md5 = System.IO.File.ReadAllBytes(path).Hash(HashOption.MD5_32).ToBase64String();
-			await Console.Out.WriteLineAsync(md5);
-			await Console.Out.WriteLineAsync((sour == md5).ToString());
 			return 1;
 		}
 		[HttpPost("[action]")]
