@@ -30,5 +30,9 @@ namespace Models.CodeMaid
 		/// </summary>
 		[AdaptIgnore]
 		public List<Maid> Maids { get; set; } = null!;
+		/// <summary>
+		/// 项目目录
+		/// </summary>
+		public List<ProjectDirectory> ProjectDirectories { get; set; } = null!; 
 	}
 }

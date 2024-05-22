@@ -39,6 +39,14 @@ namespace MaidContexts
 		/// 枚举成员定义
 		/// </summary>
 		public virtual DbSet<EnumMemberDefinition> EnumMemberDefinitions { get; set; } = null!;
+		/// <summary>
+		/// 项目目录
+		/// </summary>
+		public virtual DbSet<ProjectDirectory> ProjectDirectories { get; set; } = null!;
+		/// <summary>
+		/// 项目文件
+		/// </summary>
+		public virtual DbSet<ProjectDirectoryFile> ProjectDirectoryFiles { get; set; } = null!;
 		public MaidContext(DbContextOptions<MaidContext> options) : base(options)
 		{
 		}

@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.IO.Compression;
+
+using ExtensionMethods;
+
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.Commons;
 
@@ -6,7 +10,7 @@ namespace Api.Controllers.Commons;
 /// 文件夹信息
 /// </summary>
 [ApiController]
-public class DirectoryController : ApiControllerBase
+public class DirectoryController : CommonController
 {
 	/// <summary>
 	/// 是否已存在
@@ -156,5 +160,62 @@ public class DirectoryController : ApiControllerBase
 		if (Directory.Exists(path))
 			Directory.Move(path, to);
 		return to;
+	}
+	/// <summary>
+	/// 复制文件夹
+	/// </summary>
+	/// <param name="path"></param>
+	/// <param name="to"></param>
+	/// <returns></returns>
+	[HttpPut("[action]")]
+	public string Copy(string path, string to)
+	{
+		DirectoryInfo directoryInfo = new DirectoryInfo(path);
+		directoryInfo.CopyTo(to);
+		return to;
+	}
+
+	/// <summary>
+	/// 获取指定目录的压缩包
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
+	[HttpGet("[action]")]
+	public async Task<ActionResult> ZipAsync(string path)
+	{
+		if (Directory.Exists(path))
+		{
+			Response.Headers.ContentType = "application/zip";
+			using (var archive = new ZipArchive(Response.BodyWriter.AsStream(), ZipArchiveMode.Create, true))
+			{
+				CreateEntryFromAny(archive, path);
+			}
+			await Response.CompleteAsync();
+			return Ok();
+		}
+		else
+		{
+			return NotFound();
+		}
+		void CreateEntryFromAny(ZipArchive archive, string sourceName, string entryName = "")
+		{
+			var fileName = Path.GetFileName(sourceName);
+			if (System.IO.File.GetAttributes(sourceName).HasFlag(FileAttributes.Directory))
+			{
+				CreateEntryFromDirectory(archive, sourceName, Path.Combine(entryName, fileName));
+			}
+			else
+			{
+				archive.CreateEntryFromFile(sourceName, Path.Combine(entryName, fileName));
+			}
+			void CreateEntryFromDirectory(ZipArchive archive, string sourceDirName, string entryName = "")
+			{
+				string[] files = Directory.GetFiles(sourceDirName).Concat(Directory.GetDirectories(sourceDirName)).ToArray();
+				foreach (var file in files)
+				{
+					CreateEntryFromAny(archive, file, entryName);
+				}
+			}
+		}
 	}
 }

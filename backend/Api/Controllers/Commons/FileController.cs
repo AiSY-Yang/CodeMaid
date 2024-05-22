@@ -9,7 +9,7 @@ namespace Api.Controllers.Commons;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
-public class FileController : ApiControllerBase
+public class FileController : CommonController
 {
 	/// <summary>
 	/// 
@@ -184,6 +184,43 @@ public class FileController : ApiControllerBase
 	public bool MoveAndOverWrite(string sourceFileName, string destinationFileName)
 	{
 		System.IO.File.Move(sourceFileName, destinationFileName, true);
+		return true;
+	}
+
+	/// <summary>
+	/// 复制文件
+	/// </summary>
+	/// <param name="sourceFileName"></param>
+	/// <param name="destinationFileName"></param>
+	/// <returns></returns>
+	[HttpPut("[action]")]
+	public bool Copy(string sourceFileName, string destinationFileName)
+	{
+		System.IO.File.Copy(sourceFileName, destinationFileName);
+		return true;
+	}
+	/// <summary>
+	/// 复制文件
+	/// </summary>
+	/// <param name="sourceFileName"></param>
+	/// <param name="destinationFileName"></param>
+	/// <returns></returns>
+	[HttpPut("[action]")]
+	public bool CopyAndOverWrite(string sourceFileName, string destinationFileName)
+	{
+		System.IO.File.Copy(sourceFileName, destinationFileName, true);
+		return true;
+	}
+	/// <summary>
+	/// Create file symbolic link
+	/// </summary>
+	/// <param name="sourceFileName"></param>
+	/// <param name="destinationFileName"></param>
+	/// <returns></returns>
+	[HttpPut("[action]")]
+	public bool Link(string sourceFileName, string destinationFileName)
+	{
+		System.IO.File.CreateSymbolicLink(sourceFileName, destinationFileName);
 		return true;
 	}
 

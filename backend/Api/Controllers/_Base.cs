@@ -5,6 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers
 {
 	/// <inheritdoc/>
+	public class CommonController : ApiControllerBase
+	{
+	}
+
+
+	/// <inheritdoc/>
 	[ApiController]
 	[Route("api/[controller]")]
 	[ApiExplorerSettings(GroupName = "default")]

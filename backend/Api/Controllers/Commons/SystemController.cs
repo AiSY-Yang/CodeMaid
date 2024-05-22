@@ -16,7 +16,7 @@ namespace Api.Controllers.Commons;
 /// 系统控制器
 /// </summary>
 [AllowAnonymous]
-public class SystemController : ApiControllerBase
+public class SystemController : CommonController
 {
     private readonly ILogger<SystemController> logger;
 
