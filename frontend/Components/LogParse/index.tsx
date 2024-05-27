@@ -16,7 +16,14 @@ interface SQLLog {
 enum LogType {
 	'',
 	OpenTelemetry,
+	Default,
 }
+enum State {
+	None,
+	Parameter,
+	SQL,
+}
+
 const { TextArea } = Input
 const pattern = /(@\w+)=\s*('[^']+')?(NULL)?/g
 export default function Page() {
@@ -39,89 +46,101 @@ export default function Page() {
 	const change = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		var s = (e.target as HTMLTextAreaElement).value
 		//判断日志类型
-		if (s.indexOf('LogRecord.Timestamp') >= 0) {
-			setLogType(LogType.OpenTelemetry)
-		}
+		var lines = s.split('\n')
+		lines.forEach((element) => {
+			if (element.indexOf('LogRecord.Timestamp') >= 0) {
+				setLogType(LogType.OpenTelemetry)
+				return
+			}
+			if (element.indexOf('warn: ') >= 0 || element.indexOf('info: ') >= 0) {
+				setLogType(LogType.Default)
+				return
+			}
+		})
 		var sqlData: SQLLog[] = Array<SQLLog>()
 		var errorMessage: string[] = Array<string>()
+		/**结束标记 */
+		var endPointSign: string
+		/** 参数标记 出现就证明是个成功的sql */
+		var parameterSign: string
+		/** 错误参数标记 出现就证明是个失败的sql */
+		var errorParameterSign: string
+		/** sql结束判断 从这一行开始就不再是sql了 */
+		var currentIsNotSql: (s: string) => boolean
 		switch (logType) {
 			case LogType.OpenTelemetry:
-				/**下面的内容是否是sql */
-				var isSQL: boolean = false
-				var isError: boolean = false
-				var startError: boolean = false
-				var isErrorMessage: boolean
-				var isParameter: boolean = true
-				var tempSQL = ''
-				//匹配到的sql参数
-				var parameters: any = {}
-				var parametersString: string = ''
-				endPoint = []
-				s.split('\n').map((line: string) => {
-					line = line.trim()
-					//判断是否是endpoint
-					if (line.trim().indexOf('LogRecord.FormattedMessage:        Now listening on: ') == 0) {
-						endPoint.push(line.substring(53))
-						return
-					}
-					//查找是否开始是sql
-					var isSuccessSql = !isSQL && line.indexOf('LogRecord.FormattedMessage:        Executed DbCommand') == 0
-					var isErrorSql = !isSQL && line.indexOf('LogRecord.FormattedMessage:        Failed executing DbCommand') == 0
-					var lineIsSQL = isSuccessSql || isErrorSql
-					//查找错误消息
-					isError = isError || line.indexOf('LogRecord.LogLevel:                Error') == 0
-					startError = startError || (isError && (line.trim().indexOf('LogRecord.Exception') == 0 || (isError && line.trim().indexOf('LogRecord.FormattedMessage') == 0)))
-					var endError = isError && (line.length == 0 || line.trim().indexOf('LogRecord.ScopeValues') == 0)
-					//sql参数记录 当上一行不是sql但是这一行是的时候 说明开始是参数了
-					if (!isSQL && lineIsSQL) {
-						isSQL = true
-						isParameter = true
-						//当记录sql的时候不在当作错误消息
-					}
-					//如果是参数 就要开始记录参数字符串用于之后的匹配
-					if (isParameter) {
-						parametersString += line + '\r\n'
-						//判断参数是不是结束了 如果结束了就要提取内容
-						if (/CommandType=\'Text\', CommandTimeout=\'\d+\']$/.test(line)) {
-							isParameter = false
-							let match
-							parameters = {}
-							while ((match = pattern.exec(parametersString)) !== null) {
-								const paramName = match[1]
-								const paramValue = match[2]
-								const NULL = match[3]
-								if (NULL != undefined) parameters[paramName] = 'null'
-								if (paramValue != undefined) parameters[paramName] = paramValue
-								// console.debug(`${paramName}=${parameters[paramName]}`)
-							}
-							// console.debug(parameters)
-							parametersString = ''
-						}
-						return
-					}
-					if (isSQL && !isParameter) {
-						if (line.trim().indexOf('LogRecord.') == 0) {
-							lineIsSQL = false
-							isSQL = false
-							tempSQL = tempSQL.replaceAll(/@\w+/g, (match) => `${parameters[match]}`)
-							sqlData.push({ Error: isErrorSql, sql: tempSQL.slice(0, -1) })
-						} else tempSQL += line + '\n'
-						return
-					}
-					if (line == 'Resource associated with LogRecord:') {
-						tempSQL = ''
-						isError = false
-					}
-					if (line == 'LogRecord.Severity:                Error') isError = true
-					if (isError && line.startsWith('LogRecord.FormattedMessage:')) {
-						//错误消息记录
-						errorMessage.push(line.substring(35))
-					}
-				})
+				endPointSign = 'LogRecord.FormattedMessage:        Now listening on: '
+				parameterSign = 'LogRecord.FormattedMessage:        Executed DbCommand'
+				errorParameterSign = 'LogRecord.FormattedMessage:        Failed executing DbCommand'
+				currentIsNotSql = (line) => line.startsWith('LogRecord.')
+				break
+			case LogType.Default:
+				endPointSign = 'Now listening on: '
+				parameterSign = 'Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand'
+				errorParameterSign = 'Failed executing DbCommand'
+				currentIsNotSql = (line) => line.startsWith('info: ') || line.startsWith('warn: ') || line.startsWith('fail: ')
 				break
 			default:
 				break
 		}
+		var state: State = State.None
+		var isErrorSql = false
+		var isParameter: boolean = true
+		var tempSQL = ''
+		//匹配到的sql参数
+		var parameters: any = {}
+		var parametersString: string = ''
+		endPoint = []
+		lines.map((line: string) => {
+			line = line.trim()
+			//判断是否是endpoint
+			if (line.startsWith(endPointSign)) {
+				endPoint.push(line.substring(endPointSign.length))
+				return
+			}
+			if (line.startsWith('已加载“')) return
+			function ParseParameter() {
+				parametersString += `${line}\r\n`
+				//判断参数是不是结束了 如果结束了就要提取内容
+				if (/CommandType=\'Text\', CommandTimeout=\'\d+\']$/.test(line)) {
+					parametersString += line + '\r\n'
+					isParameter = false
+					let match
+					parameters = {}
+					while ((match = pattern.exec(parametersString)) !== null) {
+						const paramName = match[1]
+						const paramValue = match[2]
+						const NULL = match[3]
+						if (NULL != undefined) parameters[paramName] = 'null'
+						if (paramValue != undefined) parameters[paramName] = paramValue
+						// console.debug(`${paramName}=${parameters[paramName]}`)
+					}
+					// console.debug(parameters)
+					parametersString = ''
+					state = State.SQL
+				}
+			}
+			switch (state) {
+				case State.None:
+					if (line.startsWith(parameterSign) || line.startsWith(errorParameterSign)) {
+						state = State.Parameter
+						ParseParameter()
+					}
+					break
+				case State.Parameter:
+					ParseParameter()
+					break
+				case State.SQL:
+					if (currentIsNotSql(line)) {
+						state = State.None
+						tempSQL = tempSQL.replaceAll(/@\w+/g, (match) => `${parameters[match]}`)
+						sqlData.push({ Error: isErrorSql, sql: tempSQL.slice(0, -1) })
+						tempSQL = ''
+						break
+					} else tempSQL += `${line}\r\n`
+					break
+			}
+		})
 		setSql(sqlData)
 		setErrorMessageData(errorMessage)
 		setEndpoint(endPoint)

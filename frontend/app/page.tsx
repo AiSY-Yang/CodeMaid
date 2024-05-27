@@ -32,6 +32,7 @@ const data = [
 		child: [
 			{ key: 'tailwindawesome', name: 'tailwindawesome', desp: 'tailwindcss 组件库', herf: 'https://www.tailwindawesome.com/?price=free' },
 			{ key: 'tailblocks', name: 'tailblocks', desp: 'tailwindcss 组件库', herf: 'https://tailblocks.cc/' },
+			{ key: 'htmlrev', name: 'HTML templates', desp: 'free HTML templates', herf: 'https://htmlrev.com/' },
 		],
 	},
 	{
@@ -50,7 +51,6 @@ function findLastArray(items: Array<Item> | null | undefined, a: Array<string>) 
 	if (a.length == 0) return items
 	var x = items.find((x) => x.key == a[0])
 	if (x == undefined || x == null) return null
-	console.log('x', x)
 	if (a.length == 1) {
 		return x.child
 	}
@@ -62,10 +62,7 @@ function findLastArray(items: Array<Item> | null | undefined, a: Array<string>) 
 export default function Home() {
 	const router = useRouter()
 	const query = useSearchParams()
-	console.log('router', router)
-	console.log('query', query.getAll('key'))
 	var items = findLastArray(data, query.getAll('key'))
-	console.log('items', items)
 	if (items == null) return <></>
 	items.map((x) => {
 		if (x.herf === '.') {
@@ -74,7 +71,6 @@ export default function Home() {
 			// console.log('x.herf', x.herf)
 		}
 	})
-	console.log('items', items)
 	return (
 		<main>
 			<section className='text-gray-600 dark:text-gray-400 dark:bg-gray-900 body-font min-h-screen'>

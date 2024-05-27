@@ -1,0 +1,836 @@
+------------------------------------------------------------------------------
+只能将 Microsoft Visual Studio .NET/C/C++ 调试程序(vsdbg) 用于 Visual
+Studio Code、Visual Studio 或 Visual Studio for Mac
+软件，以帮助开发和测试应用程序。
+------------------------------------------------------------------------------
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Private.CoreLib.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Controllers\ToolLibraryFileController.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Http.API\Controllers\AdminControllers\ToolLibraryFileController.cs:83
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Controllers\ToolLibraryFileController.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Http.API\Controllers\AdminControllers\ToolLibraryFileController.cs:71
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Controllers\OssResourceController.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Http.API\Controllers\AdminControllers\OssResourceController.cs:150
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Worker\TimedHostedService.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Microservice\CloudResouceService\TimedHostedService.cs:129
+断点警告: 在 Http.API.dll 中找到了 D:\Work\A\src\Http.API\Controllers\TeamController.cs 的副本，但是当前源代码与 Http.API.dll 中内置的版本不同。
+
+若要允许命中此断点: 将鼠标悬停在此断点上方，单击显示的“设置...”按钮，然后依次单击“位置”和“允许源代码与原始代码不同”。
+
+若要允许命中所有断点，请禁用“工具”>“选项”>“调试”>“常规”下的“要求源文件与原始版本完全匹配”。 - d:\Work\A\src\Http.API\Controllers\AdminControllers\TeamController.cs:476
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Http.API.dll”。已加载符号。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+单步执行: 正在逐过程执行非用户代码“Program.<Main>”
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+单步执行: 正在逐过程执行非用户代码“Program.<Main>$”
+单步执行: 正在逐过程执行非用户代码“Program.<<Main>$>d__0..ctor”
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ComponentModel.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Hosting.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Http.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Routing.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Features.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Renci.SshNet.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Application.dll”。已加载符号。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EntityFramework.dll”。已加载符号。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/CromwellDatabase.dll”。已加载符号。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Http.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Options.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Share.dll”。已加载符号。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Options.ConfigurationExtensions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.Binder.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Hosting.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Http.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Polly.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/netstandard.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Http.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.Extensions.Http.Polly.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authentication.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authorization.Policy.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authorization.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Hosting.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Exporter.OpenTelemetryProtocol.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Api.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authentication.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Cors.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.ApiExplorer.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Swashbuckle.AspNetCore.SwaggerGen.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.Kestrel.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EasyCaching.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.HttpOverrides.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Diagnostics.HealthChecks.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.Extensions.Localization.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Localization.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.DataAnnotations.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Swashbuckle.AspNetCore.Swagger.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Swashbuckle.AspNetCore.SwaggerUI.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.StaticFiles.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Diagnostics.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Diagnostics.HealthChecks.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EPPlus.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+单步执行: 正在逐过程执行非用户代码“Program.<>c__DisplayClass0_0..ctor”
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Hosting.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Threading.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.EnvironmentVariables.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.FileProviders.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.FileProviders.Physical.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.FileExtensions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.Extensions.Logging.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.Json.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Linq.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.IO.FileSystem.Watcher.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ComponentModel.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.Concurrent.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Memory.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Text.Json.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Text.Encoding.Extensions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Numerics.Vectors.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Configuration.UserSecrets.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.Configuration.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.Console.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.Debug.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Logging.EventSource.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Diagnostics.Tracing.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.DependencyInjection.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.Kestrel.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.Kestrel.Transport.Quic.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Quic.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.InteropServices.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.IIS.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.IISIntegration.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.FileProviders.Composite.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Text.Encodings.Web.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Intrinsics.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/System.Diagnostics.DiagnosticSource.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Connections.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Hosting.Server.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.HostFiltering.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.ObjectPool.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Routing.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ObjectModel.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Cryptography.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/SshNet.Security.Cryptography.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Sockets.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.NameResolution.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/Microsoft.Win32.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Threading.ThreadPool.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Threading.Thread.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Text.RegularExpressions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Reflection.Emit.Lightweight.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Reflection.Emit.ILGeneration.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Reflection.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.Relational.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Data.Common.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Linq.Expressions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Caching.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.EntityFrameworkCore.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Transactions.Local.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.Immutable.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Mapster.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Core.dll”。已加载符号。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Mapster.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Polly.Extensions.Http.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ComponentModel.TypeConverter.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Private.Uri.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Extensions.Hosting.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Diagnostics.Process.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.IO.MemoryMappedFiles.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Api.ProviderBuilderExtensions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Instrumentation.Http.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Instrumentation.AspNetCore.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/OpenTelemetry.Extensions.DependencyInjection.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Authentication.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Claims.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.DataProtection.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.DataProtection.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Cryptography.Internal.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.WebEncoders.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.OpenApi.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EasyCaching.Serialization.Json.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/EasyCaching.Redis.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Newtonsoft.Json.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.Extensions.Localization.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Loader.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Swashbuckle.AspNetCore.Annotations.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.Cors.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Mvc.Razor.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Http.Extensions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Console.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Google.Protobuf.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Grpc.Core.Api.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Grpc.Net.Client.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Grpc.Net.Common.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.IO.Compression.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/System.IO.Pipelines.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Net.Http.Headers.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Http.Features.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Numerics.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/AWSSDK.S3.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/AWSSDK.SecurityToken.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/AWSSDK.Core.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Metadata.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/AlibabaCloud.SDK.Dysmsapi20170525.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Tea.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.ComponentModel.Annotations.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Xml.XDocument.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Private.Xml.Linq.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Private.Xml.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/Microsoft.Win32.Registry.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+info: Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager[62]
+      User profile is available. Using '/home/aisy/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager: Information: User profile is available. Using '/home/aisy/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Linq.Queryable.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.Security.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“Anonymously Hosted DynamicMethods Assembly”。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Npgsql.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.FileProviders.Embedded.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.Diagnostics.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.NonGeneric.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+warn: Microsoft.EntityFrameworkCore.Infrastructure[10410]
+      'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+warn: Microsoft.EntityFrameworkCore.Infrastructure[10410]
+      'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+warn: Microsoft.EntityFrameworkCore.Infrastructure[10410]
+      'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+warn: Microsoft.EntityFrameworkCore.Infrastructure[10410]
+      'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+Microsoft.EntityFrameworkCore.Infrastructure: Warning: 'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+Microsoft.EntityFrameworkCore.Infrastructure: Warning: 'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+Microsoft.EntityFrameworkCore.Infrastructure: Warning: 'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+Microsoft.EntityFrameworkCore.Infrastructure: Warning: 'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Formats.Asn1.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Xml.ReaderWriter.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:5002
+Microsoft.Hosting.Lifetime: Information: Now listening on: http://localhost:5002
+Microsoft.Hosting.Lifetime: Information: Now listening on: https://localhost:15002
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: https://localhost:15002
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+Microsoft.Hosting.Lifetime: Information: Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Development
+Microsoft.Hosting.Lifetime: Information: Hosting environment: Development
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: /mnt/d/Work/A/src/Http.API
+Microsoft.Hosting.Lifetime: Information: Content root path: /mnt/d/Work/A/src/Http.API
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.NetworkInformation.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.Extensions.Caching.Memory.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Threading.Channels.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.CompilerServices.Unsafe.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10400]
+      Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+Microsoft.EntityFrameworkCore.Model.Validation: Warning: Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+warn: Microsoft.EntityFrameworkCore.Model.Validation[10400]
+      Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+Microsoft.EntityFrameworkCore.Model.Validation: Warning: Sensitive data logging is enabled. Log entries and exception messages may include sensitive application data; this mode should only be enabled during development.
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Collections.Specialized.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (33ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Description", s."IsCurrent", s."Name", s."OpenDate", s."Path", s."ResourceProductId", s."ResourceProductStatus", s."Size", s."TeamId", s."UsedSize"
+      FROM "StoreResources" AS s
+      WHERE FALSE
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (33ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Description", s."IsCurrent", s."Name", s."OpenDate", s."Path", s."ResourceProductId", s."ResourceProductStatus", s."Size", s."TeamId", s."UsedSize"
+FROM "StoreResources" AS s
+WHERE FALSE
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (83ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (83ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+      SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (77ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (77ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE c.relname='__EFMigrationsHistory');
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (29ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT "MigrationId", "ProductVersion"
+      FROM "__EFMigrationsHistory"
+      ORDER BY "MigrationId";
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (29ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT "MigrationId", "ProductVersion"
+FROM "__EFMigrationsHistory"
+ORDER BY "MigrationId";
+info: Microsoft.EntityFrameworkCore.Migrations[20405]
+      No migrations were applied. The database is already up to date.
+Microsoft.EntityFrameworkCore.Migrations: Information: No migrations were applied. The database is already up to date.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (111ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Icon", s."IsSystem", s."Name", s."NameValue", s."PermissionId"
+      FROM "SystemRoles" AS s
+      WHERE NOT (s."IsDeleted") AND lower(s."Name") = 'admin'
+      LIMIT 2
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (111ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Icon", s."IsSystem", s."Name", s."NameValue", s."PermissionId"
+FROM "SystemRoles" AS s
+WHERE NOT (s."IsDeleted") AND lower(s."Name") = 'admin'
+LIMIT 2
+warn: Microsoft.EntityFrameworkCore.Query[10102]
+      The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+Microsoft.EntityFrameworkCore.Query: Warning: The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased.
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Pomelo.EntityFrameworkCore.MySql.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/MySqlConnector.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (75ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT o."Id", o."CreatedTime", o."IsDeleted", o."UpdatedTime", o."AccessKey", o."Description", o."IsCurrent", o."Name", o."OpenDate", o."ResourceProductId", o."ResourceProductStatus", o."SecretKey", o."ServiceURL", o."TeamId"
+      FROM "OssResources" AS o
+      WHERE NOT (o."IsDeleted") AND o."ResourceProductStatus" = 1
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (75ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT o."Id", o."CreatedTime", o."IsDeleted", o."UpdatedTime", o."AccessKey", o."Description", o."IsCurrent", o."Name", o."OpenDate", o."ResourceProductId", o."ResourceProductStatus", o."SecretKey", o."ServiceURL", o."TeamId"
+FROM "OssResources" AS o
+WHERE NOT (o."IsDeleted") AND o."ResourceProductStatus" = 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (91ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      LOCK TABLE "Bills" IN ACCESS EXCLUSIVE MODE;
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (91ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+LOCK TABLE "Bills" IN ACCESS EXCLUSIVE MODE;
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (43ms) [Parameters=[@__date_0='05/01/2024' (DbType = Date)], CommandType='Text', CommandTimeout='20']
+      SELECT c."Id", c."CreatedTime", c."IsDeleted", c."UpdatedTime", c."Description", c."IPAddress", c."Name", c."OpenDate", c."QueueName", c."ResourceProductId", c."ResourceProductStatus", c."TeamId", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AgentId", t0."CloudGroup", t0."Company", t0."Description", t0."EndDate", t0."HarborPassword", t0."HarborProjectName", t0."HarborUserName", t0."Month", t0."Name", t0."PhenotypeTypes", t0."StartDate", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."BillingMode", t."Cpu", t."Description", t."Instance", t."Memory", t."Name", t."Price", t."PriceUnit", t."ResourceProductType"
+      FROM "ComputingResources" AS c
+      INNER JOIN (
+          SELECT r."Id", r."CreatedTime", r."IsDeleted", r."UpdatedTime", r."BillingMode", r."Cpu", r."Description", r."Instance", r."Memory", r."Name", r."Price", r."PriceUnit", r."ResourceProductType"
+          FROM "ResourceProducts" AS r
+          WHERE NOT (r."IsDeleted")
+      ) AS t ON c."ResourceProductId" = t."Id"
+      INNER JOIN (
+          SELECT t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate"
+          FROM "Teams" AS t1
+          WHERE NOT (t1."IsDeleted")
+      ) AS t0 ON c."TeamId" = t0."Id"
+      WHERE NOT (c."IsDeleted") AND c."ResourceProductStatus" = 1 AND t."ResourceProductType" = 0 AND NOT (EXISTS (
+          SELECT 1
+          FROM "Bills" AS b
+          WHERE NOT (b."IsDeleted") AND c."Id" = b."ComputingResourceId" AND b."BillDay" = @__date_0))
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (43ms) [Parameters=[@__date_0='05/01/2024' (DbType = Date)], CommandType='Text', CommandTimeout='20']
+SELECT c."Id", c."CreatedTime", c."IsDeleted", c."UpdatedTime", c."Description", c."IPAddress", c."Name", c."OpenDate", c."QueueName", c."ResourceProductId", c."ResourceProductStatus", c."TeamId", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AgentId", t0."CloudGroup", t0."Company", t0."Description", t0."EndDate", t0."HarborPassword", t0."HarborProjectName", t0."HarborUserName", t0."Month", t0."Name", t0."PhenotypeTypes", t0."StartDate", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."BillingMode", t."Cpu", t."Description", t."Instance", t."Memory", t."Name", t."Price", t."PriceUnit", t."ResourceProductType"
+FROM "ComputingResources" AS c
+INNER JOIN (
+    SELECT r."Id", r."CreatedTime", r."IsDeleted", r."UpdatedTime", r."BillingMode", r."Cpu", r."Description", r."Instance", r."Memory", r."Name", r."Price", r."PriceUnit", r."ResourceProductType"
+    FROM "ResourceProducts" AS r
+    WHERE NOT (r."IsDeleted")
+) AS t ON c."ResourceProductId" = t."Id"
+INNER JOIN (
+    SELECT t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate"
+    FROM "Teams" AS t1
+    WHERE NOT (t1."IsDeleted")
+) AS t0 ON c."TeamId" = t0."Id"
+WHERE NOT (c."IsDeleted") AND c."ResourceProductStatus" = 1 AND t."ResourceProductType" = 0 AND NOT (EXISTS (
+    SELECT 1
+    FROM "Bills" AS b
+    WHERE NOT (b."IsDeleted") AND c."Id" = b."ComputingResourceId" AND b."BillDay" = @__date_0))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (85ms) [Parameters=[@__p_0='100'], CommandType='Text', CommandTimeout='20']
+      SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."Exist", t."FileType", t."GenomeVersion", t."IsStaging", t."MatchId", t."MemberPhenotypeId", t."OssResourceId", t."Path", t."SampleId", t."Size", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AccessKey", t0."Description", t0."IsCurrent", t0."Name", t0."OpenDate", t0."ResourceProductId", t0."ResourceProductStatus", t0."SecretKey", t0."ServiceURL", t0."TeamId"
+      FROM (
+          SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Exist", s."FileType", s."GenomeVersion", s."IsStaging", s."MatchId", s."MemberPhenotypeId", s."OssResourceId", s."Path", s."SampleId", s."Size"
+          FROM "SampleFiles" AS s
+          WHERE NOT (s."IsDeleted") AND (s."Size" IS NULL) AND (s."Exist" IS NULL) AND s."Path" <> ''
+          LIMIT @__p_0
+      ) AS t
+      LEFT JOIN (
+          SELECT o."Id", o."CreatedTime", o."IsDeleted", o."UpdatedTime", o."AccessKey", o."Description", o."IsCurrent", o."Name", o."OpenDate", o."ResourceProductId", o."ResourceProductStatus", o."SecretKey", o."ServiceURL", o."TeamId"
+          FROM "OssResources" AS o
+          WHERE NOT (o."IsDeleted")
+      ) AS t0 ON t."OssResourceId" = t0."Id"
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (85ms) [Parameters=[@__p_0='100'], CommandType='Text', CommandTimeout='20']
+SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."Exist", t."FileType", t."GenomeVersion", t."IsStaging", t."MatchId", t."MemberPhenotypeId", t."OssResourceId", t."Path", t."SampleId", t."Size", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AccessKey", t0."Description", t0."IsCurrent", t0."Name", t0."OpenDate", t0."ResourceProductId", t0."ResourceProductStatus", t0."SecretKey", t0."ServiceURL", t0."TeamId"
+FROM (
+    SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Exist", s."FileType", s."GenomeVersion", s."IsStaging", s."MatchId", s."MemberPhenotypeId", s."OssResourceId", s."Path", s."SampleId", s."Size"
+    FROM "SampleFiles" AS s
+    WHERE NOT (s."IsDeleted") AND (s."Size" IS NULL) AND (s."Exist" IS NULL) AND s."Path" <> ''
+    LIMIT @__p_0
+) AS t
+LEFT JOIN (
+    SELECT o."Id", o."CreatedTime", o."IsDeleted", o."UpdatedTime", o."AccessKey", o."Description", o."IsCurrent", o."Name", o."OpenDate", o."ResourceProductId", o."ResourceProductStatus", o."SecretKey", o."ServiceURL", o."TeamId"
+    FROM "OssResources" AS o
+    WHERE NOT (o."IsDeleted")
+) AS t0 ON t."OssResourceId" = t0."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (88ms) [Parameters=[@__date_0='05/01/2024' (DbType = Date)], CommandType='Text', CommandTimeout='20']
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (88ms) [Parameters=[@__date_0='05/01/2024' (DbType = Date)], CommandType='Text', CommandTimeout='20']
+SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Description", s."IsCurrent", s."Name", s."OpenDate", s."Path", s."ResourceProductId", s."ResourceProductStatus", s."Size", s."TeamId", s."UsedSize", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AgentId", t0."CloudGroup", t0."Company", t0."Description", t0."EndDate", t0."HarborPassword", t0."HarborProjectName", t0."HarborUserName", t0."Month", t0."Name", t0."PhenotypeTypes", t0."StartDate", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."BillingMode", t."Cpu", t."Description", t."Instance", t."Memory", t."Name", t."Price", t."PriceUnit", t."ResourceProductType"
+FROM "StoreResources" AS s
+INNER JOIN (
+    SELECT r."Id", r."CreatedTime", r."IsDeleted", r."UpdatedTime", r."BillingMode", r."Cpu", r."Description", r."Instance", r."Memory", r."Name", r."Price", r."PriceUnit", r."ResourceProductType"
+    FROM "ResourceProducts" AS r
+    WHERE NOT (r."IsDeleted")
+) AS t ON s."ResourceProductId" = t."Id"
+INNER JOIN (
+    SELECT t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate"
+    FROM "Teams" AS t1
+    WHERE NOT (t1."IsDeleted")
+) AS t0 ON s."TeamId" = t0."Id"
+WHERE NOT (s."IsDeleted") AND s."ResourceProductStatus" = 1 AND t."ResourceProductType" IN (1, 2) AND NOT (EXISTS (
+    SELECT 1
+    FROM "Bills" AS b
+    WHERE NOT (b."IsDeleted") AND s."Id" = b."StorageResourceId" AND b."BillDay" = @__date_0))
+      SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."Description", s."IsCurrent", s."Name", s."OpenDate", s."Path", s."ResourceProductId", s."ResourceProductStatus", s."Size", s."TeamId", s."UsedSize", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AgentId", t0."CloudGroup", t0."Company", t0."Description", t0."EndDate", t0."HarborPassword", t0."HarborProjectName", t0."HarborUserName", t0."Month", t0."Name", t0."PhenotypeTypes", t0."StartDate", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."BillingMode", t."Cpu", t."Description", t."Instance", t."Memory", t."Name", t."Price", t."PriceUnit", t."ResourceProductType"
+      FROM "StoreResources" AS s
+      INNER JOIN (
+          SELECT r."Id", r."CreatedTime", r."IsDeleted", r."UpdatedTime", r."BillingMode", r."Cpu", r."Description", r."Instance", r."Memory", r."Name", r."Price", r."PriceUnit", r."ResourceProductType"
+          FROM "ResourceProducts" AS r
+          WHERE NOT (r."IsDeleted")
+      ) AS t ON s."ResourceProductId" = t."Id"
+      INNER JOIN (
+          SELECT t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate"
+          FROM "Teams" AS t1
+          WHERE NOT (t1."IsDeleted")
+      ) AS t0 ON s."TeamId" = t0."Id"
+      WHERE NOT (s."IsDeleted") AND s."ResourceProductStatus" = 1 AND t."ResourceProductType" IN (1, 2) AND NOT (EXISTS (
+          SELECT 1
+          FROM "Bills" AS b
+          WHERE NOT (b."IsDeleted") AND s."Id" = b."StorageResourceId" AND b."BillDay" = @__date_0))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (43ms) [Parameters=[@__date_0='05/01/2024' (DbType = Date)], CommandType='Text', CommandTimeout='20']
+      SELECT o."Id", o."CreatedTime", o."IsDeleted", o."UpdatedTime", o."AccessKey", o."Description", o."IsCurrent", o."Name", o."OpenDate", o."ResourceProductId", o."ResourceProductStatus", o."SecretKey", o."ServiceURL", o."TeamId", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AgentId", t0."CloudGroup", t0."Company", t0."Description", t0."EndDate", t0."HarborPassword", t0."HarborProjectName", t0."HarborUserName", t0."Month", t0."Name", t0."PhenotypeTypes", t0."StartDate", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."BillingMode", t."Cpu", t."Description", t."Instance", t."Memory", t."Name", t."Price", t."PriceUnit", t."ResourceProductType"
+      FROM "OssResources" AS o
+      INNER JOIN (
+          SELECT r."Id", r."CreatedTime", r."IsDeleted", r."UpdatedTime", r."BillingMode", r."Cpu", r."Description", r."Instance", r."Memory", r."Name", r."Price", r."PriceUnit", r."ResourceProductType"
+          FROM "ResourceProducts" AS r
+          WHERE NOT (r."IsDeleted")
+      ) AS t ON o."ResourceProductId" = t."Id"
+      INNER JOIN (
+          SELECT t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate"
+          FROM "Teams" AS t1
+          WHERE NOT (t1."IsDeleted")
+      ) AS t0 ON o."TeamId" = t0."Id"
+      WHERE NOT (o."IsDeleted") AND o."ResourceProductStatus" = 1 AND t."ResourceProductType" IN (3, 6) AND NOT (EXISTS (
+          SELECT 1
+          FROM "Bills" AS b
+          WHERE NOT (b."IsDeleted") AND o."Id" = b."OssResourceId" AND b."BillDay" = @__date_0))
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (43ms) [Parameters=[@__date_0='05/01/2024' (DbType = Date)], CommandType='Text', CommandTimeout='20']
+SELECT o."Id", o."CreatedTime", o."IsDeleted", o."UpdatedTime", o."AccessKey", o."Description", o."IsCurrent", o."Name", o."OpenDate", o."ResourceProductId", o."ResourceProductStatus", o."SecretKey", o."ServiceURL", o."TeamId", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AgentId", t0."CloudGroup", t0."Company", t0."Description", t0."EndDate", t0."HarborPassword", t0."HarborProjectName", t0."HarborUserName", t0."Month", t0."Name", t0."PhenotypeTypes", t0."StartDate", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."BillingMode", t."Cpu", t."Description", t."Instance", t."Memory", t."Name", t."Price", t."PriceUnit", t."ResourceProductType"
+FROM "OssResources" AS o
+INNER JOIN (
+    SELECT r."Id", r."CreatedTime", r."IsDeleted", r."UpdatedTime", r."BillingMode", r."Cpu", r."Description", r."Instance", r."Memory", r."Name", r."Price", r."PriceUnit", r."ResourceProductType"
+    FROM "ResourceProducts" AS r
+    WHERE NOT (r."IsDeleted")
+) AS t ON o."ResourceProductId" = t."Id"
+INNER JOIN (
+    SELECT t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate"
+    FROM "Teams" AS t1
+    WHERE NOT (t1."IsDeleted")
+) AS t0 ON o."TeamId" = t0."Id"
+WHERE NOT (o."IsDeleted") AND o."ResourceProductStatus" = 1 AND t."ResourceProductType" IN (3, 6) AND NOT (EXISTS (
+    SELECT 1
+    FROM "Bills" AS b
+    WHERE NOT (b."IsDeleted") AND o."Id" = b."OssResourceId" AND b."BillDay" = @__date_0))
+warn: Microsoft.EntityFrameworkCore.Infrastructure[10410]
+Microsoft.EntityFrameworkCore.Infrastructure: Warning: 'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+      'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+warn: Microsoft.EntityFrameworkCore.Infrastructure[10410]
+      'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+Microsoft.EntityFrameworkCore.Infrastructure: Warning: 'AddEntityFramework*' was called on the service provider, but 'UseInternalServiceProvider' wasn't called in the DbContext options configuration. Consider removing the 'AddEntityFramework*' call, as in most cases it's not needed and may cause conflicts with other products and services registered in the same service provider.
+warn: Microsoft.EntityFrameworkCore.Query[20504]
+      Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+Microsoft.EntityFrameworkCore.Query: Warning: Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (94ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (94ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."CreateMemberId", s."ExperimentType", s."PatientInfoId", s."PatientNumber", s."QCResult", s."SampleNumber", s."SampleType", s."SequencingPlatform", s."TeamId", s."TestItem", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."ActualDepth", t."ActualQ20", t."ActualQ30", t."CromwellId", t."ExpectedDepth", t."ExpectedQ20", t."ExpectedQ30", t."Path", t."QCResult", t."SampleId", t."SubProjectTaskStatus"
+FROM "Samples" AS s
+LEFT JOIN (
+    SELECT s0."Id", s0."CreatedTime", s0."IsDeleted", s0."UpdatedTime", s0."ActualDepth", s0."ActualQ20", s0."ActualQ30", s0."CromwellId", s0."ExpectedDepth", s0."ExpectedQ20", s0."ExpectedQ30", s0."Path", s0."QCResult", s0."SampleId", s0."SubProjectTaskStatus"
+    FROM "SampleQC" AS s0
+    WHERE NOT (s0."IsDeleted")
+) AS t ON s."Id" = t."SampleId"
+WHERE NOT (s."IsDeleted") AND s."QCResult" = 1
+ORDER BY s."Id"
+      SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."CreateMemberId", s."ExperimentType", s."PatientInfoId", s."PatientNumber", s."QCResult", s."SampleNumber", s."SampleType", s."SequencingPlatform", s."TeamId", s."TestItem", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."ActualDepth", t."ActualQ20", t."ActualQ30", t."CromwellId", t."ExpectedDepth", t."ExpectedQ20", t."ExpectedQ30", t."Path", t."QCResult", t."SampleId", t."SubProjectTaskStatus"
+      FROM "Samples" AS s
+      LEFT JOIN (
+          SELECT s0."Id", s0."CreatedTime", s0."IsDeleted", s0."UpdatedTime", s0."ActualDepth", s0."ActualQ20", s0."ActualQ30", s0."CromwellId", s0."ExpectedDepth", s0."ExpectedQ20", s0."ExpectedQ30", s0."Path", s0."QCResult", s0."SampleId", s0."SubProjectTaskStatus"
+          FROM "SampleQC" AS s0
+          WHERE NOT (s0."IsDeleted")
+      ) AS t ON s."Id" = t."SampleId"
+      WHERE NOT (s."IsDeleted") AND s."QCResult" = 1
+      ORDER BY s."Id"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (91ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."JobId", s."Log", s."OutputDir", s."ProjectTaskId", s."RunType", s."SubProjectTaskStatus", p."Id", p."CreatedTime", p."IsDeleted", p."UpdatedTime", p."CompleteRule", p."CpuResourceId", p."CreateUserId", p."Description", p."ErrorMessage", p."ErrorModule", p."FileType", p."FolderName", p."HomeCachePath", p."InputCachePath", p."IsOnDemand", p."MemoryResourceId", p."Path", p."ProjectId", p."ProjectSampleSetId", p."ProjectTaskToolId", p."SampleCachePath", p."Storage", p."Task", p."TaskConfig", p."TaskResource", p."Title", p."TotalRule", p."TotalTime", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."ConfigPath", t."Content", t."CreateUserId", t."Description", t."Document", t."FileType", t."IsStandard", t."MemberId", t."MinCpu", t."MinMemory", t."PackageType", t."ProjectTaskId", t."SnakePath", t."State", t."TemplatePath", t."Title", t."Type", t."Version", t."WDLProcessName", t."WdlConfigContent", t."WdlFileContent", t."WorkflowFilePath", t."WorkflowId", t."WorkflowZipFilePath", p1."Id", p1."CreatedTime", p1."IsDeleted", p1."UpdatedTime", p1."ToolId", p1."WdlConfigContent", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."Aliases", t0."Authority", t0."CheckerUrl", t0."ClassifiedDictionaryId", t0."ConfigPath", t0."CreateUserId", t0."Description", t0."Document", t0."FileId", t0."FileType", t0."HasChecker", t0."Icon", t0."ImagePath", t0."MarkdownDocument", t0."MarkdownId", t0."MaxCpu", t0."MaxMemory", t0."MemberId", t0."MetaVersion", t0."MinCpu", t0."MinMemory", t0."Name", t0."Organization", t0."Price", t0."SnakePath", t0."State", t0."ToolClassId", t0."ToolType", t0."Url", t0."Version", t0."WDLProcessName", t0."WorkflowFilePath", t0."WorkflowZipFilePath", p0."Id", p0."CreatedTime", p0."IsDeleted", p0."UpdatedTime", p0."AccessLevel", p0."CreateUserId", p0."Description", p0."EndTime", p0."FolderName", p0."NotePort", p0."NoteToken", p0."NoteUrl", p0."OssResourceId", p0."StartTime", p0."Status", p0."StoragePath", p0."StorageResourceId", p0."TeamId", p0."Title", t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate", o."Id", o."CreatedTime", o."IsDeleted", o."UpdatedTime", o."AccessKey", o."Description", o."IsCurrent", o."Name", o."OpenDate", o."ResourceProductId", o."ResourceProductStatus", o."SecretKey", o."ServiceURL", o."TeamId", c."Id", c."CreatedTime", c."IsDeleted", c."UpdatedTime", c."Description", c."IPAddress", c."Name", c."OpenDate", c."QueueName", c."ResourceProductId", c."ResourceProductStatus", c."TeamId", r."Id", r."CreatedTime", r."IsDeleted", r."UpdatedTime", r."BillingMode", r."Cpu", r."Description", r."Instance", r."Memory", r."Name", r."Price", r."PriceUnit", r."ResourceProductType", c0."Id", c0."CreatedTime", c0."IsDeleted", c0."UpdatedTime", c0."Description", c0."IPAddress", c0."Name", c0."OpenDate", c0."QueueName", c0."ResourceProductId", c0."ResourceProductStatus", c0."TeamId", r0."Id", r0."CreatedTime", r0."IsDeleted", r0."UpdatedTime", r0."BillingMode", r0."Cpu", r0."Description", r0."Instance", r0."Memory", r0."Name", r0."Price", r0."PriceUnit", r0."ResourceProductType", t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."JobId", t2."Log", t2."OutputDir", t2."ProjectTaskId", t2."RunType", t2."SubProjectTaskStatus", t2."Id0", t2."CreatedTime0", t2."IsDeleted0", t2."UpdatedTime0", t2."Content", t2."Cpu", t2."EndTime", t2."Memory", t2."Message", t2."Name", t2."ProjectTaskStatus", t2."SlurmJobId", t2."StartTime", t2."SubProjectTaskId", t2."TotalSeconds", t2."Id00", t2."CreatedTime00", t2."IsDeleted00", t2."UpdatedTime00", t2."BillDay", t2."BillingMode", t2."ComputingResourceId", t2."Cpu0", t2."Description", t2."EndTime0", t2."Instance", t2."InstanceName", t2."IsOnDemand", t2."Memory0", t2."Name0", t2."OssResourceId", t2."Price", t2."PriceUnit", t2."ProductId", t2."ProjectId", t2."ProjectStatus", t2."ProjectTaskId0", t2."ProjectTaskTitle", t2."ProjectTitle", t2."ResourceProductType", t2."StartTime0", t2."StorageResourceId", t2."SubProjectTaskId0", t2."SubProjectTaskName", t2."SubProjectTaskTotalSeconds", t2."TeamId", t2."TotalPrice", t2."Use"
+      FROM "SubProjectTasks" AS s
+      INNER JOIN "ProjectTasks" AS p ON s."ProjectTaskId" = p."Id"
+      INNER JOIN "Projects" AS p0 ON p."ProjectId" = p0."Id"
+      LEFT JOIN "TaskWorkflows" AS t ON p."Id" = t."ProjectTaskId"
+      LEFT JOIN "ProjectTaskTools" AS p1 ON p."ProjectTaskToolId" = p1."Id"
+      LEFT JOIN "Tools" AS t0 ON p1."ToolId" = t0."Id"
+      INNER JOIN "Teams" AS t1 ON p0."TeamId" = t1."Id"
+      LEFT JOIN "OssResources" AS o ON p0."OssResourceId" = o."Id"
+      LEFT JOIN "ComputingResources" AS c ON p."CpuResourceId" = c."Id"
+      LEFT JOIN "ResourceProducts" AS r ON c."ResourceProductId" = r."Id"
+      LEFT JOIN "ComputingResources" AS c0 ON p."MemoryResourceId" = c0."Id"
+      LEFT JOIN "ResourceProducts" AS r0 ON c0."ResourceProductId" = r0."Id"
+      LEFT JOIN (
+          SELECT s0."Id", s0."CreatedTime", s0."IsDeleted", s0."UpdatedTime", s0."JobId", s0."Log", s0."OutputDir", s0."ProjectTaskId", s0."RunType", s0."SubProjectTaskStatus", t3."Id" AS "Id0", t3."CreatedTime" AS "CreatedTime0", t3."IsDeleted" AS "IsDeleted0", t3."UpdatedTime" AS "UpdatedTime0", t3."Content", t3."Cpu", t3."EndTime", t3."Memory", t3."Message", t3."Name", t3."ProjectTaskStatus", t3."SlurmJobId", t3."StartTime", t3."SubProjectTaskId", t3."TotalSeconds", t3."Id0" AS "Id00", t3."CreatedTime0" AS "CreatedTime00", t3."IsDeleted0" AS "IsDeleted00", t3."UpdatedTime0" AS "UpdatedTime00", t3."BillDay", t3."BillingMode", t3."ComputingResourceId", t3."Cpu0", t3."Description", t3."EndTime0", t3."Instance", t3."InstanceName", t3."IsOnDemand", t3."Memory0", t3."Name0", t3."OssResourceId", t3."Price", t3."PriceUnit", t3."ProductId", t3."ProjectId", t3."ProjectStatus", t3."ProjectTaskId" AS "ProjectTaskId0", t3."ProjectTaskTitle", t3."ProjectTitle", t3."ResourceProductType", t3."StartTime0", t3."StorageResourceId", t3."SubProjectTaskId0", t3."SubProjectTaskName", t3."SubProjectTaskTotalSeconds", t3."TeamId", t3."TotalPrice", t3."Use"
+          FROM "SubProjectTasks" AS s0
+          LEFT JOIN (
+              SELECT s1."Id", s1."CreatedTime", s1."IsDeleted", s1."UpdatedTime", s1."Content", s1."Cpu", s1."EndTime", s1."Memory", s1."Message", s1."Name", s1."ProjectTaskStatus", s1."SlurmJobId", s1."StartTime", s1."SubProjectTaskId", s1."TotalSeconds", b."Id" AS "Id0", b."CreatedTime" AS "CreatedTime0", b."IsDeleted" AS "IsDeleted0", b."UpdatedTime" AS "UpdatedTime0", b."BillDay", b."BillingMode", b."ComputingResourceId", b."Cpu" AS "Cpu0", b."Description", b."EndTime" AS "EndTime0", b."Instance", b."InstanceName", b."IsOnDemand", b."Memory" AS "Memory0", b."Name" AS "Name0", b."OssResourceId", b."Price", b."PriceUnit", b."ProductId", b."ProjectId", b."ProjectStatus", b."ProjectTaskId", b."ProjectTaskTitle", b."ProjectTitle", b."ResourceProductType", b."StartTime" AS "StartTime0", b."StorageResourceId", b."SubProjectTaskId" AS "SubProjectTaskId0", b."SubProjectTaskName", b."SubProjectTaskTotalSeconds", b."TeamId", b."TotalPrice", b."Use"
+              FROM "SubProjectTaskModules" AS s1
+              LEFT JOIN "Bills" AS b ON s1."Id" = b."SubProjectTaskId"
+          ) AS t3 ON s0."Id" = t3."SubProjectTaskId"
+      ) AS t2 ON p."Id" = t2."ProjectTaskId"
+      WHERE NOT (p."IsDeleted") AND NOT (p0."IsDeleted") AND s."SubProjectTaskStatus" IN (1, 0)
+      ORDER BY s."Id", p."Id", p0."Id", t."Id", p1."Id", t0."Id", t1."Id", o."Id", c."Id", r."Id", c0."Id", r0."Id", t2."Id", t2."Id0"
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (91ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."JobId", s."Log", s."OutputDir", s."ProjectTaskId", s."RunType", s."SubProjectTaskStatus", p."Id", p."CreatedTime", p."IsDeleted", p."UpdatedTime", p."CompleteRule", p."CpuResourceId", p."CreateUserId", p."Description", p."ErrorMessage", p."ErrorModule", p."FileType", p."FolderName", p."HomeCachePath", p."InputCachePath", p."IsOnDemand", p."MemoryResourceId", p."Path", p."ProjectId", p."ProjectSampleSetId", p."ProjectTaskToolId", p."SampleCachePath", p."Storage", p."Task", p."TaskConfig", p."TaskResource", p."Title", p."TotalRule", p."TotalTime", t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."ConfigPath", t."Content", t."CreateUserId", t."Description", t."Document", t."FileType", t."IsStandard", t."MemberId", t."MinCpu", t."MinMemory", t."PackageType", t."ProjectTaskId", t."SnakePath", t."State", t."TemplatePath", t."Title", t."Type", t."Version", t."WDLProcessName", t."WdlConfigContent", t."WdlFileContent", t."WorkflowFilePath", t."WorkflowId", t."WorkflowZipFilePath", p1."Id", p1."CreatedTime", p1."IsDeleted", p1."UpdatedTime", p1."ToolId", p1."WdlConfigContent", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."Aliases", t0."Authority", t0."CheckerUrl", t0."ClassifiedDictionaryId", t0."ConfigPath", t0."CreateUserId", t0."Description", t0."Document", t0."FileId", t0."FileType", t0."HasChecker", t0."Icon", t0."ImagePath", t0."MarkdownDocument", t0."MarkdownId", t0."MaxCpu", t0."MaxMemory", t0."MemberId", t0."MetaVersion", t0."MinCpu", t0."MinMemory", t0."Name", t0."Organization", t0."Price", t0."SnakePath", t0."State", t0."ToolClassId", t0."ToolType", t0."Url", t0."Version", t0."WDLProcessName", t0."WorkflowFilePath", t0."WorkflowZipFilePath", p0."Id", p0."CreatedTime", p0."IsDeleted", p0."UpdatedTime", p0."AccessLevel", p0."CreateUserId", p0."Description", p0."EndTime", p0."FolderName", p0."NotePort", p0."NoteToken", p0."NoteUrl", p0."OssResourceId", p0."StartTime", p0."Status", p0."StoragePath", p0."StorageResourceId", p0."TeamId", p0."Title", t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate", o."Id", o."CreatedTime", o."IsDeleted", o."UpdatedTime", o."AccessKey", o."Description", o."IsCurrent", o."Name", o."OpenDate", o."ResourceProductId", o."ResourceProductStatus", o."SecretKey", o."ServiceURL", o."TeamId", c."Id", c."CreatedTime", c."IsDeleted", c."UpdatedTime", c."Description", c."IPAddress", c."Name", c."OpenDate", c."QueueName", c."ResourceProductId", c."ResourceProductStatus", c."TeamId", r."Id", r."CreatedTime", r."IsDeleted", r."UpdatedTime", r."BillingMode", r."Cpu", r."Description", r."Instance", r."Memory", r."Name", r."Price", r."PriceUnit", r."ResourceProductType", c0."Id", c0."CreatedTime", c0."IsDeleted", c0."UpdatedTime", c0."Description", c0."IPAddress", c0."Name", c0."OpenDate", c0."QueueName", c0."ResourceProductId", c0."ResourceProductStatus", c0."TeamId", r0."Id", r0."CreatedTime", r0."IsDeleted", r0."UpdatedTime", r0."BillingMode", r0."Cpu", r0."Description", r0."Instance", r0."Memory", r0."Name", r0."Price", r0."PriceUnit", r0."ResourceProductType", t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."JobId", t2."Log", t2."OutputDir", t2."ProjectTaskId", t2."RunType", t2."SubProjectTaskStatus", t2."Id0", t2."CreatedTime0", t2."IsDeleted0", t2."UpdatedTime0", t2."Content", t2."Cpu", t2."EndTime", t2."Memory", t2."Message", t2."Name", t2."ProjectTaskStatus", t2."SlurmJobId", t2."StartTime", t2."SubProjectTaskId", t2."TotalSeconds", t2."Id00", t2."CreatedTime00", t2."IsDeleted00", t2."UpdatedTime00", t2."BillDay", t2."BillingMode", t2."ComputingResourceId", t2."Cpu0", t2."Description", t2."EndTime0", t2."Instance", t2."InstanceName", t2."IsOnDemand", t2."Memory0", t2."Name0", t2."OssResourceId", t2."Price", t2."PriceUnit", t2."ProductId", t2."ProjectId", t2."ProjectStatus", t2."ProjectTaskId0", t2."ProjectTaskTitle", t2."ProjectTitle", t2."ResourceProductType", t2."StartTime0", t2."StorageResourceId", t2."SubProjectTaskId0", t2."SubProjectTaskName", t2."SubProjectTaskTotalSeconds", t2."TeamId", t2."TotalPrice", t2."Use"
+FROM "SubProjectTasks" AS s
+INNER JOIN "ProjectTasks" AS p ON s."ProjectTaskId" = p."Id"
+INNER JOIN "Projects" AS p0 ON p."ProjectId" = p0."Id"
+LEFT JOIN "TaskWorkflows" AS t ON p."Id" = t."ProjectTaskId"
+LEFT JOIN "ProjectTaskTools" AS p1 ON p."ProjectTaskToolId" = p1."Id"
+LEFT JOIN "Tools" AS t0 ON p1."ToolId" = t0."Id"
+INNER JOIN "Teams" AS t1 ON p0."TeamId" = t1."Id"
+LEFT JOIN "OssResources" AS o ON p0."OssResourceId" = o."Id"
+LEFT JOIN "ComputingResources" AS c ON p."CpuResourceId" = c."Id"
+LEFT JOIN "ResourceProducts" AS r ON c."ResourceProductId" = r."Id"
+LEFT JOIN "ComputingResources" AS c0 ON p."MemoryResourceId" = c0."Id"
+LEFT JOIN "ResourceProducts" AS r0 ON c0."ResourceProductId" = r0."Id"
+LEFT JOIN (
+    SELECT s0."Id", s0."CreatedTime", s0."IsDeleted", s0."UpdatedTime", s0."JobId", s0."Log", s0."OutputDir", s0."ProjectTaskId", s0."RunType", s0."SubProjectTaskStatus", t3."Id" AS "Id0", t3."CreatedTime" AS "CreatedTime0", t3."IsDeleted" AS "IsDeleted0", t3."UpdatedTime" AS "UpdatedTime0", t3."Content", t3."Cpu", t3."EndTime", t3."Memory", t3."Message", t3."Name", t3."ProjectTaskStatus", t3."SlurmJobId", t3."StartTime", t3."SubProjectTaskId", t3."TotalSeconds", t3."Id0" AS "Id00", t3."CreatedTime0" AS "CreatedTime00", t3."IsDeleted0" AS "IsDeleted00", t3."UpdatedTime0" AS "UpdatedTime00", t3."BillDay", t3."BillingMode", t3."ComputingResourceId", t3."Cpu0", t3."Description", t3."EndTime0", t3."Instance", t3."InstanceName", t3."IsOnDemand", t3."Memory0", t3."Name0", t3."OssResourceId", t3."Price", t3."PriceUnit", t3."ProductId", t3."ProjectId", t3."ProjectStatus", t3."ProjectTaskId" AS "ProjectTaskId0", t3."ProjectTaskTitle", t3."ProjectTitle", t3."ResourceProductType", t3."StartTime0", t3."StorageResourceId", t3."SubProjectTaskId0", t3."SubProjectTaskName", t3."SubProjectTaskTotalSeconds", t3."TeamId", t3."TotalPrice", t3."Use"
+    FROM "SubProjectTasks" AS s0
+    LEFT JOIN (
+        SELECT s1."Id", s1."CreatedTime", s1."IsDeleted", s1."UpdatedTime", s1."Content", s1."Cpu", s1."EndTime", s1."Memory", s1."Message", s1."Name", s1."ProjectTaskStatus", s1."SlurmJobId", s1."StartTime", s1."SubProjectTaskId", s1."TotalSeconds", b."Id" AS "Id0", b."CreatedTime" AS "CreatedTime0", b."IsDeleted" AS "IsDeleted0", b."UpdatedTime" AS "UpdatedTime0", b."BillDay", b."BillingMode", b."ComputingResourceId", b."Cpu" AS "Cpu0", b."Description", b."EndTime" AS "EndTime0", b."Instance", b."InstanceName", b."IsOnDemand", b."Memory" AS "Memory0", b."Name" AS "Name0", b."OssResourceId", b."Price", b."PriceUnit", b."ProductId", b."ProjectId", b."ProjectStatus", b."ProjectTaskId", b."ProjectTaskTitle", b."ProjectTitle", b."ResourceProductType", b."StartTime" AS "StartTime0", b."StorageResourceId", b."SubProjectTaskId" AS "SubProjectTaskId0", b."SubProjectTaskName", b."SubProjectTaskTotalSeconds", b."TeamId", b."TotalPrice", b."Use"
+        FROM "SubProjectTaskModules" AS s1
+        LEFT JOIN "Bills" AS b ON s1."Id" = b."SubProjectTaskId"
+    ) AS t3 ON s0."Id" = t3."SubProjectTaskId"
+) AS t2 ON p."Id" = t2."ProjectTaskId"
+WHERE NOT (p."IsDeleted") AND NOT (p0."IsDeleted") AND s."SubProjectTaskStatus" IN (1, 0)
+ORDER BY s."Id", p."Id", p0."Id", t."Id", p1."Id", t0."Id", t1."Id", o."Id", c."Id", r."Id", c0."Id", r0."Id", t2."Id", t2."Id0"
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (80ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT w."Id", w."CreatedTime", w."IsDeleted", w."UpdatedTime", w."Description", w."GroupName", w."IsSystem", w."Key", w."Remark", w."SortCode", w."Valid", w."Value"
+      FROM "WebConfigs" AS w
+      WHERE NOT (w."IsDeleted") AND w."Key" = 'Version'
+      LIMIT 1
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (80ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT w."Id", w."CreatedTime", w."IsDeleted", w."UpdatedTime", w."Description", w."GroupName", w."IsSystem", w."Key", w."Remark", w."SortCode", w."Valid", w."Value"
+FROM "WebConfigs" AS w
+WHERE NOT (w."IsDeleted") AND w."Key" = 'Version'
+LIMIT 1
+当前版本:2211219.01
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (29ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT c."Id", c."CreatedTime", c."IsDeleted", c."UpdatedTime", c."ClassifiedDictionaryType", c."FirstSort", c."PrimaryClassification", c."SecondaryClassification", c."TwoLevelSort"
+      FROM "ClassifiedDictionarys" AS c
+      WHERE NOT (c."IsDeleted")
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (29ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT c."Id", c."CreatedTime", c."IsDeleted", c."UpdatedTime", c."ClassifiedDictionaryType", c."FirstSort", c."PrimaryClassification", c."SecondaryClassification", c."TwoLevelSort"
+FROM "ClassifiedDictionarys" AS c
+WHERE NOT (c."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (51ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."CategoryName", t."ClassifiedDictionaryId", t."Command", t."CreateUserId", t."Description", t."DocumentUrl", t."Enable", t."ImageData", t."Inside", t."Path", t."Price", t."State", t."Title", t."Version"
+      FROM "ToolLibraries" AS t
+      WHERE NOT (t."IsDeleted")
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (51ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT t."Id", t."CreatedTime", t."IsDeleted", t."UpdatedTime", t."CategoryName", t."ClassifiedDictionaryId", t."Command", t."CreateUserId", t."Description", t."DocumentUrl", t."Enable", t."ImageData", t."Inside", t."Path", t."Price", t."State", t."Title", t."Version"
+FROM "ToolLibraries" AS t
+WHERE NOT (t."IsDeleted")
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (82ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+      SELECT p."Id", p."CreatedTime", p."IsDeleted", p."UpdatedTime", p."CategoryName", p."ClassifiedDictionaryId", p."CreateUserId", p."Description", p."DocumentUrl", p."ImageData", p."Path", p."Price", p."State", p."Title", p."Version"
+      FROM "PublicDataResources" AS p
+      WHERE NOT (p."IsDeleted")
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (82ms) [Parameters=[], CommandType='Text', CommandTimeout='20']
+SELECT p."Id", p."CreatedTime", p."IsDeleted", p."UpdatedTime", p."CategoryName", p."ClassifiedDictionaryId", p."CreateUserId", p."Description", p."DocumentUrl", p."ImageData", p."Path", p."Price", p."State", p."Title", p."Version"
+FROM "PublicDataResources" AS p
+WHERE NOT (p."IsDeleted")
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Net.WebSockets.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/1.1 OPTIONS http://localhost:5002/api/Tool/filter - -
+Microsoft.AspNetCore.Hosting.Diagnostics: Information: Request starting HTTP/1.1 OPTIONS http://localhost:5002/api/Tool/filter - -
+info: Microsoft.AspNetCore.Cors.Infrastructure.CorsService[4]
+      CORS policy execution successful.
+Microsoft.AspNetCore.Cors.Infrastructure.CorsService: Information: CORS policy execution successful.
+已加载“/usr/share/dotnet/shared/Microsoft.AspNetCore.App/7.0.3/Microsoft.AspNetCore.WebUtilities.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 OPTIONS http://localhost:5002/api/Tool/filter - - - 204 - - 23.6723ms
+Microsoft.AspNetCore.Hosting.Diagnostics: Information: Request finished HTTP/1.1 OPTIONS http://localhost:5002/api/Tool/filter - - - 204 - - 23.6723ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/1.1 POST http://localhost:5002/api/Tool/filter application/json 36
+Microsoft.AspNetCore.Hosting.Diagnostics: Information: Request starting HTTP/1.1 POST http://localhost:5002/api/Tool/filter application/json 36
+info: Microsoft.AspNetCore.Http.HttpRequest[0]
+      {"isAll":true,"isPlatformOwn":false}
+Microsoft.AspNetCore.Http.HttpRequest: Information: {"isAll":true,"isPlatformOwn":false}
+info: Microsoft.AspNetCore.Cors.Infrastructure.CorsService[4]
+      CORS policy execution successful.
+Microsoft.AspNetCore.Cors.Infrastructure.CorsService: Information: CORS policy execution successful.
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Xml.XPath.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/System.IdentityModel.Tokens.Jwt.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Tokens.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Protocols.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.JsonWebTokens.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Logging.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/mnt/d/Work/A/src/Http.API/bin/Debug/net7.0/Microsoft.IdentityModel.Abstractions.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Cryptography.X509Certificates.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Serialization.Formatters.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Diagnostics.TraceSource.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Runtime.Serialization.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Cryptography.Algorithms.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+已加载“/usr/share/dotnet/shared/Microsoft.NETCore.App/7.0.3/System.Security.Cryptography.Primitives.dll”。已跳过加载符号。模块进行了优化，并且调试器选项“仅我的代码”已启用。
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'Http.API.Controllers.ToolController.FilterAsync (Http.API)'
+Microsoft.AspNetCore.Routing.EndpointMiddleware: Information: Executing endpoint 'Http.API.Controllers.ToolController.FilterAsync (Http.API)'
+info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[102]
+      Route matched with {action = "Filter", controller = "Tool"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.List`1[Share.Models.ToolDtos.ToolItemDto]]] FilterAsync(Share.Models.ToolDtos.ToolFilterDto) on controller Http.API.Controllers.ToolController (Http.API).
+Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Information: Route matched with {action = "Filter", controller = "Tool"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[System.Collections.Generic.List`1[Share.Models.ToolDtos.ToolItemDto]]] FilterAsync(Share.Models.ToolDtos.ToolFilterDto) on controller Http.API.Controllers.ToolController (Http.API).
+info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[101]
+      Executing action method Http.API.Controllers.ToolController.FilterAsync (Http.API) - Validation state: Valid
+Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Information: Executing action method Http.API.Controllers.ToolController.FilterAsync (Http.API) - Validation state: Valid
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (96ms) [Parameters=[@___userContext_UserId_Value_0='0e586387-fc44-4249-9916-dd4671bb3a1f'], CommandType='Text', CommandTimeout='20']
+      SELECT t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate"
+      FROM "Members" AS m
+      INNER JOIN (
+          SELECT t."MemberId", t."TeamId"
+          FROM "TeamMembers" AS t
+          WHERE NOT (t."IsDeleted")
+      ) AS t0 ON m."Id" = t0."MemberId"
+      INNER JOIN (
+          SELECT t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."AgentId", t2."CloudGroup", t2."Company", t2."Description", t2."EndDate", t2."HarborPassword", t2."HarborProjectName", t2."HarborUserName", t2."Month", t2."Name", t2."PhenotypeTypes", t2."StartDate"
+          FROM "Teams" AS t2
+          WHERE NOT (t2."IsDeleted")
+      ) AS t1 ON t0."TeamId" = t1."Id"
+      WHERE NOT (m."IsDeleted") AND m."Id" = @___userContext_UserId_Value_0
+      LIMIT 1
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (96ms) [Parameters=[@___userContext_UserId_Value_0='0e586387-fc44-4249-9916-dd4671bb3a1f'], CommandType='Text', CommandTimeout='20']
+SELECT t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentId", t1."CloudGroup", t1."Company", t1."Description", t1."EndDate", t1."HarborPassword", t1."HarborProjectName", t1."HarborUserName", t1."Month", t1."Name", t1."PhenotypeTypes", t1."StartDate"
+FROM "Members" AS m
+INNER JOIN (
+    SELECT t."MemberId", t."TeamId"
+    FROM "TeamMembers" AS t
+    WHERE NOT (t."IsDeleted")
+) AS t0 ON m."Id" = t0."MemberId"
+INNER JOIN (
+    SELECT t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."AgentId", t2."CloudGroup", t2."Company", t2."Description", t2."EndDate", t2."HarborPassword", t2."HarborProjectName", t2."HarborUserName", t2."Month", t2."Name", t2."PhenotypeTypes", t2."StartDate"
+    FROM "Teams" AS t2
+    WHERE NOT (t2."IsDeleted")
+) AS t1 ON t0."TeamId" = t1."Id"
+WHERE NOT (m."IsDeleted") AND m."Id" = @___userContext_UserId_Value_0
+LIMIT 1
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (52ms) [Parameters=[@__teamId_0='65b581f5-5f23-4eb9-bdf7-e9670365826c'], CommandType='Text', CommandTimeout='20']
+      SELECT t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."AgentInviteCode", t2."AuditStatus", t2."DisplayName", t2."Email", t2."IsNormalUser", t2."LastLoginTime", t2."PasswordHash", t2."PasswordSalt", t2."Phone", t2."Unit", t2."Unorganized", t2."Username"
+      FROM "Teams" AS t
+      INNER JOIN (
+          SELECT t1."MemberId", t1."TeamId"
+          FROM "TeamMembers" AS t1
+          WHERE NOT (t1."IsDeleted")
+      ) AS t0 ON t."Id" = t0."TeamId"
+      LEFT JOIN (
+          SELECT m."Id", m."CreatedTime", m."IsDeleted", m."UpdatedTime", m."AgentInviteCode", m."AuditStatus", m."DisplayName", m."Email", m."IsNormalUser", m."LastLoginTime", m."PasswordHash", m."PasswordSalt", m."Phone", m."Unit", m."Unorganized", m."Username"
+          FROM "Members" AS m
+          WHERE NOT (m."IsDeleted")
+      ) AS t2 ON t0."MemberId" = t2."Id"
+      WHERE NOT (t."IsDeleted") AND t."Id" = @__teamId_0 AND (t2."Id" IS NOT NULL)
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (52ms) [Parameters=[@__teamId_0='65b581f5-5f23-4eb9-bdf7-e9670365826c'], CommandType='Text', CommandTimeout='20']
+SELECT t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."AgentInviteCode", t2."AuditStatus", t2."DisplayName", t2."Email", t2."IsNormalUser", t2."LastLoginTime", t2."PasswordHash", t2."PasswordSalt", t2."Phone", t2."Unit", t2."Unorganized", t2."Username"
+FROM "Teams" AS t
+INNER JOIN (
+    SELECT t1."MemberId", t1."TeamId"
+    FROM "TeamMembers" AS t1
+    WHERE NOT (t1."IsDeleted")
+) AS t0 ON t."Id" = t0."TeamId"
+LEFT JOIN (
+    SELECT m."Id", m."CreatedTime", m."IsDeleted", m."UpdatedTime", m."AgentInviteCode", m."AuditStatus", m."DisplayName", m."Email", m."IsNormalUser", m."LastLoginTime", m."PasswordHash", m."PasswordSalt", m."Phone", m."Unit", m."Unorganized", m."Username"
+    FROM "Members" AS m
+    WHERE NOT (m."IsDeleted")
+) AS t2 ON t0."MemberId" = t2."Id"
+WHERE NOT (t."IsDeleted") AND t."Id" = @__teamId_0 AND (t2."Id" IS NOT NULL)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (93ms) [Parameters=[@__UserId_Value_0='0e586387-fc44-4249-9916-dd4671bb3a1f'], CommandType='Text', CommandTimeout='20']
+      SELECT t0."TeamOrgId"
+      FROM "Members" AS m
+      INNER JOIN (
+          SELECT t."MemberId", t."TeamOrgId"
+          FROM "TeamMembers" AS t
+          WHERE NOT (t."IsDeleted")
+      ) AS t0 ON m."Id" = t0."MemberId"
+      WHERE NOT (m."IsDeleted") AND m."Id" = @__UserId_Value_0
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (93ms) [Parameters=[@__UserId_Value_0='0e586387-fc44-4249-9916-dd4671bb3a1f'], CommandType='Text', CommandTimeout='20']
+SELECT t0."TeamOrgId"
+FROM "Members" AS m
+INNER JOIN (
+    SELECT t."MemberId", t."TeamOrgId"
+    FROM "TeamMembers" AS t
+    WHERE NOT (t."IsDeleted")
+) AS t0 ON m."Id" = t0."MemberId"
+WHERE NOT (m."IsDeleted") AND m."Id" = @__UserId_Value_0
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (103ms) [Parameters=[@__UserId_Value_0='0e586387-fc44-4249-9916-dd4671bb3a1f'], CommandType='Text', CommandTimeout='20']
+      SELECT t5."Id", t5."CreatedTime", t5."IsDeleted", t5."UpdatedTime", t5."AgentInviteCode", t5."AuditStatus", t5."DisplayName", t5."Email", t5."IsNormalUser", t5."LastLoginTime", t5."PasswordHash", t5."PasswordSalt", t5."Phone", t5."Unit", t5."Unorganized", t5."Username"
+      FROM "Members" AS m
+      INNER JOIN (
+          SELECT t."MemberId", t."TeamOrgId"
+          FROM "TeamMembers" AS t
+          WHERE NOT (t."IsDeleted")
+      ) AS t0 ON m."Id" = t0."MemberId"
+      INNER JOIN (
+          SELECT t2."Id"
+          FROM "TeamOrgs" AS t2
+          WHERE NOT (t2."IsDeleted")
+      ) AS t1 ON t0."TeamOrgId" = t1."Id"
+      INNER JOIN (
+          SELECT t4."MemberId", t4."TeamOrgId"
+          FROM "TeamMembers" AS t4
+          WHERE NOT (t4."IsDeleted")
+      ) AS t3 ON t1."Id" = t3."TeamOrgId"
+      LEFT JOIN (
+          SELECT m0."Id", m0."CreatedTime", m0."IsDeleted", m0."UpdatedTime", m0."AgentInviteCode", m0."AuditStatus", m0."DisplayName", m0."Email", m0."IsNormalUser", m0."LastLoginTime", m0."PasswordHash", m0."PasswordSalt", m0."Phone", m0."Unit", m0."Unorganized", m0."Username"
+          FROM "Members" AS m0
+          WHERE NOT (m0."IsDeleted")
+      ) AS t5 ON t3."MemberId" = t5."Id"
+      WHERE NOT (m."IsDeleted") AND m."Id" = @__UserId_Value_0 AND (t5."Id" IS NOT NULL)
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (103ms) [Parameters=[@__UserId_Value_0='0e586387-fc44-4249-9916-dd4671bb3a1f'], CommandType='Text', CommandTimeout='20']
+SELECT t5."Id", t5."CreatedTime", t5."IsDeleted", t5."UpdatedTime", t5."AgentInviteCode", t5."AuditStatus", t5."DisplayName", t5."Email", t5."IsNormalUser", t5."LastLoginTime", t5."PasswordHash", t5."PasswordSalt", t5."Phone", t5."Unit", t5."Unorganized", t5."Username"
+FROM "Members" AS m
+INNER JOIN (
+    SELECT t."MemberId", t."TeamOrgId"
+    FROM "TeamMembers" AS t
+    WHERE NOT (t."IsDeleted")
+) AS t0 ON m."Id" = t0."MemberId"
+INNER JOIN (
+    SELECT t2."Id"
+    FROM "TeamOrgs" AS t2
+    WHERE NOT (t2."IsDeleted")
+) AS t1 ON t0."TeamOrgId" = t1."Id"
+INNER JOIN (
+    SELECT t4."MemberId", t4."TeamOrgId"
+    FROM "TeamMembers" AS t4
+    WHERE NOT (t4."IsDeleted")
+) AS t3 ON t1."Id" = t3."TeamOrgId"
+LEFT JOIN (
+    SELECT m0."Id", m0."CreatedTime", m0."IsDeleted", m0."UpdatedTime", m0."AgentInviteCode", m0."AuditStatus", m0."DisplayName", m0."Email", m0."IsNormalUser", m0."LastLoginTime", m0."PasswordHash", m0."PasswordSalt", m0."Phone", m0."Unit", m0."Unorganized", m0."Username"
+    FROM "Members" AS m0
+    WHERE NOT (m0."IsDeleted")
+) AS t5 ON t3."MemberId" = t5."Id"
+WHERE NOT (m."IsDeleted") AND m."Id" = @__UserId_Value_0 AND (t5."Id" IS NOT NULL)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (78ms) [Parameters=[@___userContext_RequireUserId_0='0e586387-fc44-4249-9916-dd4671bb3a1f' (Nullable = true), @___userContext_RequireUserId_1='0e586387-fc44-4249-9916-dd4671bb3a1f'], CommandType='Text', CommandTimeout='20']
+      SELECT t."Id"
+      FROM "Tools" AS t
+      WHERE NOT (t."IsDeleted") AND (t."MemberId" = @___userContext_RequireUserId_0 OR (t."Authority" = 1 AND EXISTS (
+          SELECT 1
+          FROM "ToolPermissions" AS t0
+          WHERE NOT (t0."IsDeleted") AND t."Id" = t0."ToolId" AND t0."TargetId" = @___userContext_RequireUserId_1)) OR (t."ToolType" = 1 AND t."State" = 3 AND t."Price" = 0.0)) AND (t."ToolType" = 0 OR (t."ToolType" = 1 AND t."State" = 3))
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (78ms) [Parameters=[@___userContext_RequireUserId_0='0e586387-fc44-4249-9916-dd4671bb3a1f' (Nullable = true), @___userContext_RequireUserId_1='0e586387-fc44-4249-9916-dd4671bb3a1f'], CommandType='Text', CommandTimeout='20']
+SELECT t."Id"
+FROM "Tools" AS t 
+WHERE NOT (t."IsDeleted") AND (t."MemberId" = @___userContext_RequireUserId_0 OR (t."Authority" = 1 AND EXISTS (  
+    SELECT 1
+    FROM "ToolPermissions" AS t0
+    WHERE NOT (t0."IsDeleted") AND t."Id" = t0."ToolId" AND t0."TargetId" = @___userContext_RequireUserId_1)) OR (t."ToolType" = 1 AND t."State" = 3 AND t."Price" = 0.0)) AND (t."ToolType" = 0 OR (t."ToolType" = 1 AND t."State" = 3))
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (26ms) [Parameters=[@__ids_0={ 'c3a8a5f5-a126-4d26-a0fc-3070945be926', 'f2807f8d-bc2f-4ecc-bf0a-e67eb041f78e', 'a3b7fce9-fd54-4243-82ac-6a57c58355a7', '92c4006a-37b1-4aff-8fc4-67546ec22892', 'bf9dae58-e272-441a-933f-8627aaeb145c', ... } (DbType = Object)], CommandType='Text', CommandTimeout='20']
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (26ms) [Parameters=[@__ids_0={ 'c3a8a5f5-a126-4d26-a0fc-3070945be926', 'f2807f8d-bc2f-4ecc-bf0a-e67eb041f78e', 'a3b7fce9-fd54-4243-82ac-6a57c58355a7', '92c4006a-37b1-4aff-8fc4-67546ec22892', 'bf9dae58-e272-441a-933f-8627aaeb145c', ... } (DbType = Object)], CommandType='Text', CommandTimeout='20']
+SELECT t."Name", t."Version", t."State", t."ToolType", t."SnakePath", t."ConfigPath", t."Id", t."CreatedTime", t."UpdatedTime", t."Price", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AccessFailedCount", t0."Avatar", t0."Email", t0."EmailConfirmed", t0."InviteCode", t0."LastLoginTime", t0."LockoutEnabled", t0."LockoutEnd", t0."PasswordHash", t0."PasswordSalt", t0."PhoneNumber", t0."PhoneNumberConfirmed", t0."RealName", t0."Sex", t0."TwoFactorEnabled", t0."UserName", t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentInviteCode", t1."AuditStatus", t1."DisplayName", t1."Email", t1."IsNormalUser", t1."LastLoginTime", t1."PasswordHash", t1."PasswordSalt", t1."Phone", t1."Unit", t1."Unorganized", t1."Username", t."Description", t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."ClassifiedDictionaryType", t2."FirstSort", t2."PrimaryClassification", t2."SecondaryClassification", t2."TwoLevelSort", t."Icon", t."MarkdownDocument"
+FROM "Tools" AS t
+LEFT JOIN (
+    SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."AccessFailedCount", s."Avatar", s."Email", s."EmailConfirmed", s."InviteCode", s."LastLoginTime", s."LockoutEnabled", s."LockoutEnd", s."PasswordHash", s."PasswordSalt", s."PhoneNumber", s."PhoneNumberConfirmed", s."RealName", s."Sex", s."TwoFactorEnabled", s."UserName"
+    FROM "SystemUsers" AS s
+    WHERE NOT (s."IsDeleted")
+) AS t0 ON t."CreateUserId" = t0."Id"
+LEFT JOIN (
+    SELECT m."Id", m."CreatedTime", m."IsDeleted", m."UpdatedTime", m."AgentInviteCode", m."AuditStatus", m."DisplayName", m."Email", m."IsNormalUser", m."LastLoginTime", m."PasswordHash", m."PasswordSalt", m."Phone", m."Unit", m."Unorganized", m."Username"
+    FROM "Members" AS m
+    WHERE NOT (m."IsDeleted")
+) AS t1 ON t."MemberId" = t1."Id"
+LEFT JOIN (
+    SELECT c."Id", c."CreatedTime", c."IsDeleted", c."UpdatedTime", c."ClassifiedDictionaryType", c."FirstSort", c."PrimaryClassification", c."SecondaryClassification", c."TwoLevelSort"
+    FROM "ClassifiedDictionarys" AS c
+    WHERE NOT (c."IsDeleted")
+) AS t2 ON t."ClassifiedDictionaryId" = t2."Id"
+WHERE NOT (t."IsDeleted") AND t."Id" = ANY (@__ids_0)
+      SELECT t."Name", t."Version", t."State", t."ToolType", t."SnakePath", t."ConfigPath", t."Id", t."CreatedTime", t."UpdatedTime", t."Price", t0."Id", t0."CreatedTime", t0."IsDeleted", t0."UpdatedTime", t0."AccessFailedCount", t0."Avatar", t0."Email", t0."EmailConfirmed", t0."InviteCode", t0."LastLoginTime", t0."LockoutEnabled", t0."LockoutEnd", t0."PasswordHash", t0."PasswordSalt", t0."PhoneNumber", t0."PhoneNumberConfirmed", t0."RealName", t0."Sex", t0."TwoFactorEnabled", t0."UserName", t1."Id", t1."CreatedTime", t1."IsDeleted", t1."UpdatedTime", t1."AgentInviteCode", t1."AuditStatus", t1."DisplayName", t1."Email", t1."IsNormalUser", t1."LastLoginTime", t1."PasswordHash", t1."PasswordSalt", t1."Phone", t1."Unit", t1."Unorganized", t1."Username", t."Description", t2."Id", t2."CreatedTime", t2."IsDeleted", t2."UpdatedTime", t2."ClassifiedDictionaryType", t2."FirstSort", t2."PrimaryClassification", t2."SecondaryClassification", t2."TwoLevelSort", t."Icon", t."MarkdownDocument"
+      FROM "Tools" AS t
+      LEFT JOIN (
+          SELECT s."Id", s."CreatedTime", s."IsDeleted", s."UpdatedTime", s."AccessFailedCount", s."Avatar", s."Email", s."EmailConfirmed", s."InviteCode", s."LastLoginTime", s."LockoutEnabled", s."LockoutEnd", s."PasswordHash", s."PasswordSalt", s."PhoneNumber", s."PhoneNumberConfirmed", s."RealName", s."Sex", s."TwoFactorEnabled", s."UserName"
+          FROM "SystemUsers" AS s
+          WHERE NOT (s."IsDeleted")
+      ) AS t0 ON t."CreateUserId" = t0."Id"
+      LEFT JOIN (
+          SELECT m."Id", m."CreatedTime", m."IsDeleted", m."UpdatedTime", m."AgentInviteCode", m."AuditStatus", m."DisplayName", m."Email", m."IsNormalUser", m."LastLoginTime", m."PasswordHash", m."PasswordSalt", m."Phone", m."Unit", m."Unorganized", m."Username"
+          FROM "Members" AS m
+          WHERE NOT (m."IsDeleted")
+      ) AS t1 ON t."MemberId" = t1."Id"
+      LEFT JOIN (
+          SELECT c."Id", c."CreatedTime", c."IsDeleted", c."UpdatedTime", c."ClassifiedDictionaryType", c."FirstSort", c."PrimaryClassification", c."SecondaryClassification", c."TwoLevelSort"
+          FROM "ClassifiedDictionarys" AS c
+          WHERE NOT (c."IsDeleted")
+      ) AS t2 ON t."ClassifiedDictionaryId" = t2."Id"
+      WHERE NOT (t."IsDeleted") AND t."Id" = ANY (@__ids_0)
+info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+      Executed DbCommand (72ms) [Parameters=[@__ids_0={ 'c3a8a5f5-a126-4d26-a0fc-3070945be926', 'f2807f8d-bc2f-4ecc-bf0a-e67eb041f78e', 'a3b7fce9-fd54-4243-82ac-6a57c58355a7', '92c4006a-37b1-4aff-8fc4-67546ec22892', 'bf9dae58-e272-441a-933f-8627aaeb145c', ... } (DbType = Object)], CommandType='Text', CommandTimeout='20']
+      SELECT t0."Id", t2."DisplayName"
+      FROM "ToolPermissions" AS t
+      INNER JOIN (
+          SELECT t1."Id"
+          FROM "Tools" AS t1
+          WHERE NOT (t1."IsDeleted")
+      ) AS t0 ON t."ToolId" = t0."Id"
+      INNER JOIN (
+          SELECT m."Id", m."DisplayName"
+          FROM "Members" AS m
+          WHERE NOT (m."IsDeleted")
+      ) AS t2 ON t."TargetId" = t2."Id"
+      WHERE NOT (t."IsDeleted") AND t0."Id" = ANY (@__ids_0)
+Microsoft.EntityFrameworkCore.Database.Command: Information: Executed DbCommand (72ms) [Parameters=[@__ids_0={ 'c3a8a5f5-a126-4d26-a0fc-3070945be926', 'f2807f8d-bc2f-4ecc-bf0a-e67eb041f78e', 'a3b7fce9-fd54-4243-82ac-6a57c58355a7', '92c4006a-37b1-4aff-8fc4-67546ec22892', 'bf9dae58-e272-441a-933f-8627aaeb145c', ... } (DbType = Object)], CommandType='Text', CommandTimeout='20']
+SELECT t0."Id", t2."DisplayName"
+FROM "ToolPermissions" AS t
+INNER JOIN (
+    SELECT t1."Id"
+    FROM "Tools" AS t1
+    WHERE NOT (t1."IsDeleted")
+) AS t0 ON t."ToolId" = t0."Id"
+INNER JOIN (
+    SELECT m."Id", m."DisplayName"
+    FROM "Members" AS m
+    WHERE NOT (m."IsDeleted")
+) AS t2 ON t."TargetId" = t2."Id"
+WHERE NOT (t."IsDeleted") AND t0."Id" = ANY (@__ids_0)
+info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[103]
+      Executed action method Http.API.Controllers.ToolController.FilterAsync (Http.API), returned result Microsoft.AspNetCore.Mvc.ObjectResult in 1212.6465ms.
+Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Information: Executed action method Http.API.Controllers.ToolController.FilterAsync (Http.API), returned result Microsoft.AspNetCore.Mvc.ObjectResult in 1212.6465ms.
+info: Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor[1]
+      Executing ObjectResult, writing value of type 'System.Collections.Generic.List`1[[Share.Models.ToolDtos.ToolItemDto, Share, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+Microsoft.AspNetCore.Mvc.Infrastructure.ObjectResultExecutor: Information: Executing ObjectResult, writing value of type 'System.Collections.Generic.List`1[[Share.Models.ToolDtos.ToolItemDto, Share, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+info: Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker[105]
+      Executed action Http.API.Controllers.ToolController.FilterAsync (Http.API) in 1552.5886ms
+Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker: Information: Executed action Http.API.Controllers.ToolController.FilterAsync (Http.API) in 1552.5886ms
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'Http.API.Controllers.ToolController.FilterAsync (Http.API)'
+Microsoft.AspNetCore.Routing.EndpointMiddleware: Information: Executed endpoint 'Http.API.Controllers.ToolController.FilterAsync (Http.API)'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/1.1 POST http://localhost:5002/api/Tool/filter application/json 36 - 200 - application/json;+charset=utf-8 2027.8659ms
+Microsoft.AspNetCore.Hosting.Diagnostics: Information: Request finished HTTP/1.1 POST http://localhost:5002/api/Tool/filter application/json 36 - 200 - application/json;+charset=utf-8 2027.8659ms
