@@ -97,11 +97,12 @@ namespace Api
 			//添加数据库
 			string? connectionString = builder.Configuration.GetConnectionString("MaidContext");
 			builder.Services.AddDbContextPool<MaidContext>((serviceProvider, dbContextBuilder) =>
-							dbContextBuilder.UseNpgsql(connectionString, builder => builder
+							dbContextBuilder.UseNpgsql(connectionString
 #if DEBUG
-								.EnableRetryOnFailure(0)
-#endif
+							, builder => builder.EnableRetryOnFailure(0))
+#else
 							)
+#endif
 #if DEBUG
 							.EnableDetailedErrors()
 							.EnableSensitiveDataLogging()
@@ -418,7 +419,7 @@ namespace Api
 								var dirs = directoryInfo.GetDirectories();
 								foreach (var item in dirs)
 								{
-									item.LastWriteTimeUtc= DateTime.Now;
+									item.LastWriteTimeUtc = DateTime.Now;
 									GetInfo(item.FullName);
 								}
 								var files = directoryInfo.GetFiles("*.cs");

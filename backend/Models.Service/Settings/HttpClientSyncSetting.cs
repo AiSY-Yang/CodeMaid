@@ -28,5 +28,9 @@ namespace ServicesModels.Settings
 		/// 选项的路径
 		/// </summary>
 		public string? OptionsPath { get; set; }
+		/// <summary>
+		/// 重命名客户端
+		/// </summary>
+		public string? RenameClient { get; set; }
 	}
 }

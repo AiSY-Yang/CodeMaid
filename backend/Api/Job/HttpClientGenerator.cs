@@ -87,6 +87,7 @@ namespace Api.Job
 			}
 			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out var diagnostic);
 			RestfulApiDocument restfulApiDocument = new(openApiDocument);
+			if (!setting.RenameClient.IsNullOrEmpty()) restfulApiDocument.Title = setting.RenameClient.Replace("*", restfulApiDocument.Title);
 			var needCreateModel = !setting.ModelPath.IsNullOrEmpty();
 			var needCreateOptions = !setting.OptionsPath.IsNullOrEmpty();
 			#region create model file
@@ -351,7 +352,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// <summary>
 		/// 标题
 		/// </summary>
-		public string Title { get; private set; }
+		public string Title { get; set; }
 		public string PropertyStyleName => Title.ToNamingConvention(NamingConvention.PascalCase);
 		public string Description { get; private set; }
 
