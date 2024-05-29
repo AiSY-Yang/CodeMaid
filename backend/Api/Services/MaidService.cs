@@ -276,15 +276,17 @@ namespace Api.Services
 
 						namespace Api.MasstransitConsumer
 						{
+							///<inheritdoc/>
 							public class {{classDefinition.Name}}Consumer : IConsumer<{{classDefinition.Name}}>
 							{
 								private readonly ILogger<{{classDefinition.Name}}Consumer> logger;
 
+								///<inheritdoc/>
 								public {{classDefinition.Name}}Consumer(ILogger<{{classDefinition.Name}}Consumer> logger)
 								{
 									this.logger = logger;
 								}
-
+								///<inheritdoc/>
 								public async Task Consume(ConsumeContext<{{classDefinition.Name}}> context)
 								{
 								}

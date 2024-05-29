@@ -8,6 +8,8 @@ using Api.Tools;
 
 using ExtensionMethods;
 
+using Grpc.Net.Client.Configuration;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -60,7 +62,6 @@ namespace Api.Job
 					var res = await httpClient.GetAsync(uri);
 					if (!res.IsSuccessStatusCode)
 					{
-
 						logger.LogError("{maid}生成HTTP客户端错误,{url}返回状态码为{StatusCode}", maid.Name, uri, res.StatusCode);
 						return;
 					}
@@ -211,6 +212,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 
 			foreach (var api in restfulApiDocument.Api)
 			{
+				if (api.Method == OperationType.Get && api.BodyParameter is not null) logger.LogWarning("方法{MethodName}的body不为空", api.MethodName);
 				var methodName = api.MethodName;
 				var m = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().FirstOrDefault(x => x.Identifier.Text == methodName);
 				if (m != null)

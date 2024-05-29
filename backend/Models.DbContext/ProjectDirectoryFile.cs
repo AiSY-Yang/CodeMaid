@@ -13,6 +13,7 @@ namespace Models.CodeMaid
 		/// 文件名
 		/// </summary>
 		public string Name { get; set; } = null!;
+		public DateTimeOffset LastWriteTime { get; set; }
 		/// <summary>
 		/// 路径
 		/// </summary>
