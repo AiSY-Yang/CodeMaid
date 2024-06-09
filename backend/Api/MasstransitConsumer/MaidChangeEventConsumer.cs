@@ -26,21 +26,21 @@ namespace Api.MasstransitConsumer
 		/// <inheritdoc/>
 		public async Task Consume(ConsumeContext<MaidChangeEvent> context)
 		{
-			var maid = maidContext.Maids
-				.AsNoTracking()
-						.Include(x => x.Project)
-						.Include(x => x.Enums)
-						.ThenInclude(x => x.EnumMembers)
-						.Include(x => x.Classes)
-						.ThenInclude(x => x.Properties)
-						.ThenInclude(x => x.Attributes)
-						.Include(x => x.Classes)
-						.ThenInclude(x => x.Properties)
-						.ThenInclude(x => x.EnumDefinition)
-						.ThenInclude(x => x!.EnumMembers)
-						.First(x => x.Id == context.Message.MaidId);
-			logger.LogInformation("项目{projectName}maid{maidName}开始工作", maid.Project.Name, maid.Name);
-			await MaidService.Work(maid);
+			//var maid = maidContext.Maids
+			//	.AsNoTracking()
+			//			.Include(x => x.Project)
+			//			.Include(x => x.Enums)
+			//			.ThenInclude(x => x.EnumMembers)
+			//			.Include(x => x.Classes)
+			//			.ThenInclude(x => x.Properties)
+			//			.ThenInclude(x => x.Attributes)
+			//			.Include(x => x.Classes)
+			//			.ThenInclude(x => x.Properties)
+			//			.ThenInclude(x => x.EnumDefinition)
+			//			.ThenInclude(x => x!.EnumMembers)
+			//			.First(x => x.Id == context.Message.MaidId);
+			//logger.LogInformation("项目{projectName}maid{maidName}开始工作", maid.Project.Name, maid.Name);
+			//await MaidService.Work(maid);
 		}
 	}
 	/// <inheritdoc/>

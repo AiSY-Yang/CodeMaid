@@ -1,3 +1,7 @@
+using Api.Services;
+
+using ExtensionMethods;
+
 using MaidContexts;
 
 using MassTransit;
@@ -25,17 +29,27 @@ namespace Api.MasstransitConsumer
 		///<inheritdoc/>
 		public async Task Consume(ConsumeContext<ProjectUpdateEvent> context)
 		{
+			MaidService.Projects.TryRemove(context.Message.ProjectId, out var p);
+			MaidService.Watchers.TryRemove(context.Message.ProjectId, out var watcher);
+			if (watcher is not null)
+			{
+				MaidService.WatcherToProject.TryRemove(watcher, out var _);
+				watcher.Dispose();
+			}
+
 			var project = await maidContext.Projects
 				.AsSplitQuery()
 				.Include(x => x.ProjectDirectories)
 				.ThenInclude(x => x.ProjectDirectoryFiles)
 				.FirstAsync(x => x.Id == context.Message.ProjectId);
+
 			project.ProjectDirectories.ForEach(x =>
 			{
 				x.ProjectDirectoryFiles.ForEach(x => x.IsDeleted = true);
 				x.IsDeleted = true;
 			});
 			GetInfo(project.Path);
+
 			void GetInfo(string path)
 			{
 				var name = Path.GetFileName(path);
@@ -53,7 +67,7 @@ namespace Api.MasstransitConsumer
 					};
 					maidContext.Add(projectDirectory);
 				}
-				else project.IsDeleted = false;
+				//else directories.Add(projectDirectory);
 
 				var directoryInfo = new DirectoryInfo(path);
 				foreach (var item in directoryInfo.EnumerateDirectories())
@@ -69,7 +83,8 @@ namespace Api.MasstransitConsumer
 					};
 					var f = File.ReadAllLines(file.FullName);
 					var linesCount = f.Length;
-					DateTimeOffset lastWriteTime = file.LastWriteTimeUtc;
+					DateTimeOffset lastWriteTime = file.LastWriteTime;
+					lastWriteTime = lastWriteTime.TruncateNanosecond();
 					var commentCount = 0;
 					var spaceCount = 0;
 					var isAutoGen = false;
@@ -96,7 +111,7 @@ namespace Api.MasstransitConsumer
 					}
 					var projectDirectoryFile = projectDirectory.ProjectDirectoryFiles.Where(x => x.Name == file.Name).FirstOrDefault();
 					projectDirectoryFile ??= project.ProjectDirectories.SelectMany(x => x.ProjectDirectoryFiles)
-								.FirstOrDefault(x => x.Name == file.Name && x.LastWriteTime == lastWriteTime);
+								.FirstOrDefault(x => x.Name == file.Name && x.LastWriteTime == lastWriteTime && x.LinesCount == linesCount);
 					if (projectDirectoryFile == null)
 					{
 						projectDirectoryFile = new ProjectDirectoryFile()
@@ -111,6 +126,8 @@ namespace Api.MasstransitConsumer
 							Path = file.FullName,
 							LastWriteTime = lastWriteTime,
 							IsDeleted = false,
+							ProjectStructures = [],
+							EnumDefinitions = [],
 						};
 						maidContext.Add(projectDirectoryFile);
 					}
@@ -126,15 +143,67 @@ namespace Api.MasstransitConsumer
 						projectDirectoryFile.Path = file.FullName;
 						projectDirectoryFile.LastWriteTime = lastWriteTime;
 						projectDirectoryFile.IsDeleted = false;
-						maidContext.Update(projectDirectoryFile);
 					};
 				}
-				var adds = maidContext.ChangeTracker.Entries<ProjectDirectoryFile>().Where(x => x.State == EntityState.Added);
-				var deletes = maidContext.ChangeTracker.Entries<ProjectDirectoryFile>().Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == true);
-				var modifieds = maidContext.ChangeTracker.Entries<ProjectDirectoryFile>().Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == false);
-				maidContext.SaveChanges();
-				//context.PublishBatch<FileChangeEvent>(adds.Select(x => new FileChangeEvent() { FilePath = x.Entity.Path, IsDelete = false, MaidId = 0 }));
 			}
+			var adds = maidContext.ChangeTracker.Entries<ProjectDirectoryFile>().Where(x => x.State == EntityState.Added).ToList();
+			var deletes = maidContext.ChangeTracker.Entries<ProjectDirectoryFile>().Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == true).ToList();
+			var modifieds = maidContext.ChangeTracker.Entries<ProjectDirectoryFile>().Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == false).ToList();
+			maidContext.SaveChanges();
+			MaidService.Projects[project.Id] = project;
+			watcher = new(project.Path)
+			{
+				NotifyFilter = NotifyFilters.Attributes
+				   | NotifyFilters.CreationTime
+				   | NotifyFilters.DirectoryName
+				   | NotifyFilters.FileName
+				   //   | NotifyFilters.LastAccess
+				   | NotifyFilters.LastWrite
+				   //   | NotifyFilters.Security
+				   | NotifyFilters.Size,
+				Filter = "*.cs",
+				IncludeSubdirectories = true,
+				EnableRaisingEvents = true,
+			};
+			watcher.Changed += Watcher_Changed;
+			watcher.Renamed += Watcher_Renamed;
+			watcher.Deleted += Watcher_Deleted;
+
+			MaidService.Watchers[project.Id] = watcher;
+			MaidService.WatcherToProject[watcher] = project;
+			await context.PublishBatch<FileChangeEvent>(adds.Select(x => new FileChangeEvent() { ProjectId = project.Id, ProjectPath = project.Path, FilePath = x.Entity.Path, IsDelete = false }));
+			await context.PublishBatch<FileChangeEvent>(deletes.Select(x => new FileChangeEvent() { ProjectId = project.Id, ProjectPath = project.Path, FilePath = x.Entity.Path, IsDelete = true }));
+			await context.PublishBatch<FileChangeEvent>(modifieds.Select(x => new FileChangeEvent() { ProjectId = project.Id, ProjectPath = project.Path, FilePath = x.Entity.Path, IsDelete = false }));
+		}
+		private static async void Watcher_Deleted(object sender, FileSystemEventArgs e)
+		{
+			await FileChange(MaidService.WatcherToProject[(FileSystemWatcher)sender], e.FullPath, true);
+		}
+
+		private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
+		{
+			await FileChange(MaidService.WatcherToProject[(FileSystemWatcher)sender], e.FullPath, false);
+		}
+
+		private static async void Watcher_Changed(object sender, FileSystemEventArgs e)
+		{
+			await FileChange(MaidService.WatcherToProject[(FileSystemWatcher)sender], e.FullPath, false);
+		}
+		/// <summary>
+		/// 变更筛选器 VS修改文件的时候可能使用的是创建 修改 重命名的操作 要把中间文件排除掉
+		/// </summary>
+		/// <param name="project"></param>
+		/// <param name="filePath">文件路径</param>
+		/// <param name="isDelete">是否是删除文件</param>
+		/// <returns></returns>
+		private static async Task FileChange(Project project, string filePath, bool isDelete)
+		{
+			//if (Path.GetExtension(filePath) != ".TMP")
+			//{
+			var msg = new FileChangeEvent() { ProjectId = project.Id, ProjectPath = project.Path, FilePath = filePath, IsDelete = isDelete };
+			using var scope = Program.Services.CreateScope();
+			await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(msg);
+			//}
 		}
 	}
 	///<inheritdoc/>
@@ -143,6 +212,8 @@ namespace Api.MasstransitConsumer
 		///<inheritdoc/>
 		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<ProjectUpdateEventConsumer> consumerConfigurator, IRegistrationContext context)
 		{
+			endpointConfigurator
+				.UseScheduledRedelivery(x => x.Interval(9999, TimeSpan.FromSeconds(1)));
 		}
 	}
 }

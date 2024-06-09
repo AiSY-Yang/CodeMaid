@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -7,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MaidContexts.Migrations
 {
     /// <inheritdoc />
-    public partial class _20231224161837 : Migration
+    public partial class _20240609231255 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,6 +34,36 @@ namespace MaidContexts.Migrations
                 comment: "项目定义");
 
             migrationBuilder.CreateTable(
+                name: "ClassDefinitions",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ProjectId = table.Column<long>(type: "bigint", nullable: true),
+                    NameSpace = table.Column<string>(type: "text", nullable: true, comment: "命名空间"),
+                    Modifiers = table.Column<string>(type: "text", nullable: true, comment: "修饰符"),
+                    Name = table.Column<string>(type: "text", nullable: false, comment: "类名"),
+                    Summary = table.Column<string>(type: "text", nullable: true, comment: "注释"),
+                    Base = table.Column<string>(type: "text", nullable: true, comment: "基类或者接口名称"),
+                    Using = table.Column<string>(type: "text", nullable: false, comment: "类引用的命名空间"),
+                    LeadingTrivia = table.Column<string>(type: "text", nullable: true, comment: "前导"),
+                    MemberType = table.Column<int>(type: "integer", nullable: false, comment: "成员类型(0-类,1-接口,2-记录,3-结构体)"),
+                    CreateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, comment: "创建时间"),
+                    UpdateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true, comment: "更新时间"),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, comment: "是否有效")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClassDefinitions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ClassDefinitions_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id");
+                },
+                comment: "类定义");
+
+            migrationBuilder.CreateTable(
                 name: "Maids",
                 columns: table => new
                 {
@@ -44,7 +75,7 @@ namespace MaidContexts.Migrations
                     SourcePath = table.Column<string>(type: "text", nullable: false, comment: "原路径"),
                     DestinationPath = table.Column<string>(type: "text", nullable: false, comment: "目标路径"),
                     Autonomous = table.Column<bool>(type: "boolean", nullable: false, comment: "是否自动修复"),
-                    Setting = table.Column<string>(type: "text", nullable: false, comment: "设置"),
+                    Setting = table.Column<JsonDocument>(type: "jsonb", nullable: false, comment: "设置"),
                     CreateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, comment: "创建时间"),
                     UpdateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true, comment: "更新时间"),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, comment: "是否有效")
@@ -62,35 +93,60 @@ namespace MaidContexts.Migrations
                 comment: "功能");
 
             migrationBuilder.CreateTable(
-                name: "ClassDefinitions",
+                name: "ProjectDirectories",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    MaidId = table.Column<long>(type: "bigint", nullable: false, comment: "Maid对象Id"),
-                    NameSpace = table.Column<string>(type: "text", nullable: true, comment: "命名空间"),
-                    Modifiers = table.Column<string>(type: "text", nullable: true, comment: "修饰符"),
-                    Name = table.Column<string>(type: "text", nullable: false, comment: "类名"),
-                    Summary = table.Column<string>(type: "text", nullable: true, comment: "注释"),
-                    Base = table.Column<string>(type: "text", nullable: true, comment: "基类或者接口名称"),
-                    Using = table.Column<string>(type: "text", nullable: false, comment: "类引用的命名空间"),
-                    LeadingTrivia = table.Column<string>(type: "text", nullable: true, comment: "前导"),
-                    MemberType = table.Column<int>(type: "integer", nullable: false, comment: "成员类型(0-类,1-接口,2-记录,3-结构体)"),
+                    Name = table.Column<string>(type: "text", nullable: false, comment: "目录名"),
+                    Path = table.Column<string>(type: "text", nullable: false, comment: "路径"),
+                    ProjectId = table.Column<long>(type: "bigint", nullable: false),
                     CreateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, comment: "创建时间"),
                     UpdateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true, comment: "更新时间"),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, comment: "是否有效")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClassDefinitions", x => x.Id);
+                    table.PrimaryKey("PK_ProjectDirectories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ClassDefinitions_Maids_MaidId",
-                        column: x => x.MaidId,
-                        principalTable: "Maids",
+                        name: "FK_ProjectDirectories_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 },
-                comment: "类定义");
+                comment: "项目目录");
+
+            migrationBuilder.CreateTable(
+                name: "ProjectDirectoryFiles",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false, comment: "文件名"),
+                    LastWriteTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Path = table.Column<string>(type: "text", nullable: false, comment: "路径"),
+                    ProjectDirectoryId = table.Column<long>(type: "bigint", nullable: false),
+                    IsAutoGen = table.Column<bool>(type: "boolean", nullable: false, comment: "是否是自动生成的文件"),
+                    LinesCount = table.Column<int>(type: "integer", nullable: false, comment: "总行数"),
+                    SpaceCount = table.Column<int>(type: "integer", nullable: false, comment: "空行数"),
+                    CommentCount = table.Column<int>(type: "integer", nullable: false, comment: "注释行数"),
+                    FileType = table.Column<int>(type: "integer", nullable: false, comment: "文件类型(0-其他,1-C#文件)"),
+                    CreateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, comment: "创建时间"),
+                    UpdateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true, comment: "更新时间"),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, comment: "是否有效")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectDirectoryFiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProjectDirectoryFiles_ProjectDirectories_ProjectDirectoryId",
+                        column: x => x.ProjectDirectoryId,
+                        principalTable: "ProjectDirectories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "项目文件");
 
             migrationBuilder.CreateTable(
                 name: "EnumDefinitions",
@@ -98,11 +154,12 @@ namespace MaidContexts.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ProjectDirectoryFileId = table.Column<long>(type: "bigint", nullable: false),
                     NameSpace = table.Column<string>(type: "text", nullable: true, comment: "命名空间"),
                     Name = table.Column<string>(type: "text", nullable: false, comment: "枚举名"),
                     Summary = table.Column<string>(type: "text", nullable: true, comment: "注释"),
                     LeadingTrivia = table.Column<string>(type: "text", nullable: true, comment: "前导"),
-                    MaidId = table.Column<long>(type: "bigint", nullable: true),
+                    ProjectId = table.Column<long>(type: "bigint", nullable: true),
                     CreateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, comment: "创建时间"),
                     UpdateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true, comment: "更新时间"),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, comment: "是否有效")
@@ -111,12 +168,48 @@ namespace MaidContexts.Migrations
                 {
                     table.PrimaryKey("PK_EnumDefinitions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EnumDefinitions_Maids_MaidId",
-                        column: x => x.MaidId,
-                        principalTable: "Maids",
+                        name: "FK_EnumDefinitions_ProjectDirectoryFiles_ProjectDirectoryFileId",
+                        column: x => x.ProjectDirectoryFileId,
+                        principalTable: "ProjectDirectoryFiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EnumDefinitions_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
                         principalColumn: "Id");
                 },
                 comment: "枚举定义");
+
+            migrationBuilder.CreateTable(
+                name: "ProjectStructure",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ProjectDirectoryFileId = table.Column<long>(type: "bigint", nullable: false),
+                    ClassDefinitionId = table.Column<long>(type: "bigint", nullable: false),
+                    CreateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, comment: "创建时间"),
+                    UpdateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true, comment: "更新时间"),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false, comment: "是否有效")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectStructure", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProjectStructure_ClassDefinitions_ClassDefinitionId",
+                        column: x => x.ClassDefinitionId,
+                        principalTable: "ClassDefinitions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProjectStructure_ProjectDirectoryFiles_ProjectDirectoryFile~",
+                        column: x => x.ProjectDirectoryFileId,
+                        principalTable: "ProjectDirectoryFiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "");
 
             migrationBuilder.CreateTable(
                 name: "EnumMemberDefinitions",
@@ -165,6 +258,8 @@ namespace MaidContexts.Migrations
                     HasSet = table.Column<bool>(type: "boolean", nullable: false, comment: "是否包含Set"),
                     Set = table.Column<string>(type: "text", nullable: true, comment: "Set方法体"),
                     EnumDefinitionId = table.Column<long>(type: "bigint", nullable: true),
+                    ProjectDirectoryFileId = table.Column<long>(type: "bigint", nullable: false),
+                    ProjectStructureId = table.Column<long>(type: "bigint", nullable: true),
                     CreateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, comment: "创建时间"),
                     UpdateTime = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true, comment: "更新时间"),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false, comment: "是否有效")
@@ -182,6 +277,17 @@ namespace MaidContexts.Migrations
                         name: "FK_PropertyDefinitions_EnumDefinitions_EnumDefinitionId",
                         column: x => x.EnumDefinitionId,
                         principalTable: "EnumDefinitions",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_PropertyDefinitions_ProjectDirectoryFiles_ProjectDirectoryF~",
+                        column: x => x.ProjectDirectoryFileId,
+                        principalTable: "ProjectDirectoryFiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PropertyDefinitions_ProjectStructure_ProjectStructureId",
+                        column: x => x.ProjectStructureId,
+                        principalTable: "ProjectStructure",
                         principalColumn: "Id");
                 },
                 comment: "类定义");
@@ -219,20 +325,19 @@ namespace MaidContexts.Migrations
                 column: "PropertyDefinitionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClassDefinitions_MaidId",
+                name: "IX_ClassDefinitions_ProjectId",
                 table: "ClassDefinitions",
-                column: "MaidId");
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClassDefinitions_Name_MaidId",
-                table: "ClassDefinitions",
-                columns: new[] { "Name", "MaidId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EnumDefinitions_MaidId",
+                name: "IX_EnumDefinitions_ProjectDirectoryFileId",
                 table: "EnumDefinitions",
-                column: "MaidId");
+                column: "ProjectDirectoryFileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EnumDefinitions_ProjectId",
+                table: "EnumDefinitions",
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EnumMemberDefinitions_EnumDefinitionId",
@@ -243,6 +348,26 @@ namespace MaidContexts.Migrations
                 name: "IX_Maids_ProjectId",
                 table: "Maids",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectDirectories_ProjectId",
+                table: "ProjectDirectories",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectDirectoryFiles_ProjectDirectoryId",
+                table: "ProjectDirectoryFiles",
+                column: "ProjectDirectoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectStructure_ClassDefinitionId",
+                table: "ProjectStructure",
+                column: "ClassDefinitionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectStructure_ProjectDirectoryFileId",
+                table: "ProjectStructure",
+                column: "ProjectDirectoryFileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PropertyDefinitions_ClassDefinitionId",
@@ -259,6 +384,16 @@ namespace MaidContexts.Migrations
                 table: "PropertyDefinitions",
                 columns: new[] { "Name", "ClassDefinitionId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PropertyDefinitions_ProjectDirectoryFileId",
+                table: "PropertyDefinitions",
+                column: "ProjectDirectoryFileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PropertyDefinitions_ProjectStructureId",
+                table: "PropertyDefinitions",
+                column: "ProjectStructureId");
         }
 
         /// <inheritdoc />
@@ -271,16 +406,25 @@ namespace MaidContexts.Migrations
                 name: "EnumMemberDefinitions");
 
             migrationBuilder.DropTable(
-                name: "PropertyDefinitions");
+                name: "Maids");
 
             migrationBuilder.DropTable(
-                name: "ClassDefinitions");
+                name: "PropertyDefinitions");
 
             migrationBuilder.DropTable(
                 name: "EnumDefinitions");
 
             migrationBuilder.DropTable(
-                name: "Maids");
+                name: "ProjectStructure");
+
+            migrationBuilder.DropTable(
+                name: "ClassDefinitions");
+
+            migrationBuilder.DropTable(
+                name: "ProjectDirectoryFiles");
+
+            migrationBuilder.DropTable(
+                name: "ProjectDirectories");
 
             migrationBuilder.DropTable(
                 name: "Projects");

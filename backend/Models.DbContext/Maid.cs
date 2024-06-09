@@ -42,15 +42,5 @@ namespace Models.CodeMaid
 		/// 设置
 		/// </summary>
 		public required JsonDocument Setting { get; set; }
-		/// <summary>
-		/// 包含的类
-		/// </summary>
-		[AdaptIgnore]
-		public List<ClassDefinition> Classes { get; set; } = null!;
-		/// <summary>
-		/// 包含的枚举
-		/// </summary>
-		[AdaptIgnore]
-		public List<EnumDefinition> Enums { get; set; } = null!;
 	}
 }

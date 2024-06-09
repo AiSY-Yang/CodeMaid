@@ -23,5 +23,6 @@ internal class EnumDefinitionConfiguration : DatabaseEntityConfiguration<EnumDef
 		builder.Property(x => x.Name).HasComment("枚举名");
 		builder.Property(x => x.Summary).HasComment("注释");
 		builder.Property(x => x.LeadingTrivia).HasComment("前导");
+		builder.Property(x => x.ProjectDirectoryFileId);
 	}
 }

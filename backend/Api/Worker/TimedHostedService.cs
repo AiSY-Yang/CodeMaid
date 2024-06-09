@@ -1,5 +1,11 @@
 ﻿using Api.Job;
 
+using MaidContexts;
+
+using MassTransit;
+
+using MasstransitModels;
+
 using Microsoft.EntityFrameworkCore;
 
 using ServicesModels.Settings;
@@ -23,8 +29,9 @@ namespace Api.Worker
 			_logger = logger;
 		}
 		/// <inheritdoc/>
-		public Task StartAsync(CancellationToken cancellationToken)
+		public async Task StartAsync(CancellationToken cancellationToken)
 		{
+			await Task.Delay(0, cancellationToken);
 			try
 			{
 #if DEBUG
@@ -32,12 +39,12 @@ namespace Api.Worker
 #else
 				_timer = new Timer(RunAsync, null, TimeSpan.Zero, TimeSpan.FromSeconds(60));
 #endif
-				return Task.CompletedTask;
+				return;
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "定时器开启异常");
-				return Task.CompletedTask;
+				_logger.LogError(ex, "后台任务启动异常");
+				return;
 			}
 		}
 		/// <inheritdoc/>

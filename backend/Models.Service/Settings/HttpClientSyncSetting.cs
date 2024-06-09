@@ -13,6 +13,14 @@ namespace ServicesModels.Settings
 	public class HttpClientSyncSetting
 	{
 		/// <summary>
+		/// Url
+		/// </summary>
+		public string? SourceUrl { get; set; }
+		/// <summary>
+		/// swagger文档
+		/// </summary>
+		public string? SwaggerDocument { get; set; }
+		/// <summary>
 		/// 是否是手动执行
 		/// </summary>
 		public bool IsManual { get; set; }

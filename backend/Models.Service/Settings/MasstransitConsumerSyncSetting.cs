@@ -11,5 +11,14 @@ namespace ServicesModels.Settings
 	/// </summary>
 	public class MasstransitConsumerSyncSetting
 	{
+		/// <summary>
+		/// 源目录
+		/// </summary>
+		public required string SourceDirectory { get; set; }
+		/// <summary>
+		/// 目标目录
+		/// </summary>
+		public required string TargetDirectory { get; set; }
+
 	}
 }

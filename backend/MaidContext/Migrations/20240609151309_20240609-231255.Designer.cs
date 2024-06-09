@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MaidContexts.Migrations
 {
     [DbContext(typeof(MaidContext))]
-    [Migration("20240529060144_20240529-140126")]
-    partial class _20240529140126
+    [Migration("20240609151309_20240609-231255")]
+    partial class _20240609231255
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -101,10 +101,6 @@ namespace MaidContexts.Migrations
                         .HasColumnType("text")
                         .HasComment("前导");
 
-                    b.Property<long>("MaidId")
-                        .HasColumnType("bigint")
-                        .HasComment("Maid对象Id");
-
                     b.Property<int>("MemberType")
                         .HasColumnType("integer")
                         .HasComment("成员类型(0-类,1-接口,2-记录,3-结构体)");
@@ -122,6 +118,9 @@ namespace MaidContexts.Migrations
                         .HasColumnType("text")
                         .HasComment("命名空间");
 
+                    b.Property<long?>("ProjectId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Summary")
                         .HasColumnType("text")
                         .HasComment("注释");
@@ -137,10 +136,7 @@ namespace MaidContexts.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MaidId");
-
-                    b.HasIndex("Name", "MaidId")
-                        .IsUnique();
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("ClassDefinitions", t =>
                         {
@@ -168,9 +164,6 @@ namespace MaidContexts.Migrations
                         .HasColumnType("text")
                         .HasComment("前导");
 
-                    b.Property<long?>("MaidId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
@@ -179,6 +172,12 @@ namespace MaidContexts.Migrations
                     b.Property<string>("NameSpace")
                         .HasColumnType("text")
                         .HasComment("命名空间");
+
+                    b.Property<long>("ProjectDirectoryFileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ProjectId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Summary")
                         .HasColumnType("text")
@@ -190,7 +189,9 @@ namespace MaidContexts.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MaidId");
+                    b.HasIndex("ProjectDirectoryFileId");
+
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("EnumDefinitions", t =>
                         {
@@ -465,6 +466,44 @@ namespace MaidContexts.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Models.CodeMaid.ProjectStructure", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("ClassDefinitionId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset>("CreateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("创建时间");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasComment("是否有效");
+
+                    b.Property<long>("ProjectDirectoryFileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("UpdateTime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasComment("更新时间");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassDefinitionId");
+
+                    b.HasIndex("ProjectDirectoryFileId");
+
+                    b.ToTable("ProjectStructure", t =>
+                        {
+                            t.HasComment("");
+                        });
+                });
+
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
                 {
                     b.Property<long>("Id")
@@ -527,6 +566,12 @@ namespace MaidContexts.Migrations
                         .HasColumnType("text")
                         .HasComment("属性名称");
 
+                    b.Property<long>("ProjectDirectoryFileId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("ProjectStructureId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Remark")
                         .HasColumnType("text")
                         .HasComment("备注");
@@ -554,6 +599,10 @@ namespace MaidContexts.Migrations
 
                     b.HasIndex("EnumDefinitionId");
 
+                    b.HasIndex("ProjectDirectoryFileId");
+
+                    b.HasIndex("ProjectStructureId");
+
                     b.HasIndex("Name", "ClassDefinitionId")
                         .IsUnique();
 
@@ -576,20 +625,26 @@ namespace MaidContexts.Migrations
 
             modelBuilder.Entity("Models.CodeMaid.ClassDefinition", b =>
                 {
-                    b.HasOne("Models.CodeMaid.Maid", "Maid")
-                        .WithMany("Classes")
-                        .HasForeignKey("MaidId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Models.CodeMaid.Project", "Project")
+                        .WithMany("ClassDefinitions")
+                        .HasForeignKey("ProjectId");
 
-                    b.Navigation("Maid");
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.EnumDefinition", b =>
                 {
-                    b.HasOne("Models.CodeMaid.Maid", null)
-                        .WithMany("Enums")
-                        .HasForeignKey("MaidId");
+                    b.HasOne("Models.CodeMaid.ProjectDirectoryFile", "ProjectDirectoryFile")
+                        .WithMany("EnumDefinitions")
+                        .HasForeignKey("ProjectDirectoryFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.CodeMaid.Project", null)
+                        .WithMany("EnumDefinitions")
+                        .HasForeignKey("ProjectId");
+
+                    b.Navigation("ProjectDirectoryFile");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.EnumMemberDefinition", b =>
@@ -632,6 +687,25 @@ namespace MaidContexts.Migrations
                     b.Navigation("ProjectDirectory");
                 });
 
+            modelBuilder.Entity("Models.CodeMaid.ProjectStructure", b =>
+                {
+                    b.HasOne("Models.CodeMaid.ClassDefinition", "ClassDefinition")
+                        .WithMany()
+                        .HasForeignKey("ClassDefinitionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.CodeMaid.ProjectDirectoryFile", "ProjectDirectoryFile")
+                        .WithMany("ProjectStructures")
+                        .HasForeignKey("ProjectDirectoryFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClassDefinition");
+
+                    b.Navigation("ProjectDirectoryFile");
+                });
+
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>
                 {
                     b.HasOne("Models.CodeMaid.ClassDefinition", "ClassDefinition")
@@ -644,9 +718,21 @@ namespace MaidContexts.Migrations
                         .WithMany()
                         .HasForeignKey("EnumDefinitionId");
 
+                    b.HasOne("Models.CodeMaid.ProjectDirectoryFile", "ProjectDirectoryFile")
+                        .WithMany()
+                        .HasForeignKey("ProjectDirectoryFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.CodeMaid.ProjectStructure", null)
+                        .WithMany("propertyDefinitions")
+                        .HasForeignKey("ProjectStructureId");
+
                     b.Navigation("ClassDefinition");
 
                     b.Navigation("EnumDefinition");
+
+                    b.Navigation("ProjectDirectoryFile");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.ClassDefinition", b =>
@@ -659,15 +745,12 @@ namespace MaidContexts.Migrations
                     b.Navigation("EnumMembers");
                 });
 
-            modelBuilder.Entity("Models.CodeMaid.Maid", b =>
-                {
-                    b.Navigation("Classes");
-
-                    b.Navigation("Enums");
-                });
-
             modelBuilder.Entity("Models.CodeMaid.Project", b =>
                 {
+                    b.Navigation("ClassDefinitions");
+
+                    b.Navigation("EnumDefinitions");
+
                     b.Navigation("Maids");
 
                     b.Navigation("ProjectDirectories");
@@ -676,6 +759,18 @@ namespace MaidContexts.Migrations
             modelBuilder.Entity("Models.CodeMaid.ProjectDirectory", b =>
                 {
                     b.Navigation("ProjectDirectoryFiles");
+                });
+
+            modelBuilder.Entity("Models.CodeMaid.ProjectDirectoryFile", b =>
+                {
+                    b.Navigation("EnumDefinitions");
+
+                    b.Navigation("ProjectStructures");
+                });
+
+            modelBuilder.Entity("Models.CodeMaid.ProjectStructure", b =>
+                {
+                    b.Navigation("propertyDefinitions");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>

@@ -26,7 +26,7 @@ namespace Api.MasstransitConsumer
 	{
 		private readonly ILogger<ControllerCreateEventConsumer> logger;
 		private readonly MaidContext maidContext;
-
+		 
 		///<inheritdoc/>
 		public ControllerCreateEventConsumer(ILogger<ControllerCreateEventConsumer> logger, MaidContext maidContext)
 		{
@@ -50,11 +50,6 @@ namespace Api.MasstransitConsumer
 			var maid = maidContext.Maids
 			.AsSplitQuery()
 			.Include(x => x.Project)
-			.Include(x => x.Enums)
-			.ThenInclude(x => x.EnumMembers)
-			.Include(x => x.Classes)
-			.ThenInclude(x => x.Properties)
-			.ThenInclude(x => x.Attributes)
 			.First(x => x.Id == context.Message.MaidId);
 			var entityName = context.Message.EntityName;
 			var setting = maid.Setting.Deserialize<ControllerSetting>() ?? ControllerSetting.Default;

@@ -82,5 +82,6 @@ namespace Models.CodeMaid
 		/// </summary>
 		[AdaptIgnore]
 		public List<AttributeDefinition> Attributes { get; set; } = null!;
+		public required ProjectDirectoryFile ProjectDirectoryFile { get; set; }
 	}
 }

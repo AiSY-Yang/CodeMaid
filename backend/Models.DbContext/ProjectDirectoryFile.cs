@@ -42,6 +42,8 @@ namespace Models.CodeMaid
 		/// 文件类型
 		/// </summary>
 		public required FileType FileType { get; set; }
+		public required List<ProjectStructure> ProjectStructures { get; set; }
+		public required List<EnumDefinition> EnumDefinitions { get; set; }
 	}
 
 	/// <summary>
@@ -58,5 +60,13 @@ namespace Models.CodeMaid
 		/// C#文件
 		/// </summary>
 		CSahrp,
+	}
+
+
+	public class ProjectStructure : DatabaseEntity
+	{
+		public ProjectDirectoryFile ProjectDirectoryFile { get; set; }
+		public ClassDefinition ClassDefinition { get; set; }
+		public List<PropertyDefinition> propertyDefinitions { get; set; }
 	}
 }

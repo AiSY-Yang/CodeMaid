@@ -9,6 +9,8 @@ namespace Models.CodeMaid
 	/// </summary>
 	public class EnumDefinition : DatabaseEntity
 	{
+		public required ProjectDirectoryFile ProjectDirectoryFile { get; set; }
+		public long ProjectDirectoryFileId { get; set; }
 		/// <summary>
 		/// 命名空间
 		/// </summary>

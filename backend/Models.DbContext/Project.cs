@@ -34,5 +34,7 @@ namespace Models.CodeMaid
 		/// 项目目录
 		/// </summary>
 		public List<ProjectDirectory> ProjectDirectories { get; set; } = null!; 
+		public List<EnumDefinition> EnumDefinitions { get; set; } = null!; 
+		public List<ClassDefinition> ClassDefinitions { get; set; } = null!; 
 	}
 }

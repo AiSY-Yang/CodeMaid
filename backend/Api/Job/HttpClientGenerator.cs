@@ -55,27 +55,28 @@ namespace Api.Job
 		{
 			var setting = maid.Setting.Deserialize<HttpClientSyncSetting>()!;
 			string json;
-			if (Uri.TryCreate(maid.SourcePath, UriKind.Absolute, out var uri))
+			var url = setting.SourceUrl;
+			if (url is not null)
 			{
 				try
 				{
-					var res = await httpClient.GetAsync(uri);
+					var res = await httpClient.GetAsync(url);
 					if (!res.IsSuccessStatusCode)
 					{
-						logger.LogError("{maid}生成HTTP客户端错误,{url}返回状态码为{StatusCode}", maid.Name, uri, res.StatusCode);
+						logger.LogError("{maid}生成HTTP客户端错误,{url}返回状态码为{StatusCode}", maid.Name, url, res.StatusCode);
 						return;
 					}
 					json = await res.Content.ReadAsStringAsync();
 				}
 				catch (Exception ex)
 				{
-					logger.LogError(ex, "{maid}生成HTTP客户端错误,{url}", maid.Name, uri);
+					logger.LogError(ex, "{maid}生成HTTP客户端错误,{url}", maid.Name, url);
 					return;
 				}
 			}
 			else
 			{
-				json = maid.SourcePath;
+				json = setting.SwaggerDocument!;
 			}
 			var md5 = json.Hash(HashOption.MD5_32);
 			if (Md5s.TryGetValue(maid.SourcePath, out string? lastMd5) && lastMd5 == md5)

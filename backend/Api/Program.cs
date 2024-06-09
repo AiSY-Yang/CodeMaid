@@ -22,6 +22,8 @@ using Microsoft.EntityFrameworkCore;
 
 using Models.CodeMaid;
 
+using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
+
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -379,45 +381,6 @@ namespace Api
 				{
 					await InitServices.Init(app.Services);
 				});
-			//await Task.Run(async () =>
-			//	{
-			//		var scope = app.Services.CreateScope();
-			//		var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-			//		var data = context.Maids.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync)
-			//		//.Where(x => x.DestinationPath != "")
-			//		.ToList();
-			//		foreach (var item in data)
-			//		{
-			//			var setting = item.Setting.Deserialize<HttpClientSyncSetting>();
-			//			//setting.ClientPath = item.DestinationPath;
-			//			//item.DestinationPath = "";
-			//			item.Setting = JsonSerializer.SerializeToDocument(setting);
-			//		}
-			//		context.SaveChanges();
-			//	});
-#if DEBUG
-			Task.Run(async () =>
-					{
-						try
-						{
-							await Task.Delay(1000);
-							var scope = app.Services.CreateScope();
-							var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
-							var publish = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
-							var project = context.Projects.ToList();
-							await publish.Publish<ProjectUpdateEvent>(new ProjectUpdateEvent() { ProjectId = 4 });
-
-
-
-							context.SaveChanges();
-
-						}
-						catch (Exception)
-						{
-						}
-					});
-#endif
-
 			//开始运行
 			app.Run();
 			//程序结束的时候刷新日志

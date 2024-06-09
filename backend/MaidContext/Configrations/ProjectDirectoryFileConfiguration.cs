@@ -25,5 +25,6 @@ internal class ProjectDirectoryFileConfiguration : DatabaseEntityConfiguration<P
 		builder.Property(x => x.SpaceCount).HasComment("空行数");
 		builder.Property(x => x.CommentCount).HasComment("注释行数");
 		builder.Property(x => x.FileType).HasComment("文件类型(0-其他,1-C#文件)");
+		builder.Property(x => x.LastWriteTime);
 	}
 }
