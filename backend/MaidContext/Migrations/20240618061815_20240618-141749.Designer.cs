@@ -4,6 +4,7 @@ using System.Text.Json;
 using MaidContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MaidContexts.Migrations
 {
     [DbContext(typeof(MaidContext))]
-    partial class MaidContextModelSnapshot : ModelSnapshot
+    [Migration("20240618061815_20240618-141749")]
+    partial class _20240618141749
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,6 +131,7 @@ namespace MaidContexts.Migrations
                         .HasComment("更新时间");
 
                     b.Property<string>("Using")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasComment("类引用的命名空间");
 
@@ -445,9 +449,6 @@ namespace MaidContexts.Migrations
                     b.Property<long>("ProjectDirectoryId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("ProjectId")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("SpaceCount")
                         .HasColumnType("integer")
                         .HasComment("空行数");
@@ -459,8 +460,6 @@ namespace MaidContexts.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectDirectoryId");
-
-                    b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectDirectoryFiles", t =>
                         {
@@ -686,14 +685,6 @@ namespace MaidContexts.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Models.CodeMaid.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
                     b.Navigation("ProjectDirectory");
                 });
 
@@ -735,7 +726,7 @@ namespace MaidContexts.Migrations
                         .IsRequired();
 
                     b.HasOne("Models.CodeMaid.ProjectStructure", null)
-                        .WithMany("PropertyDefinitions")
+                        .WithMany("propertyDefinitions")
                         .HasForeignKey("ProjectStructureId");
 
                     b.Navigation("ClassDefinition");
@@ -780,7 +771,7 @@ namespace MaidContexts.Migrations
 
             modelBuilder.Entity("Models.CodeMaid.ProjectStructure", b =>
                 {
-                    b.Navigation("PropertyDefinitions");
+                    b.Navigation("propertyDefinitions");
                 });
 
             modelBuilder.Entity("Models.CodeMaid.PropertyDefinition", b =>

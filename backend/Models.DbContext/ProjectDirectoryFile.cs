@@ -10,9 +10,20 @@ namespace Models.CodeMaid
 	public class ProjectDirectoryFile : DatabaseEntity
 	{
 		/// <summary>
+		/// 所属项目
+		/// </summary>
+		public required Project Project { get; set; }
+		/// <summary>
+		/// 项目Id
+		/// </summary>
+		public long ProjectId { get; set; }
+		/// <summary>
 		/// 文件名
 		/// </summary>
 		public string Name { get; set; } = null!;
+		/// <summary>
+		/// 文件最后修改时间
+		/// </summary>
 		public DateTimeOffset LastWriteTime { get; set; }
 		/// <summary>
 		/// 路径
@@ -42,7 +53,13 @@ namespace Models.CodeMaid
 		/// 文件类型
 		/// </summary>
 		public required FileType FileType { get; set; }
+		/// <summary>
+		/// 项目结构
+		/// </summary>
 		public required List<ProjectStructure> ProjectStructures { get; set; }
+		/// <summary>
+		/// 关联枚举
+		/// </summary>
 		public required List<EnumDefinition> EnumDefinitions { get; set; }
 	}
 
@@ -60,13 +77,5 @@ namespace Models.CodeMaid
 		/// C#文件
 		/// </summary>
 		CSahrp,
-	}
-
-
-	public class ProjectStructure : DatabaseEntity
-	{
-		public ProjectDirectoryFile ProjectDirectoryFile { get; set; }
-		public ClassDefinition ClassDefinition { get; set; }
-		public List<PropertyDefinition> propertyDefinitions { get; set; }
 	}
 }

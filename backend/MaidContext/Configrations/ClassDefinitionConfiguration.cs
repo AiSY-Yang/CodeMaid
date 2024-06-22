@@ -27,6 +27,6 @@ internal class ClassDefinitionConfiguration : DatabaseEntityConfiguration<ClassD
 		builder.Property(x => x.Using).HasComment("类引用的命名空间");
 		builder.Property(x => x.LeadingTrivia).HasComment("前导");
 		builder.Property(x => x.MemberType).HasComment("成员类型(0-类,1-接口,2-记录,3-结构体)");
-		builder.Property(x => x.ProjectId);
+		builder.Property(x => x.ProjectId).HasComment("所属项目");
 	}
 }

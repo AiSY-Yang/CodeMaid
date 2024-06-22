@@ -42,7 +42,11 @@ namespace Api.MasstransitConsumer
 				.Include(x => x.ProjectDirectories)
 				.ThenInclude(x => x.ProjectDirectoryFiles)
 				.FirstAsync(x => x.Id == context.Message.ProjectId);
-
+			if (!Directory.Exists(project.Path))
+			{
+				logger.LogError("项目{project}的路径{path}不存在", project.Name, project.Path);
+				return;
+			}
 			project.ProjectDirectories.ForEach(x =>
 			{
 				x.ProjectDirectoryFiles.ForEach(x => x.IsDeleted = true);
@@ -116,6 +120,7 @@ namespace Api.MasstransitConsumer
 					{
 						projectDirectoryFile = new ProjectDirectoryFile()
 						{
+							Project=project,
 							LinesCount = linesCount,
 							CommentCount = commentCount,
 							SpaceCount = spaceCount,
@@ -166,7 +171,8 @@ namespace Api.MasstransitConsumer
 				EnableRaisingEvents = true,
 			};
 			watcher.Changed += Watcher_Changed;
-			watcher.Renamed += Watcher_Renamed;
+			watcher.Renamed += Watcher_Changed;
+			watcher.Created += Watcher_Changed;
 			watcher.Deleted += Watcher_Deleted;
 
 			MaidService.Watchers[project.Id] = watcher;
@@ -179,18 +185,12 @@ namespace Api.MasstransitConsumer
 		{
 			await FileChange(MaidService.WatcherToProject[(FileSystemWatcher)sender], e.FullPath, true);
 		}
-
-		private static async void Watcher_Renamed(object sender, RenamedEventArgs e)
-		{
-			await FileChange(MaidService.WatcherToProject[(FileSystemWatcher)sender], e.FullPath, false);
-		}
-
 		private static async void Watcher_Changed(object sender, FileSystemEventArgs e)
 		{
 			await FileChange(MaidService.WatcherToProject[(FileSystemWatcher)sender], e.FullPath, false);
 		}
 		/// <summary>
-		/// 变更筛选器 VS修改文件的时候可能使用的是创建 修改 重命名的操作 要把中间文件排除掉
+		/// 变更筛选器
 		/// </summary>
 		/// <param name="project"></param>
 		/// <param name="filePath">文件路径</param>
@@ -198,12 +198,9 @@ namespace Api.MasstransitConsumer
 		/// <returns></returns>
 		private static async Task FileChange(Project project, string filePath, bool isDelete)
 		{
-			//if (Path.GetExtension(filePath) != ".TMP")
-			//{
 			var msg = new FileChangeEvent() { ProjectId = project.Id, ProjectPath = project.Path, FilePath = filePath, IsDelete = isDelete };
 			using var scope = Program.Services.CreateScope();
 			await scope.ServiceProvider.GetRequiredService<IPublishEndpoint>().Publish(msg);
-			//}
 		}
 	}
 	///<inheritdoc/>

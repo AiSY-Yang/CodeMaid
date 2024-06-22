@@ -44,7 +44,7 @@ namespace Models.CodeMaid
 		/// <summary>
 		/// 类引用的命名空间
 		/// </summary>
-		public string Using { get; set; } = null!;
+		public string? Using { get; set; }
 		/// <summary>
 		/// 前导
 		/// </summary>

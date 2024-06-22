@@ -22,6 +22,10 @@ namespace Models.CodeMaid
 		/// </summary>
 		public Project Project { get; set; } = null!;
 		/// <summary>
+		/// 项目Id
+		/// </summary>
+		public long ProjectId { get; set; }
+		/// <summary>
 		/// 目录
 		/// </summary>
 		public List<ProjectDirectoryFile> ProjectDirectoryFiles { get; set; } = null!;

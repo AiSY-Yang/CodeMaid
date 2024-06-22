@@ -47,6 +47,9 @@ namespace MaidContexts
 		/// 项目文件
 		/// </summary>
 		public virtual DbSet<ProjectDirectoryFile> ProjectDirectoryFiles { get; set; } = null!;
+	
+	
+		public virtual DbSet<ProjectStructure> ProjectStructures { get; set; } = null!;
 		public MaidContext(DbContextOptions<MaidContext> options) : base(options)
 		{
 		}

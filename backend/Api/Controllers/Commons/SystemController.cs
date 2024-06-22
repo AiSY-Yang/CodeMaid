@@ -134,7 +134,6 @@ public class SystemController : CommonController
     [HttpPatch("[action]")]
     public async Task<object> Echo(int? statusCode, int? delay)
     {
-        await Console.Out.WriteLineAsync(delay.ToString());
         if (delay is not null)
             await Task.Delay(delay.Value);
         var req = new

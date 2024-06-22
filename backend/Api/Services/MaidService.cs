@@ -67,6 +67,7 @@ namespace Api.Services
 					CreateEnumEntity(enumNode).Adapt(e);
 				}
 				e.ProjectDirectoryFile = file;
+				e.ProjectDirectoryFileId = file.Id;
 				//记录这个枚举现在有的成员
 				HashSet<string> MemberList = new();
 				//记录上次枚举的成员值到了多少 如果没有值的话上次值+1则为新的值
@@ -101,26 +102,35 @@ namespace Api.Services
 			//}
 			#endregion
 			#region 更新类
-			List<ClassDeclarationSyntax> classes = compilationUnit.GetDeclarationSyntaxes<ClassDeclarationSyntax>();
+			List<TypeDeclarationSyntax> classes = compilationUnit.GetDeclarationSyntaxes<TypeDeclarationSyntax>();
 			foreach (var classNode in classes)
 			{
+				ProjectStructure projectStructures;
 				var c = file.ProjectStructures.Select(x => x.ClassDefinition).FirstOrDefault(x => x.Name.Equals(classNode.Identifier.ValueText, StringComparison.OrdinalIgnoreCase));
 				if (c == null)
 				{
 					c = CreateClassEntity(classNode);
-					file.ProjectStructures.Add(new ProjectStructure() { ClassDefinition = c, ProjectDirectoryFile = file });
+					projectStructures = new ProjectStructure()
+					{
+						ClassDefinition = c,
+						ProjectDirectoryFile = file,
+						PropertyDefinitions = new List<PropertyDefinition>(),
+					};
+					file.ProjectStructures.Add(projectStructures);
 					maidContext.ClassDefinitions.Add(c);
 				}
 				else
 				{
 					CreateClassEntity(classNode).Adapt(c);
+					projectStructures = file.ProjectStructures.First(x => x.ClassDefinition == c);
 				}
+				c.ProjectId = file.ProjectId;
 				c.Using = usingText;
+				projectStructures.PropertyDefinitions.ForEach(x=>x.IsDeleted = true);
 				//记录这个类现在有的属性
-				HashSet<string> Properties = new();
 				foreach (var propertyDeclaration in classNode.Members.OfType<PropertyDeclarationSyntax>())
 				{
-					var p = c.Properties.FirstOrDefault(x => x.Name == propertyDeclaration.Identifier.Text);
+					var p = projectStructures.PropertyDefinitions.FirstOrDefault(x => x.Name == propertyDeclaration.Identifier.Text);
 					if (p == null)
 					{
 						p = CreatePropertyEntity(c, propertyDeclaration);
@@ -158,10 +168,8 @@ namespace Api.Services
 					//	p.IsEnum = false;
 					//	p.EnumDefinition = null;
 					//}
-					Properties.Add(p.Name);
+					projectStructures.PropertyDefinitions.Add(p);
 				}
-				//本次如果没有这个属性的话 则标记删除
-				c.Properties.Where(x => !Properties.Contains(x.Name)).ToList().ForEach(x => x.IsDeleted = true);
 			}
 			#endregion
 		}
@@ -187,7 +195,9 @@ namespace Api.Services
 
 						namespace Api.MasstransitConsumer
 						{
-							///<inheritdoc/>
+							/// <summary>
+							/// {{classDefinition.Summary}}
+							/// </summary>
 							public class {{classDefinition.Name}}Consumer : IConsumer<{{classDefinition.Name}}>
 							{
 								private readonly ILogger<{{classDefinition.Name}}Consumer> logger;
@@ -490,7 +500,7 @@ Configure$1
 		/// </summary>
 		/// <param name="maid"></param>
 		/// <returns></returns>
-	public	static async Task UpdateDto(List<ClassDefinition> classes, DtoSyncSetting setting, string destinationPath)
+		public static async Task UpdateDto(List<ClassDefinition> classes, DtoSyncSetting setting, string destinationPath)
 		{
 			//确认目标路径的存在
 			if (!Directory.Exists(destinationPath))

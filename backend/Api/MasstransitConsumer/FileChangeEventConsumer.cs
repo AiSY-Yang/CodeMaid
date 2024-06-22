@@ -36,13 +36,15 @@ namespace Api.MasstransitConsumer
 		///<inheritdoc/>
 		public async Task Consume(ConsumeContext<Batch<FileChangeEvent>> context)
 		{
-			foreach (var eventMessage in context.Message)
+			//只保留最新的文件状态 因为VS保存文件的时候会采用删除 重命名 修改的方式
+			var messageList = context.Message.Select(x => x.Message).Reverse().DistinctBy(x => x.ProjectPath).ToList();
+			foreach (var message in messageList)
 			{
-				var message = eventMessage.Message;
 				if (File.Exists(Path.Combine(message.ProjectPath, ".git", "index.lock")) || File.Exists(Path.Combine(message.ProjectPath, ".git", "HEAD.lock")))
 				{
 					logger.LogInformation("分支切换中,稍后再试");
-					throw new Exception("分支切换中,稍后再试");
+					await context.Redeliver(TimeSpan.FromSeconds(3));
+					return;
 				}
 				if (!MaidService.Projects.TryGetValue(message.ProjectId, out var project)) throw new Exception("项目属性被锁定,稍后再试");
 				if (!project.GitBranch.IsNullOrEmpty())
@@ -80,19 +82,34 @@ namespace Api.MasstransitConsumer
 				var addClasses = maidContext.ChangeTracker.Entries<ClassDefinition>().Where(x => x.State == EntityState.Added).ToList();
 				var deleteClasses = maidContext.ChangeTracker.Entries<ClassDefinition>().Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == true).ToList();
 				var modifiedClasses = maidContext.ChangeTracker.Entries<ClassDefinition>().Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == false).ToList();
-				var addProperties = maidContext.ChangeTracker.Entries<PropertyDefinition>().Where(x => x.State == EntityState.Added).ToList();
-				var deleteProperties = maidContext.ChangeTracker.Entries<PropertyDefinition>().Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == true).ToList();
-				var modifiedProperties = maidContext.ChangeTracker.Entries<PropertyDefinition>().Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == false).ToList();
+
+				var properties = maidContext.ChangeTracker.Entries<PropertyDefinition>().ToList();
+				var addProperties = properties.Where(x => x.State == EntityState.Added).ToList();
+				var deleteProperties = properties.Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == true).ToList();
+				var modifiedProperties = properties.Where(x => x.State == EntityState.Modified && x.Entity.IsDeleted == false).ToList();
+				var enums = maidContext.ChangeTracker.Entries<EnumDefinition>().Where(x => x.State == EntityState.Added || x.State == EntityState.Modified).ToList();
+
+				properties.ForEach(x =>
+					{
+						var e = enums.Where(e => e.Entity.Name == x.Entity.Type).FirstOrDefault();
+						if (e is not null)
+						{
+							x.Entity.IsEnum = true;
+							x.Entity.EnumDefinition = e.Entity;
+						}
+					});
 				try
 				{
 					await maidContext.SaveChangesAsync();
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
-
-					throw;
+					logger.LogError(ex, "数据保存失败");
 				}
-
+				enums.ForEach(async e =>
+				{
+					await context.Publish(new EnumUpdateEvent() { EnumId = e.Entity.Id, ProjectId = project.Id });
+				});
 
 				var maid = await maidContext.Maids
 							.AsSplitQuery()
@@ -113,6 +130,7 @@ namespace Api.MasstransitConsumer
 								if (!file.Path.StartsWith(sourcePath)) continue;
 								deleteClasses.ForEach(async x =>
 								{
+									if (x.Entity.MemberType != MemberType.ClassDeclarationSyntax) return;
 									var classDefinition = x.Entity;
 									string fileName = Path.Combine(targetPath, $"{classDefinition.Name}Configuration.cs");
 									if (File.Exists(fileName)) File.Delete(fileName);
@@ -120,6 +138,7 @@ namespace Api.MasstransitConsumer
 								});
 								addClasses.Union(modifiedClasses).ToList().ForEach(async x =>
 								{
+									if (x.Entity.MemberType != MemberType.ClassDeclarationSyntax) return;
 									if (contextPath is not null) await MaidService.UpdateDataBaseContext(x.Entity, contextPath);
 									var classDefinition = x.Entity;
 									string fileName = Path.Combine(targetPath, $"{classDefinition.Name}Configuration.cs");
@@ -190,7 +209,6 @@ namespace Api.MasstransitConsumer
 									await MaidService.MasstransitConsumerSync(x.Entity, fileName);
 								});
 							}
-
 							break;
 						default:
 							break;
@@ -207,8 +225,8 @@ namespace Api.MasstransitConsumer
 		protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<FileChangeEventConsumer> consumerConfigurator, IRegistrationContext context)
 		{
 			endpointConfigurator.ConcurrentMessageLimit = 1;
-			endpointConfigurator
-				.UseScheduledRedelivery(x => x.Interval(9999, TimeSpan.FromSeconds(1)));
+			//endpointConfigurator
+			//	.UseScheduledRedelivery(x => x.Interval(9999, TimeSpan.FromSeconds(1)));
 			consumerConfigurator
 				.Options<BatchOptions>(options => options.SetMessageLimit(9999)
 				.SetConcurrencyLimit(1)
