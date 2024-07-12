@@ -20,5 +20,6 @@ internal class ProjectDirectoryConfiguration : DatabaseEntityConfiguration<Proje
 		builder.Metadata.SetComment("项目目录");
 		builder.Property(x => x.Name).HasComment("目录名");
 		builder.Property(x => x.Path).HasComment("路径");
+		builder.Property(x => x.ProjectId).HasComment("项目Id");
 	}
 }

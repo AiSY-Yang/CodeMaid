@@ -73,7 +73,7 @@ namespace Api.Controllers
 				        if (branch in p.stdout.decode("utf-8")):
 				            function.execute_command('git pull')
 				        # 设定不带-的分支为主分支 禁止提交
-				        if (('-' not in branch) and branch != 'az'):
+				        if ('-' not in branch):
 				            print(".git/hooks: 不能commit到 {} 分支".format(branch))
 				            exit(1)
 
@@ -90,7 +90,7 @@ namespace Api.Controllers
 				        'git rev-parse --symbolic --abbrev-ref HEAD').strip()
 				    if ('-' in branch):
 				        kv = branch.split("-")
-				        function.execute_command('git checkout '+kv[1])
+				        function.execute_command('git checkout '+kv[0])
 				        function.execute_command('git pull ')
 				        res = function.execute_command('git merge '+branch)
 				        function.execute_command('git push ')

@@ -17,6 +17,6 @@ internal class ProjectStructureConfiguration : DatabaseEntityConfiguration<Proje
 	/// </summary>
 	static void ConfigureComment(EntityTypeBuilder<ProjectStructure> builder)
 	{
-		builder.Metadata.SetComment("");
+		builder.Metadata.SetComment("项目结构");
 	}
 }

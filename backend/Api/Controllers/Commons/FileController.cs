@@ -1,7 +1,11 @@
+using System.ComponentModel;
 using System.Net.Mime;
+using System.Runtime.CompilerServices;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace Api.Controllers.Commons;
 /// <summary>
@@ -9,16 +13,13 @@ namespace Api.Controllers.Commons;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
-public class FileController : CommonController
+public partial class FileController(ILogger<FileController> logger) : CommonController
 {
 	/// <summary>
 	/// 
 	/// </summary>
-	private ILogger<FileController> logger;
-	public FileController(ILogger<FileController> logger)
-	{
-		this.logger = logger;
-	}
+	private readonly ILogger<FileController> logger = logger;
+
 	/// <summary>
 	/// 文件是否存在
 	/// </summary>
@@ -107,23 +108,18 @@ public class FileController : CommonController
 	/// 同步写入文件
 	/// </summary>
 	/// <param name="filePath">文件完整路径</param>
-	/// <param name="_">文件</param>
 	/// <returns></returns>
 	[HttpPost("[action]")]
 	[RequestSizeLimit(long.MaxValue)]
-	public async Task<string> SyncWrite(string filePath, [BindNever] IFormFile file)
+	[Consumes(MediaTypeNames.Application.Octet)]
+	public async Task<string> SyncWrite([FromQuery] string filePath)
 	{
-		logger.LogInformation($"SyncWrite {filePath}");
-		var stream = new FileStream(filePath, FileMode.Create);
-		logger.LogInformation($"SyncWrite {filePath} stream created");
+		using var stream = new FileStream(filePath, FileMode.Create);
 		await HttpContext.Request.Body.CopyToAsync(stream);
-		logger.LogInformation($"SyncWrite {filePath} stream copied");
 		await stream.FlushAsync();
-		logger.LogInformation($"SyncWrite {filePath} stream flushed");
-		stream.Dispose();
-		logger.LogInformation($"SyncWrite {filePath} stream disposed");
 		return filePath;
 	}
+
 	/// <summary>
 	/// 文本内容
 	/// </summary>

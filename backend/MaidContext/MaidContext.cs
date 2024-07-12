@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using System.Text.Json;
 
 using ContextBases;
@@ -48,7 +49,9 @@ namespace MaidContexts
 		/// </summary>
 		public virtual DbSet<ProjectDirectoryFile> ProjectDirectoryFiles { get; set; } = null!;
 	
-	
+		/// <summary>
+		/// 项目结构
+		/// </summary>
 		public virtual DbSet<ProjectStructure> ProjectStructures { get; set; } = null!;
 		public MaidContext(DbContextOptions<MaidContext> options) : base(options)
 		{

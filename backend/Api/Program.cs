@@ -1,8 +1,6 @@
-using System.Linq;
 using System.Net;
-using System.Text.Json;
 
-using Api.Controllers;
+using Api.Controllers.Commons;
 using Api.Job;
 using Api.Middleware;
 using Api.Middleware.Swagger;
@@ -12,17 +10,10 @@ using MaidContexts;
 
 using MassTransit;
 
-using MasstransitModels;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using Models.CodeMaid;
-
-using Npgsql.EntityFrameworkCore.PostgreSQL.Query.Expressions.Internal;
 
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
@@ -34,7 +25,6 @@ using Serilog;
 using ServicesModels.Results;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
-
 
 namespace Api
 {
@@ -57,6 +47,8 @@ namespace Api
 		public static async Task Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
+			//var myOptions = new MyRateLimitOptions();
+			//builder.Configuration.GetSection(MyRateLimitOptions.MyRateLimit).Bind(myOptions);
 			var openTelemetryEndpoint = builder.Configuration.GetValue<string>("OpenTelemetryEndpoint")!;
 			var openTelemetryLogsEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/logs";
 			var openTelemetryTracesEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/traces";
@@ -118,8 +110,7 @@ namespace Api
 				options.Filters.Add<HttpResponseExceptionFilter>();
 				//支持从body直接接收string参数
 				options.InputFormatters.Add(new TextFormatter());
-			})
-				.ConfigureApiBehaviorOptions(options =>
+			}).ConfigureApiBehaviorOptions(options =>
 				{
 					options.InvalidModelStateResponseFactory = x =>
 					{
@@ -135,6 +126,21 @@ namespace Api
 					options.JsonSerializerOptions.ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip;
 					options.JsonSerializerOptions.AllowTrailingCommas = true;
 				}).AddDataAnnotationsLocalization();
+			////接口速率限制
+			//builder.Services.AddRateLimiter(x => x.GlobalLimiter = System.Threading.RateLimiting.PartitionedRateLimiter.Create<HttpContext, IPAddress>(context =>
+			//{
+			//	IPAddress? remoteIpAddress = context.Connection.RemoteIpAddress;
+			//	if (!IPAddress.IsLoopback(remoteIpAddress!))
+			//	{
+			//		return System.Threading.RateLimiting.RateLimitPartition.GetTokenBucketLimiter
+			//		(remoteIpAddress!, _ =>
+			//			new System.Threading.RateLimiting.TokenBucketRateLimiterOptions
+			//			{
+			//			});
+			//	}
+
+			//	return System.Threading.RateLimiting.RateLimitPartition.GetNoLimiter(IPAddress.Loopback);
+			//}));
 			//添加响应压缩
 			builder.Services.AddResponseCompression();
 			//i18n
@@ -211,6 +217,7 @@ namespace Api
 			{
 				//添加所有消费者
 				configurator.AddConsumers(System.Reflection.Assembly.GetExecutingAssembly());
+				configurator.AddInMemoryInboxOutbox();
 				//使用内存队列
 				configurator.UsingInMemory((context, cfg) =>
 				{
@@ -345,9 +352,9 @@ namespace Api
 			{
 				OnPrepareResponse = context =>
 				{
-					//处理点击劫持漏洞
+					//当前端文件由后端返回的时候 处理点击劫持漏洞
 					context.Context.Response.Headers.XFrameOptions = "SAMEORIGIN";
-					//CSP防止XSS
+					//当前端文件由后端返回的时候 CSP防止XSS
 					context.Context.Response.Headers.ContentSecurityPolicy = "script-src 'self'";
 				}
 			});

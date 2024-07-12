@@ -57,67 +57,6 @@ internal class Program
 		client?.Disconnect();
 	}
 	/// <summary>
-	/// 
-	/// </summary>
-	/// <typeparam name="T">原对象和复制到的对象</typeparam>
-	/// <typeparam name="T2">多对多关联的对象</typeparam>
-	/// <param name="targetContext">数据库上下文</param>
-	/// <param name="data">要同步的数据</param>
-	/// <param name="include">选择多对多关系的表达式</param>
-	/// <param name="action">重新建立关系的表达式 参数为新对象 源对象 多对多关系的数据列表</param>
-	static void SyncMany<T, T2>(DbContext targetContext, IEnumerable<T> data, Expression<Func<T, IEnumerable<T2>>> include, Action<T, T, List<T2>> action) where T : DatabaseEntity where T2 : DatabaseEntity
-	{
-		Console.Write($"同步{typeof(T).Name}表");
-		var ids = data.Select(x => x.Id).ToList();
-		Console.Write($",一共{ids.Count}条数据");
-		var has = targetContext.Set<T>().Include(include).Where(x => ids.Contains(x.Id)).ToList();
-		Console.Write($",其中更新{has.Count}条,新增{ids.Count - has.Count}条");
-		Console.WriteLine();
-		Stopwatch stopwatch = new();
-		stopwatch.Start();
-		var i = 0;
-		var func = include.Compile();
-		var relativeIds = data.SelectMany(x => func(x)).Select(x => x.Id).ToList();
-		var relativeData = targetContext.Set<T2>().Where(x => relativeIds.Contains(x.Id)).ToList();
-		foreach (var item in relativeData)
-		{
-			Console.SetCursorPosition(0, Console.CursorTop);
-			Console.Write($"{i}/{ids.Count}");
-			var testData = relativeData.FirstOrDefault(x => x.Id == item.Id);
-			if (testData is null)
-			{
-				testData = item.Adapt<T2>();
-				relativeData.Add(testData);
-				targetContext.Set<T2>().Add(testData);
-			}
-			else
-			{
-				item.Adapt(testData);
-			}
-		}
-
-		foreach (var item in data)
-		{
-			Console.SetCursorPosition(0, Console.CursorTop);
-			Console.Write($"{i}/{ids.Count}");
-			var testData = has.FirstOrDefault(x => x.Id == item.Id);
-			if (testData is null)
-			{
-				targetContext.Set<T>().Add(item.Adapt<T>());
-			}
-			else
-			{
-				item.Adapt(testData);
-			}
-			var id = func(item).Select(x => x.Id).ToList();
-			var x = relativeData.Where(x => func(item).Select(x => x.Id).Contains(x.Id)).ToList();
-			action(testData!, item, relativeData);
-		}
-		targetContext.SaveChanges();
-		targetContext.ChangeTracker.Clear();
-		Console.WriteLine($"执行完成,耗时{stopwatch.ElapsedMilliseconds / 1000}秒");
-	}
-	/// <summary>
 	/// 复制数据
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
@@ -128,10 +67,8 @@ internal class Program
 		var list = data.Where(x => x != null).Distinct().ToList();
 		Console.Write($"同步{typeof(T).Name}表");
 		var ids = list.Select(x => x.Id).ToList();
-		Console.Write($",一共{ids.Count}条数据");
-		var has = targetContext.Set<T>().Where(x => ids.Contains(x.Id)).ToList();
-		Console.Write($",其中更新{has.Count}条,新增{ids.Count - has.Count}条");
-		Console.WriteLine();
+		Console.WriteLine($",一共{ids.Count}条数据");
+		var has = targetContext.Set<T>().IgnoreQueryFilters().Where(x => ids.Contains(x.Id)).ToList();
 		Stopwatch stopwatch = new();
 		stopwatch.Start();
 		var i = 0;
@@ -139,7 +76,7 @@ internal class Program
 		{
 			i++;
 			Console.SetCursorPosition(0, Console.CursorTop);
-			Console.Write($"{i}/{ids.Count}");
+			Console.Write($"已完成{i}/{ids.Count}");
 			var testData = has.FirstOrDefault(x => x.Id == item.Id);
 			if (testData is null)
 			{
@@ -150,6 +87,10 @@ internal class Program
 				item.Adapt(testData);
 			}
 		}
+		var updateCount = targetContext.ChangeTracker.Entries().Where(x => x.State == EntityState.Modified).Count();
+		var addCount = targetContext.ChangeTracker.Entries().Where(x => x.State == EntityState.Added).Count();
+		var unchangedCount = targetContext.ChangeTracker.Entries().Where(x => x.State == EntityState.Unchanged).Count();
+		Console.WriteLine($",其中更新{updateCount}条,新增{addCount}条,未变化{unchangedCount}条");
 		targetContext.SaveChanges();
 		targetContext.ChangeTracker.Clear();
 		Console.WriteLine($"执行完成,耗时{stopwatch.ElapsedMilliseconds / 1000}秒");
@@ -188,6 +129,5 @@ internal class Program
 		//		adapterConfig.ForType<BossDetection, BossDetection>()
 		//.AfterMapping(x => x.TeamId = Team ?? x.TeamId)
 		//;
-
 	}
 }

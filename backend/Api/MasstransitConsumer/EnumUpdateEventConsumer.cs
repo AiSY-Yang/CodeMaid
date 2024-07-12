@@ -27,7 +27,7 @@ namespace Api.MasstransitConsumer
 		{
 			var e = maidContext.EnumDefinitions.First(x => x.Id == context.Message.EnumId);
 			var ps = await maidContext.Projects
-				.Where(x => x.Id == context.Message.ProjectId)
+				.Where(x => x.Id == context.Message.ProjectId)  
 				.SelectMany(x => x.ClassDefinitions)
 				.SelectMany(x => x.Properties.Where(x => x.Type == e.Name))
 				.ToListAsync();

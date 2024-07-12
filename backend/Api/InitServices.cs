@@ -17,8 +17,6 @@ namespace Api
 {
 	class InitServices
 	{
-		static IServiceProvider serviceProvider = null!;
-		static readonly ConcurrentDictionary<FileSystemWatcher, Maid> Watchers = new();
 		/// <summary>
 		/// 初始化文件监听器
 		/// </summary>
@@ -31,7 +29,8 @@ namespace Api
 			await bus.StartAsync();
 			var publish = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 			var project = context.Projects.Where(x => !x.IsDeleted).ToList();
-			foreach (var item in project) await publish.Publish<ProjectUpdateEvent>(new ProjectUpdateEvent() { ProjectId = item.Id });
+			foreach (var item in project)
+				await publish.Publish(new ProjectUpdateEvent() { ProjectId = item.Id });
 		}
 	}
 }

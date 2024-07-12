@@ -28,7 +28,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static ServicesModels.Settings.DtoSyncSetting;
 
 using Project = Models.CodeMaid.Project;
-
+using ProjectId = long;
 namespace Api.Services
 {
 	/// <summary>
@@ -36,14 +36,18 @@ namespace Api.Services
 	/// </summary>
 	public class MaidService
 	{
-		public static readonly ConcurrentDictionary<long, Project> Projects = new();
-		public static readonly ConcurrentDictionary<long, FileSystemWatcher> Watchers = new();
-		public static readonly ConcurrentDictionary<FileSystemWatcher, Project> WatcherToProject = new();
+		public static readonly ConcurrentDictionary<ProjectId, ProjectInformation> Projects = new();
 
+		public class ProjectInformation
+		{
+			public Project Project { get; set; }
+			public FileSystemWatcher? FileSystemWatcher { get; set; }
+		}
 		/// <summary>
 		/// 指定文件更新maid信息
 		/// </summary>
-		/// <param name="maid"></param>
+		/// <param name="file"></param>
+		/// <param name="maidContext"></param>
 		/// <param name="path">文件路径</param>
 		/// <returns></returns>
 		public static async Task Update(Models.CodeMaid.ProjectDirectoryFile file, MaidContext maidContext, string path)
@@ -126,7 +130,7 @@ namespace Api.Services
 				}
 				c.ProjectId = file.ProjectId;
 				c.Using = usingText;
-				projectStructures.PropertyDefinitions.ForEach(x=>x.IsDeleted = true);
+				projectStructures.PropertyDefinitions.ForEach(x => x.IsDeleted = true);
 				//记录这个类现在有的属性
 				foreach (var propertyDeclaration in classNode.Members.OfType<PropertyDeclarationSyntax>())
 				{
@@ -157,17 +161,6 @@ namespace Api.Services
 					}
 					p.ClassDefinitionId = c.Id;
 					p.ProjectDirectoryFile = file;
-					//var e = project.EnumDefinitions.FirstOrDefault(x => !x.IsDeleted && x.Name == p.Type.TrimEnd('?'));
-					//if (e is not null)
-					//{
-					//	p.IsEnum = true;
-					//	p.EnumDefinition = e;
-					//}
-					//else
-					//{
-					//	p.IsEnum = false;
-					//	p.EnumDefinition = null;
-					//}
 					projectStructures.PropertyDefinitions.Add(p);
 				}
 			}
@@ -177,7 +170,8 @@ namespace Api.Services
 		/// <summary>
 		/// Generate Masstransit Consumer
 		/// </summary>
-		/// <param name="maid"></param>
+		/// <param name="classDefinition"></param>
+		/// <param name="destinationPath"></param>
 		/// <returns></returns>
 		public static async Task MasstransitConsumerSync(ClassDefinition classDefinition, string destinationPath)
 		{
@@ -498,58 +492,13 @@ Configure$1
 		/// <summary>
 		/// 更新DTO的功能
 		/// </summary>
-		/// <param name="maid"></param>
+		/// <remarks>更新Dto需要传入所有的实体类和配置,因为某个实体改变的时候,其他实体中的属性需要变,而这个属性是不确定的</remarks>
+		/// <param name="classes"></param>
+		/// <param name="setting"></param>
+		/// <param name="destinationPath"></param>
 		/// <returns></returns>
 		public static async Task UpdateDto(List<ClassDefinition> classes, DtoSyncSetting setting, string destinationPath)
 		{
-			//确认目标路径的存在
-			if (!Directory.Exists(destinationPath))
-				Directory.CreateDirectory(destinationPath);
-			//所有的类都进行更新
-			foreach (var c in classes
-				.Where(x => !x.IsAbstract)
-				.Where(x => x.UpdateTime > DateTimeOffset.Now.AddMinutes(-1))
-				)
-			{
-				if (setting.CreateDirectory)
-				{
-					//生成Dto的目录
-					string dirPath = Path.Combine(destinationPath, c.Name + setting.Suffix);
-					if (c.IsDeleted)
-					{
-						if (Directory.Exists(dirPath))
-						{
-							Directory.Delete(dirPath, true);
-						}
-					}
-					else
-					{
-						if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-						foreach (var dtoSetting in setting.DtoSyncItemSettings)
-						{
-							string className = c.Name + dtoSetting.Suffix;
-							string fileName = Path.Combine(dirPath, className + ".cs");
-							await UpdateDto(fileName, className, c, dtoSetting);
-						}
-					}
-				}
-				else
-				{
-					string fileName = Path.Combine(destinationPath, c.Name + setting.Suffix + ".cs");
-					if (c.IsDeleted)
-					{
-						File.Delete(fileName);
-					}
-					else
-					{
-						foreach (var dtoSetting in setting.DtoSyncItemSettings)
-						{
-							string className = c.Name + dtoSetting.Suffix;
-							await UpdateDto(fileName, className, c, dtoSetting);
-						}
-					}
-				}
-			}
 			#region 同步属性的功能
 			foreach (var file in Directory.GetFiles(destinationPath, "*.cs", SearchOption.AllDirectories))
 			{
@@ -567,7 +516,7 @@ Configure$1
 		/// </summary>
 		/// <param name="classDeclaration">需要同步的类</param>
 		/// <param name="source">需要同步的属性</param>
-		/// <param name="maid">保存好所有关联对象的maid</param>
+		/// <param name="classes">所有模型类的集合</param>
 		/// <returns></returns>
 		static PropertyDeclarationSyntax SyncProperties(ClassDeclarationSyntax classDeclaration, PropertyDeclarationSyntax source, List<ClassDefinition> classes)
 		{
@@ -626,7 +575,7 @@ Configure$1
 		/// <summary>
 		/// 根据属性名称找到可以组合成这个名称的一组属性
 		/// </summary>
-		/// <param name="maid">保存好所有关联对象的maid</param>
+		/// <param name="classes">所有模型类的集合</param>
 		/// <param name="c">原来的类</param>
 		/// <param name="name">属性的名称</param>
 		/// <returns></returns>
@@ -686,7 +635,7 @@ Configure$1
 		/// <param name="classDefinition">类信息</param>
 		/// <param name="setting">设置</param>
 		/// <returns></returns>
-		static async Task UpdateDto(string fileName, string className, ClassDefinition classDefinition, DtoSyncItemSetting setting)
+		public static async Task UpdateDto(string fileName, string className, ClassDefinition classDefinition, DtoSyncItemSetting setting)
 		{
 			CompilationUnitSyntax compilationUnit;
 			if (File.Exists(fileName))
