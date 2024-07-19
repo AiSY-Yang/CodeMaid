@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using System.Net.Mime;
 
 using ExtensionMethods;
 
@@ -181,7 +182,9 @@ public class DirectoryController : CommonController
 	/// <param name="path"></param>
 	/// <returns></returns>
 	[HttpGet("[action]")]
-	public async Task<ActionResult> ZipAsync(string path)
+	[ProducesResponseType<Stream>(200, MediaTypeNames.Application.Zip)]
+	[ProducesResponseType(404)]
+	public async Task<ActionResult> Zip(string path)
 	{
 		if (Directory.Exists(path))
 		{

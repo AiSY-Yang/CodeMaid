@@ -89,6 +89,7 @@ namespace Api
 			//添加映射配置
 			builder.Services.AddMapster();
 			//添加数据库
+			builder.Services.AddEntityFrameworkNpgsql();
 			string? connectionString = builder.Configuration.GetConnectionString("MaidContext");
 			builder.Services.AddDbContextPool<MaidContext>((serviceProvider, dbContextBuilder) =>
 							dbContextBuilder.UseNpgsql(connectionString
@@ -154,7 +155,6 @@ namespace Api
 			});
 
 			//添加基础组件
-			builder.Services.AddEntityFrameworkNpgsql();
 			builder.Services.AddHttpClient();
 			builder.Services.AddHttpClient("ignoreCertificate")
 				.ConfigurePrimaryHttpMessageHandler(x => new HttpClientHandler() { ServerCertificateCustomValidationCallback = (a, b, c, d) => true });

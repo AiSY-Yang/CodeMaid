@@ -32,7 +32,7 @@ namespace Api.MasstransitConsumer
 		private readonly ILogger<FileChangeEventConsumer> logger;
 		private readonly MaidContext maidContext;
 		private static readonly string[] sourceArray = [".git", "bin", "obj", "node_modules", "Migrations"];
-
+		
 		///<inheritdoc/>
 		public FileChangeEventConsumer(ILogger<FileChangeEventConsumer> logger, MaidContext maidContext)
 		{

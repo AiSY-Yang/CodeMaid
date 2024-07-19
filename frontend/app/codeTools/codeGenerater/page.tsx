@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import LogParse from '@/Components/LogParse'
 import { Metadata } from 'next'
 
@@ -8,5 +8,7 @@ export const metadata: Metadata = {
 	},
 }
 export default function Page() {
+	const [project, setProject] = useState({})
+	fetch()
 	return <LogParse></LogParse>
 }
