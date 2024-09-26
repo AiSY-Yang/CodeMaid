@@ -1,3 +1,6 @@
+using System.Collections.Frozen;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Net;
 
 using Api.Controllers.Commons;
@@ -22,6 +25,7 @@ using OpenTelemetry.Trace;
 
 using Serilog;
 
+using ServicesModels;
 using ServicesModels.Results;
 
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -60,18 +64,18 @@ namespace Api
 				//从配置文件读取日志规则
 				config.ReadFrom.Configuration(context.Configuration)
 				//写入OpenTelemetry
-				.WriteTo.OpenTelemetry(sinkOptions =>
-				{
-					sinkOptions.Endpoint = openTelemetryLogsEndpoint;
-					//sinkOptions.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
-					sinkOptions.HttpMessageHandler = new HttpClientHandler()
-					{
-						ServerCertificateCustomValidationCallback = (a, b, c, d) => true,
-						UseProxy = true,
-						Proxy = new WebProxy() { BypassProxyOnLocal = true }
-					};
-					sinkOptions.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
-				})
+				//.WriteTo.OpenTelemetry(sinkOptions =>
+				//{
+				//	sinkOptions.Endpoint = openTelemetryLogsEndpoint;
+				//	//sinkOptions.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
+				//	sinkOptions.HttpMessageHandler = new HttpClientHandler()
+				//	{
+				//		ServerCertificateCustomValidationCallback = (a, b, c, d) => true,
+				//		UseProxy = true,
+				//		Proxy = new WebProxy() { BypassProxyOnLocal = true }
+				//	};
+				//	sinkOptions.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
+				//})
 				;
 			});
 			builder.Services.AddHttpLogging(x => { });
@@ -156,8 +160,29 @@ namespace Api
 
 			//添加基础组件
 			builder.Services.AddHttpClient();
-			builder.Services.AddHttpClient("ignoreCertificate")
+			builder.Services.AddHttpClient("IgnoreCertificate")
 				.ConfigurePrimaryHttpMessageHandler(x => new HttpClientHandler() { ServerCertificateCustomValidationCallback = (a, b, c, d) => true });
+			builder.Services.AddHttpClient("RetryClient", x =>
+			{
+				x.Timeout = TimeSpan.FromDays(1);
+			}).ConfigurePrimaryHttpMessageHandler(x => new HttpClientHandler() { CookieContainer = new System.Net.CookieContainer() })
+				.AddStandardResilienceHandler(x =>
+				{
+					x.CircuitBreaker = new Microsoft.Extensions.Http.Resilience.HttpCircuitBreakerStrategyOptions()
+					{
+						SamplingDuration = TimeSpan.FromHours(1),
+					};
+					x.TotalRequestTimeout = new Microsoft.Extensions.Http.Resilience.HttpTimeoutStrategyOptions() { Timeout = TimeSpan.FromDays(1) };
+					x.AttemptTimeout = new Microsoft.Extensions.Http.Resilience.HttpTimeoutStrategyOptions() { Timeout = TimeSpan.FromMinutes(1) };
+					x.Retry = new Microsoft.Extensions.Http.Resilience.HttpRetryStrategyOptions()
+					{
+						BackoffType = Polly.DelayBackoffType.Constant,
+						ShouldHandle = x => ValueTask.FromResult(!x.Outcome.Result?.IsSuccessStatusCode ?? true),
+						MaxRetryAttempts = 3,
+						Delay = TimeSpan.FromMinutes(5),
+					};
+				});
+			;
 			//添加后台服务
 			builder.Services.AddHostedService<TimedHostedService>();
 			//添加仓储
@@ -209,8 +234,7 @@ namespace Api
 				options.UseDateOnlyTimeOnlyStringConverters();
 			});
 			//文件提供器
-			Directory.CreateDirectory("/files");
-			var fileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider("/files");
+			var fileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.Combine(Environment.CurrentDirectory, "wwwroot"));
 			builder.Services.AddSingleton(fileProvider);
 			//添加消息总线
 			builder.Services.AddMassTransit(configurator =>
@@ -311,9 +335,24 @@ namespace Api
 					config.AddOtlpExporter(openTelemetryMetricsOptions);
 				})
 				;
+
+			I18n.I18nDictionary = new Dictionary<string, FrozenDictionary<string, string>>()
+			{
+				{"zh-cn", new Dictionary<string, string>(){
+					{"error","错误" }
+				}.ToFrozenDictionary()},
+				{"en-us", new Dictionary<string, string>(){
+					{"error","errorEn" }
+				}.ToFrozenDictionary()},
+			}.ToFrozenDictionary();
 			var app = builder.Build();
 			//保存容器为全局变量 以便手动创建DI对象
 			Services = app.Services;
+			app.Use(async (context, next) =>
+			{
+				I18n.Language.Value = context.Request.Headers.AcceptLanguage;
+				await next();
+			});
 			//开发环境显示swagger文档
 			if (app.Environment.IsDevelopment())
 			{

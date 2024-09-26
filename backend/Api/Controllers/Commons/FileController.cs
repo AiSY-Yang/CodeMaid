@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.IO.Compression;
 using System.Net.Mime;
 using System.Runtime.CompilerServices;
 
@@ -114,6 +115,8 @@ public partial class FileController(ILogger<FileController> logger) : CommonCont
 	[Consumes(MediaTypeNames.Application.Octet)]
 	public async Task<string> SyncWrite([FromQuery] string filePath)
 	{
+		var dir = Path.GetDirectoryName(filePath)!;
+		if (dir is not null && !Directory.Exists(dir)) Directory.CreateDirectory(dir);
 		using var stream = new FileStream(filePath, FileMode.Create);
 		await HttpContext.Request.Body.CopyToAsync(stream);
 		await stream.FlushAsync();
@@ -219,5 +222,16 @@ public partial class FileController(ILogger<FileController> logger) : CommonCont
 		System.IO.File.CreateSymbolicLink(sourceFileName, destinationFileName);
 		return true;
 	}
-
+	/// <summary>
+	/// Decompression Zip file to a directory
+	/// </summary>
+	/// <param name="zipFileName"></param>
+	/// <param name="destinationDirectory"></param>
+	/// <returns></returns>
+	[HttpPost("[action]")]
+	public string[] DecompressionZip(string zipFileName, string destinationDirectory)
+	{
+		ZipFile.ExtractToDirectory(zipFileName, destinationDirectory);
+		return Directory.GetFiles(destinationDirectory);
+	}
 }

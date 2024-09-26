@@ -43,7 +43,7 @@ namespace Api.MasstransitConsumer
 		public async Task Consume(ConsumeContext<Batch<FileChangeEvent>> context)
 		{
 			//只保留最新的文件状态 因为VS保存文件的时候会采用删除 重命名 修改的方式
-			var messageList = context.Message.Select(x => x.Message).Where(x => x.FilePath.EndsWith(".cs")).Reverse().DistinctBy(x => x.FilePath).ToList();
+			var messageList = context.Message.Select(x => x.Message).Where(x => x.FilePath.EndsWith(".cs")).Reverse().OrderBy(x => !x.IsDelete).ToList();
 			var messageGroup = messageList.GroupBy(x => x.ProjectId).Select(x => new { ProjectId = x.Key, Message = x }).ToList();
 			foreach (var group in messageGroup)
 			{

@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using ServicesModels.Methods;
+using ServicesModels.Results;
+using ServicesModels.Results.Exceptions;
 
 namespace Api.Controllers
 {
@@ -79,6 +81,18 @@ namespace Api.Controllers
 		{
 			return null;
 		}
+		static int delay = 3000;
+		[HttpGet("[action]")]
+		public int? Throw(string? error)
+		{
+			if (delay>0)
+			{
+				Task.Delay(delay);
+				delay -= 1000;
+			}
+			throw new BusinessException(error ?? "error", "msg");
+		}
+
 		public class BodyClass
 		{
 			public int Int { get; set; }

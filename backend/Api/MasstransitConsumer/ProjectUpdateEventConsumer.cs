@@ -118,17 +118,24 @@ namespace Api.MasstransitConsumer
 				EnableRaisingEvents = true,
 			};
 			projectInformation.FileSystemWatcher = watcher;
-			watcher.Changed += Watcher_Changed;
-			watcher.Renamed += Watcher_Changed;
-			watcher.Created += Watcher_Changed;
-			watcher.Deleted += Watcher_Deleted;
+			watcher.Changed += FileChanged;
+			watcher.Renamed += FileRenamed;
+			watcher.Created += FileChanged;
+			watcher.Deleted += FileDeleted;
 
 		}
-		private static async void Watcher_Deleted(object sender, FileSystemEventArgs e)
+
+		private static async void FileRenamed(object sender, RenamedEventArgs e)
+		{
+			await FileChange((FileSystemWatcher)sender, e.OldFullPath, true);
+			await FileChange((FileSystemWatcher)sender, e.FullPath, false);
+		}
+
+		private static async void FileDeleted(object sender, FileSystemEventArgs e)
 		{
 			await FileChange((FileSystemWatcher)sender, e.FullPath, true);
 		}
-		private static async void Watcher_Changed(object sender, FileSystemEventArgs e)
+		private static async void FileChanged(object sender, FileSystemEventArgs e)
 		{
 			await FileChange((FileSystemWatcher)sender, e.FullPath, false);
 		}
