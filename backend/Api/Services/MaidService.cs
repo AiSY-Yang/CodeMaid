@@ -113,7 +113,7 @@ namespace Api.Services
 				var c = file.ProjectStructures.Select(x => x.ClassDefinition).FirstOrDefault(x => x.Name.Equals(classNode.Identifier.ValueText, StringComparison.OrdinalIgnoreCase));
 				if (c == null)
 				{
-					c = CreateClassEntity(classNode);
+					c = (ClassDefinition)CreateClassEntity(classNode);
 					projectStructures = new ProjectStructure()
 					{
 						ClassDefinition = c,
@@ -805,7 +805,7 @@ public class {className}
 		/// </summary>
 		/// <param name="classDeclaration"></param>
 		/// <returns></returns>
-		private static ClassDefinition CreateClassEntity(TypeDeclarationSyntax classDeclaration)
+		private static ClassDefinitionBase CreateClassEntity(TypeDeclarationSyntax classDeclaration)
 		{
 			return new ClassDefinition()
 			{

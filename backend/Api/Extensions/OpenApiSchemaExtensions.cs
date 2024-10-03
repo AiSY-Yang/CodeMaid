@@ -15,42 +15,18 @@ namespace Api.Extensions
 {
 	static class OpenApiSchemaExtensions
 	{
-		public static OpenApiSchemaInfo GetTypeInfo(this OpenApiSchema OpenApiSchema)
+		public static OpenApiSchemaInfo GetTypeInfo(this OpenApiSchema openApiSchema)
 		{
-			var type = OpenApiSchema.Reference?.Id ?? OpenApiSchema.Type switch
-			{
-				"string" => OpenApiSchema.Format switch
-				{
-					"uuid" => "Guid",
-					"binary" => "Stream",
-					"date" => "DateOnly",
-					"date-time" => "DateTimeOffset",
-					_ => "string",
-				},
-				"number" => OpenApiSchema.Format switch
-				{
-					"float" => "float",
-					"double" => "double",
-					_ => "decimal",
-				},
-				"integer" => OpenApiSchema.Format switch
-				{
-					"int64" => "long",
-					"int32" => "int",
-					_ => "int",
-				},
-				"boolean" => "bool",
-				"array" => $"array",
-				_ => "JsonElement",
-			};
 			return new OpenApiSchemaInfo()
 			{
-				CanBeNull = OpenApiSchema.Nullable,
+				CanBeNull = openApiSchema.Nullable,
 				Required = false,
-				Type = type,
-				IsArray = OpenApiSchema.Type == "array",
-				Item = OpenApiSchema.Items?.GetTypeInfo(),
-				IsRef = OpenApiSchema.Reference != null,
+				ReferenceId = openApiSchema.Reference?.Id,
+				Type = openApiSchema.Type,
+				Format = openApiSchema.Format,
+				IsArray = openApiSchema.Type == "array",
+				Item = openApiSchema.Items?.GetTypeInfo(),
+				IsRef = openApiSchema.Reference != null,
 			};
 		}
 	}

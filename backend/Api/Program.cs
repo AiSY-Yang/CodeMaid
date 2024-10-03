@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Net;
+using System.Text.Json;
 
 using Api.Controllers.Commons;
 using Api.Job;
@@ -64,18 +65,22 @@ namespace Api
 				//从配置文件读取日志规则
 				config.ReadFrom.Configuration(context.Configuration)
 				//写入OpenTelemetry
-				//.WriteTo.OpenTelemetry(sinkOptions =>
-				//{
-				//	sinkOptions.Endpoint = openTelemetryLogsEndpoint;
-				//	//sinkOptions.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
-				//	sinkOptions.HttpMessageHandler = new HttpClientHandler()
-				//	{
-				//		ServerCertificateCustomValidationCallback = (a, b, c, d) => true,
-				//		UseProxy = true,
-				//		Proxy = new WebProxy() { BypassProxyOnLocal = true }
-				//	};
-				//	sinkOptions.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
-				//})
+				.WriteTo.OpenTelemetry(sinkOptions =>
+				{
+					sinkOptions.Endpoint = openTelemetryLogsEndpoint;
+					sinkOptions.ResourceAttributes = new Dictionary<string, object>
+					{
+						["service.name"] = ServiceName,
+					};
+					//sinkOptions.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
+					sinkOptions.HttpMessageHandler = new HttpClientHandler()
+					{
+						ServerCertificateCustomValidationCallback = (a, b, c, d) => true,
+						UseProxy = true,
+						Proxy = new WebProxy() { BypassProxyOnLocal = true }
+					};
+					sinkOptions.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
+				})
 				;
 			});
 			builder.Services.AddHttpLogging(x => { });
@@ -234,8 +239,12 @@ namespace Api
 				options.UseDateOnlyTimeOnlyStringConverters();
 			});
 			//文件提供器
-			var fileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(Path.Combine(Environment.CurrentDirectory, "wwwroot"));
-			builder.Services.AddSingleton(fileProvider);
+			var path = Path.Combine(Environment.CurrentDirectory, "wwwroot");
+			if (Directory.Exists(path))
+			{
+				var fileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(path);
+				builder.Services.AddSingleton(fileProvider);
+			}
 			//添加消息总线
 			builder.Services.AddMassTransit(configurator =>
 			{
@@ -425,7 +434,15 @@ namespace Api
 			//初始化服务
 			await Task.Run(async () =>
 				{
-					await InitServices.Init(app.Services);
+					//var list = context.Maids.Where(x => x.MaidWork == Models.CodeMaid.MaidWork.HttpClientSync).ToList();
+					//list.ForEach(x =>
+					//{
+					//	var setting = x.Setting.Deserialize<ServicesModels.Settings.HttpClientSyncSetting>();
+					//	x.Setting = JsonSerializer.SerializeToDocument(setting);
+					//});
+					//context.SaveChanges();
+
+					//await InitServices.Init(app.Services);
 				});
 			//开始运行
 			app.Run();

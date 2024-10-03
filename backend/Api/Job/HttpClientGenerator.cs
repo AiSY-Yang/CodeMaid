@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -30,7 +31,7 @@ namespace Api.Job
 	/// </summary>
 	public class HttpClientGenerator
 	{
-		static readonly ConcurrentDictionary<string, string> Md5s = new();
+		static readonly ConcurrentDictionary<(long, string), string> Md5s = new();
 		private readonly HttpClient httpClient;
 		private readonly ILogger<HttpClientGenerator> logger;
 
@@ -79,13 +80,13 @@ namespace Api.Job
 				json = setting.SwaggerDocument!;
 			}
 			var md5 = json.Hash(HashOption.MD5_32);
-			if (Md5s.TryGetValue(maid.SourcePath, out string? lastMd5) && lastMd5 == md5)
+			if (Md5s.TryGetValue((maid.Id, maid.SourcePath), out string? lastMd5) && lastMd5 == md5)
 			{
 				return;
 			}
 			else
 			{
-				Md5s[maid.SourcePath] = md5;
+				Md5s[(maid.Id, maid.SourcePath)] = md5;
 			}
 			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out var diagnostic);
 			RestfulApiDocument restfulApiDocument = new(openApiDocument);
@@ -96,28 +97,53 @@ namespace Api.Job
 			if (needCreateModel)
 			{
 				//模型文件路径
-				var modelPath = Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.cs");
-				CompilationUnitSyntax modelUnit;
-				if (File.Exists(modelPath))
-					modelUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(modelPath)).GetCompilationUnitRoot();
-				else
-					modelUnit = CSharpSyntaxTree.ParseText($$"""
+				var modelPath = setting.HttpClientType switch
+				{
+					HttpClientType.CSharp => Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.cs"),
+					HttpClientType.TypeScript => Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.ts"),
+					_ => throw new InvalidEnumArgumentException()
+				};
+				switch (setting.HttpClientType)
+				{
+					case HttpClientType.CSharp:
+						{
+							CompilationUnitSyntax modelUnit;
+							if (File.Exists(modelPath))
+								modelUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(modelPath)).GetCompilationUnitRoot();
+							else
+								modelUnit = CSharpSyntaxTree.ParseText($$"""
 				#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 				using System.Text.Json.Serialization;
 				namespace RestfulClient.{{restfulApiDocument.PropertyStyleName}}Model;
 				#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 
 				""").GetCompilationUnitRoot();
-				var modelUnitNew = modelUnit;
-				foreach (var item in restfulApiDocument.Models)
-				{
-					var obj = modelUnitNew.GetDeclarationSyntaxes<BaseTypeDeclarationSyntax>().Where(x => x.Identifier.Text == PropertyStyle(item.Name)).FirstOrDefault();
-					if (obj == null)
-						modelUnitNew = modelUnitNew.AddMembers(SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
-					else
-						modelUnitNew = modelUnitNew.ReplaceNode(obj, SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
+							var modelUnitNew = modelUnit;
+							foreach (var item in restfulApiDocument.Models)
+							{
+								var obj = modelUnitNew.GetDeclarationSyntaxes<BaseTypeDeclarationSyntax>().Where(x => x.Identifier.Text == PropertyStyle(item.Name)).FirstOrDefault();
+								if (obj == null)
+									modelUnitNew = modelUnitNew.AddMembers(SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
+								else
+									modelUnitNew = modelUnitNew.ReplaceNode(obj, SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
+							}
+							await FileTools.Write(modelPath, modelUnit, modelUnitNew);
+						}
+						break;
+					case HttpClientType.TypeScript:
+						{
+							StringBuilder stringBuilder = new StringBuilder();
+							foreach (var item in restfulApiDocument.Models)
+							{
+								var text = item.ToTsCode();
+								stringBuilder.Append(text);
+							}
+							await File.WriteAllTextAsync(modelPath, stringBuilder.ToString());
+						}
+						break;
+					default:
+						break;
 				}
-				await FileTools.Write(modelPath, modelUnit, modelUnitNew);
 			}
 			#endregion
 			if (needCreateOptions)
@@ -134,6 +160,10 @@ public class {{restfulApiDocument.PropertyStyleName}}Options
 	/// 服务地址
 	/// </summary>
 	public required string Url { get; set; }
+	/// <summary>
+	/// 超时时间
+	/// </summary>
+	public double TimeoutSecond { get; set; } = 30;
 }
 """);
 				}
@@ -170,8 +200,9 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	public {{restfulApiDocument.PropertyStyleName}}(HttpClient httpClient, ILogger<{{restfulApiDocument.PropertyStyleName}}> logger, IOptions<{{restfulApiDocument.PropertyStyleName}}Options> options)
 	{
 		var url = options.Value.Url;
+		var timeout = options.Value.TimeoutSecond;
 		httpClient.BaseAddress = new Uri(url);
-		httpClient.Timeout = TimeSpan.FromMinutes(5);
+		httpClient.Timeout = TimeSpan.FromSeconds(timeout);
 		this.httpClient = httpClient;
 		this.logger = logger;
 	}
@@ -322,7 +353,11 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 					{
 						var content = res.Value.Content.FirstOrDefault().Value;
 						if (content is null)
-							restfulApiResponses.Add(new RestfulApiResponse() { HttpStatusCode = res.Key, ResponseType = new OpenApiSchemaInfo() { CanBeNull = false, Type = OpenApiSchemaInfo.stream, IsArray = false, IsRef = false, Required = true } });
+							restfulApiResponses.Add(new RestfulApiResponse()
+							{
+								HttpStatusCode = res.Key,
+								ResponseType = null,
+							});
 						else
 							restfulApiResponses.Add(new RestfulApiResponse() { HttpStatusCode = res.Key, ResponseType = res.Value.Content.FirstOrDefault().Value?.Schema?.GetTypeInfo() });
 					}
@@ -394,7 +429,19 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			stringBuilder.AppendLine("}");
 			return stringBuilder.ToString();
 		}
-
+		public override string ToTsCode()
+		{
+			StringBuilder stringBuilder = new StringBuilder();
+			AppendTsSummary(stringBuilder, Summary, "");
+			stringBuilder.AppendLine($$"""interface {{PropertyStyle(Name)}} {""");
+			foreach (var item in ClassFields)
+			{
+				AppendTsSummary(stringBuilder, item.Summary, "\t");
+				stringBuilder.AppendLine($$"""	{{TsStyle(item.Name)}}: {{item.Type.TypeScriptType}},""");
+			}
+			stringBuilder.AppendLine($$"""}""");
+			return stringBuilder.ToString();
+		}
 	}
 	class RestfulEnumModel : RestfulModel
 	{
@@ -423,11 +470,24 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			stringBuilder.AppendLine("}");
 			return stringBuilder.ToString();
 		}
+		public override string ToTsCode()
+		{
+			StringBuilder stringBuilder = new StringBuilder();
+			AppendTsSummary(stringBuilder, Summary, "");
+			stringBuilder.AppendLine($$"""enum {{PropertyStyle(Name)}} {""");
+			foreach (var item in EnumFields)
+			{
+				stringBuilder.AppendLine($$"""	{{VariableStyle(item.Name)}}= {{item.Value}},""");
+			}
+			stringBuilder.AppendLine($$"""}""");
+			return stringBuilder.ToString();
+		}
 	}
 
 	abstract class RestfulModel : Field
 	{
 		public abstract string ToCode();
+		public abstract string ToTsCode();
 		/// <summary>
 		/// 类型 如果是枚举的话可能自定义类型转换器
 		/// </summary>
@@ -436,6 +496,26 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// 类或者枚举的注释
 		/// </summary>
 		public required string? Summary { get; set; }
+
+		protected static void AppendTsSummary(StringBuilder stringBuilder, string? summary, string leader)
+		{
+			if (summary is null)
+				stringBuilder.AppendLine($$"""{{leader}}/**  */""");
+			else
+			{
+				var summaries = summary.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+									.Select(x => x.Trim())
+									.ToList();
+				if (summaries.Count == 1)
+					stringBuilder.AppendLine($$"""{{leader}}/** {{summaries[0]}} */""");
+				else
+				{
+					stringBuilder.AppendLine($$"""{{leader}}/**""");
+					summaries.ForEach(x => stringBuilder.AppendLine($" *{x}"));
+					stringBuilder.AppendLine($$"""{{leader}} */""");
+				}
+			}
+		}
 	}
 	/// <summary>
 	/// 枚举字段信息
@@ -472,26 +552,13 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 				true => $"\t\t{Content("")};",
 				false => $"\t\tif ({name} is not null) {Content(".Value")};",
 			};
-			string Content(string s) => Type.Type switch
+			string Content(string s) => Type.CSharpType switch
 			{
 				"Stream" => Type.CanBeNull ? $"content.Add({name}{s}.content, nameof({name}), {name}{s}.fileName)" : $"content.Add({name}{s}.content, nameof({name}), {name}{s}.fileName)",
 				"Guid" => $"content.Add(new StringContent({name}{s}.ToString()), nameof({name}))",
 				"string" => $"content.Add(new StringContent({name}), nameof({name}))",
 				"bool" or "int" or "long" => $"content.Add(JsonContent.Create({name}{s}), nameof({name}))",
 				_ => $"content.Add(JsonContent.Create({name}), nameof({name}))",
-			};
-		}
-		/// <summary>
-		/// 函数参数
-		/// </summary>
-		public string GetParameter()
-		{
-			var name = VariableStyle(Name);
-			return $"{Content()} {name}";
-			string Content() => Type.Type switch
-			{
-				OpenApiSchemaInfo.stream => Type.Required ? $"(HttpContent content, string fileName)" : $"(HttpContent content, string fileName)?",
-				_ => Type.ParameterCode,
 			};
 		}
 		#endregion
@@ -513,24 +580,74 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	public class OpenApiSchemaInfo
 	{
 		/// <summary>
+		/// typescript type definition
+		/// </summary>
+		public string TypeScriptType => ReferenceId is not null ? NamingConvert.PropertyStyle(ReferenceId) :
+			Item is not null ? $"{Item.CSharpType}[]" :
+			Type switch
+			{
+				"integer" => "number",
+				null => "Blob",
+				_ => Type,
+			}
+			+ (CanBeNull ? "| null" : "") + (!Required ? " | undefined" : "");
+		/// <summary>
 		/// 作为参数的类型 判断required
 		/// </summary>
-		public string ParameterCode => Code + (CanBeNull || !Required ? "?" : "");
+		public string ParameterCode => CSharpType + (CanBeNull || !Required ? "?" : "");
 		/// <summary>
 		/// 作为返回值的类型 不判断required
 		/// </summary>
 		/// <returns></returns>
-		public string ReturnCode => Code + (CanBeNull ? "?" : "");
-		public string Code => (IsRef ? NamingConvert.PropertyStyle(Type)
-			: Item is null ? Type : $"List<{Item.Code}>");
+		public string ReturnCode => CSharpType + (CanBeNull ? "?" : "");
+		/// <summary>
+		/// C#类型
+		/// </summary>
+		public string CSharpType => ReferenceId is not null ? NamingConvert.PropertyStyle(ReferenceId) :
+			Item is not null ? $"List<{Item.CSharpType}>" :
+			Type switch
+			{
+				"string" => Format switch
+				{
+					"uuid" => "Guid",
+					"binary" => "Stream",
+					"date" => "DateOnly",
+					"date-time" => "DateTimeOffset",
+					_ => "string",
+				},
+				"number" => Format switch
+				{
+					"float" => "float",
+					"double" => "double",
+					_ => "decimal",
+				},
+				"integer" => Format switch
+				{
+					"int64" => "long",
+					"int32" => "int",
+					_ => "int",
+				},
+				"boolean" => "bool",
+				"array" => $"array",
+				_ => "JsonElement",
+			};
+
 		/// <summary>
 		/// 流类型
 		/// </summary>
 		public const string stream = "Stream";
 		/// <summary>
+		/// 引用对象的Id
+		/// </summary>
+		public required string? ReferenceId { get; set; }
+		/// <summary>
 		/// 类型
 		/// </summary>
 		public required string Type { get; set; }
+		/// <summary>
+		/// 格式
+		/// </summary>
+		public required string? Format { get; set; }
 		/// <summary>
 		/// 是否必须
 		/// </summary>
@@ -581,6 +698,25 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	"partial", "remove", "select", "set", "value",
 	"var", "when", "where", "yield"
 };
+		static readonly string[] tsKeywords = {
+			    // JavaScript 保留字
+    "break", "case", "catch", "class", "const",
+	"continue", "debugger", "default", "delete", "do",
+	"else", "export", "extends", "finally", "for",
+	"function", "if", "import", "in", "instanceof",
+	"new", "return", "super", "switch", "this",
+	"throw", "try", "typeof", "var", "void",
+	"while", "with", "yield", "async", "await",
+
+    // TypeScript 额外保留字
+    "implements", "interface", "namespace", "pure",
+	"readonly", "type", "abstract", "as", "any",
+	"boolean", "constructor", "declare", "enum",
+	"infer", "is", "keyof", "let", "module",
+	"never", "object", "override", "private",
+	"protected", "public", "static", "string",
+	"symbol", "unknown"
+		};
 		/// <summary>
 		/// 属性风格名称
 		/// </summary>
@@ -589,6 +725,9 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// 变量风格名称
 		/// </summary>
 		public static string VariableStyle(string s) => StringExtension.ToNamingConvention(number.Contains(s[0]) ? $"Field_{s}" : csharpKeywords.Contains(s) ? $"@{s}" : s, NamingConvention.camelCase);
+		public static string TsStyle(string s) => StringExtension.ToNamingConvention(number.Contains(s[0]) ? $"Field_{s}" : tsKeywords.Contains(s) ? $"'{s}'" : s, NamingConvention.camelCase);
+
+
 	}
 
 
@@ -655,7 +794,13 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			var queryParameters = new List<string>();
 			foreach (var item in QueryParameter)
 			{
-				if (item.GetParameter().StartsWith("List<"))
+				var name = VariableStyle(item.Name);
+				var paraType = item.Type.Type switch
+				{
+					null => item.Type.Required ? $"(HttpContent content, string fileName)" : $"(HttpContent content, string fileName)?",
+					_ => item.Type.ParameterCode,
+				};
+				if (paraType.StartsWith("List<"))
 					queryParameters.Add($"queryParameters.Add(string.Join('&', {VariableStyle(item.Name)}.Select(x => $\"{VariableStyle(item.Name)}={{x}}\")));");
 				else
 					queryParameters.Add($"queryParameters.Add($\"{UrlEncoder.Default.Encode(item.Name)}={{{VariableStyle(item.Name)}}}\");");
@@ -665,7 +810,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 			//合并所有参数 作为方法的入参
 			List<(string type, string name, string? summary)> argument = new List<(string type, string name, string? summary)>();
 			foreach (var item in PathParameter) argument.Add((item.Type.ParameterCode, VariableStyle(item.Name), item.Summary));
-			foreach (var item in QueryParameter) argument.Add((item.Type.Required || item.Type.CanBeNull ? item.Type.Code : item.Type.Code + "?", VariableStyle(item.Name), item.Summary));
+			foreach (var item in QueryParameter) argument.Add((item.Type.Required || item.Type.CanBeNull ? item.Type.CSharpType : item.Type.CSharpType + "?", VariableStyle(item.Name), item.Summary));
 			//foreach (var item in HeaderParameter) argument.Add((item.Type.Required ? item.Type.Type : item.Type.Type + "?", VariableStyle(item.Name)));
 			//此处只处理一种contentType
 			if (BodyParameter != null)
@@ -673,16 +818,16 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 				var item = BodyParameter.First();
 				if (item.HasJsonContentType)
 				{
-					argument.Add((item.BodyType.Required ? item.BodyType.Code : item.BodyType.Code + "?", "body", null));
+					argument.Add((item.BodyType.Required ? item.BodyType.CSharpType : item.BodyType.CSharpType + "?", "body", null));
 				}
 				else
 				{
 					foreach (var form in item.Form)
 					{
-						if (form.Type.Type == OpenApiSchemaInfo.stream)
+						if (form.Type.CSharpType == "Stream")
 							argument.Add(("(HttpContent content, string fileName)?", VariableStyle(form.Name), form.Summary));
 						else
-							argument.Add((form.Type.Required || form.Type.CanBeNull ? form.Type.Code : form.Type.Code + "?", VariableStyle(form.Name), form.Summary));
+							argument.Add((form.Type.Required || form.Type.CanBeNull ? form.Type.CSharpType : form.Type.CSharpType + "?", VariableStyle(form.Name), form.Summary));
 					}
 				}
 			}
@@ -704,11 +849,14 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 					/// </summary>
 					/// <returns></returns>
 				{{paramNamesXml}}	[GeneratedCode("codeMaid", "1.0.0")]
-					public async Task<{{ResponseType.ReturnCode}}{{(hasNullResponse ? "?" : "")}}> {{MethodName}}({{argumentCode}})
+					public async Task<{{ResponseType?.ReturnCode ?? "Stream"}}{{(hasNullResponse ? "?" : "")}}> {{MethodName}}({{argumentCode}})
 					{
 				{{queryParametersCode}}{{(body != null
 				? body.HasJsonContentType
-					? $"		var content = JsonContent.Create(body);\r\n"
+					? $"""
+					var content = JsonContent.Create(body);
+
+					"""
 					: $"""
 							var content = new MultipartFormDataContent();
 					{string.Join("\r\n", body.Form.Select(x => x.GetGetAddContent()))}
@@ -723,15 +871,15 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 						};
 						{{
 						//如果返回的是流的话 默认提前响应
-						ResponseType.Type switch
+						ResponseType?.Type switch
 						{
-							OpenApiSchemaInfo.stream => $"var response = await httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead);",
+							null => $"var response = await httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead);",
 							_ => $"var response = await httpClient.SendAsync(httpRequestMessage);"
 						}}}
 						{{(hasNullResponse ? "if (response.StatusCode == System.Net.HttpStatusCode.NoContent) return null;" : "")}}
-						{{ResponseType.Type switch
+						{{ResponseType?.Type switch
 						{
-							OpenApiSchemaInfo.stream => $"return await response.Content.ReadAsStreamAsync();",
+							null => $"return await response.Content.ReadAsStreamAsync();",
 							"string" => $"return await response.Content.ReadAsStringAsync();",
 							_ => $"return await GetResult<{ResponseType.ReturnCode}>(httpRequestMessage, response);"
 						}}}

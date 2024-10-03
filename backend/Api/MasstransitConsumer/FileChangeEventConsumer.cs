@@ -216,7 +216,7 @@ namespace Api.MasstransitConsumer
 					}
 					catch (Exception ex)
 					{
-						logger.LogError(ex, "数据保存失败");
+						logger.LogCritical(ex, "数据保存失败");
 					}
 					foreach (var e in addEnums.Union(modifiedEnums))
 					{

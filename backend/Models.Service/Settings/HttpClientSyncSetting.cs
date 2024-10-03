@@ -40,5 +40,28 @@ namespace ServicesModels.Settings
 		/// 重命名客户端
 		/// </summary>
 		public string? RenameClient { get; set; }
+		/// <summary>
+		/// 生成类型
+		/// </summary>
+		public HttpClientType HttpClientType { get; set; }
+
+	}
+	/// <summary>
+	/// 客户端类型
+	/// </summary>
+	public enum HttpClientType
+	{
+		/// <summary>
+		/// C#
+		/// </summary>
+		CSharp,
+		/// <summary>
+		/// TypeScript
+		/// </summary>
+		TypeScript,
+	}
+	class HttpClientTypeScriptGenerateSetting
+	{
+
 	}
 }
