@@ -1,33 +1,33 @@
 /** action信息 */
-interface ApiControllersCommonsActionInfo {
+export interface ApiControllersCommonsActionInfo {
 	/** action名称 */
 	name: string | undefined,
 	/** 参数列表 */
 	paramList: ApiControllersCommonsParameterInfo[],
 }
 /** 控制器信息 */
-interface ApiControllersCommonsControllerInfo {
+export interface ApiControllersCommonsControllerInfo {
 	/** 控制器名称 */
 	name: string | undefined,
 	/** action列表 */
 	actionList: ApiControllersCommonsActionInfo[],
 }
 /** 参数信息 */
-interface ApiControllersCommonsParameterInfo {
+export interface ApiControllersCommonsParameterInfo {
 	/** 参数名称 */
 	name: string | undefined,
 	/**  */
 	'type': SystemType,
 }
 /** 文件 */
-interface ApiControllersCommonsSystemFile {
+export interface ApiControllersCommonsSystemFile {
 	/** 名称 */
 	name: string | undefined,
 	/** 完整路径 */
 	path: string | undefined,
 }
 /** 文件夹 */
-interface ApiControllersCommonsSystemFolder {
+export interface ApiControllersCommonsSystemFolder {
 	/** 名称 */
 	name: string | undefined,
 	/** 完整路径 */
@@ -38,26 +38,26 @@ interface ApiControllersCommonsSystemFolder {
 	systemFiles: ApiControllersCommonsSystemFile[],
 }
 /**  */
-interface MicrosoftAspNetCoreMvcProblemDetails {
+export interface MicrosoftAspNetCoreMvcProblemDetails {
 	/**  */
-	'type': string| null | undefined,
+	'type': string | null | undefined,
 	/**  */
-	title: string| null | undefined,
+	title: string | null | undefined,
 	/**  */
-	status: number| null | undefined,
+	status: number | null | undefined,
 	/**  */
-	detail: string| null | undefined,
+	detail: string | null | undefined,
 	/**  */
-	instance: string| null | undefined,
+	instance: string | null | undefined,
 }
 /** 属性定义 */
-interface ModelsCodeMaidAttributeDefinition {
+export interface ModelsCodeMaidAttributeDefinition {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** Attribute名称 */
@@ -65,55 +65,55 @@ interface ModelsCodeMaidAttributeDefinition {
 	/** Attribute文本 */
 	text: string | undefined,
 	/** 参数文本 */
-	argumentsText: string| null | undefined,
+	argumentsText: string | null | undefined,
 	/** 参数 */
-	arguments: string| null | undefined,
+	arguments: string | null | undefined,
 	/** 类定义 */
 	propertyDefinition: ModelsCodeMaidPropertyDefinition,
 }
 /** 类定义 */
-interface ModelsCodeMaidClassDefinition {
+export interface ModelsCodeMaidClassDefinition {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** 命名空间 */
-	nameSpace: string| null | undefined,
+	nameSpace: string | null | undefined,
 	/** 修饰符 */
-	modifiers: string| null | undefined,
+	modifiers: string | null | undefined,
 	/** 是否是抽象类 */
 	isAbstract: boolean | undefined,
 	/** 类名 */
 	name: string | undefined,
 	/** 注释 */
-	summary: string| null | undefined,
+	summary: string | null | undefined,
 	/** 基类或者接口名称 */
-	base: string| null | undefined,
+	base: string | null | undefined,
 	/** 类引用的命名空间 */
-	using: string| null | undefined,
+	using: string | null | undefined,
 	/** 前导 */
-	leadingTrivia: string| null | undefined,
+	leadingTrivia: string | null | undefined,
 	/** 成员类型 */
 	memberType: ModelsCodeMaidMemberType,
 	/** 项目定义 */
 	project: ModelsCodeMaidProject,
 	/** 所属项目 */
-	projectId: number| null | undefined,
+	projectId: number | null | undefined,
 	/** 属性列表 */
 	properties: ModelsCodeMaidPropertyDefinition[],
 }
 /** 枚举定义 */
-interface ModelsCodeMaidEnumDefinition {
+export interface ModelsCodeMaidEnumDefinition {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** 项目文件 */
@@ -121,26 +121,26 @@ interface ModelsCodeMaidEnumDefinition {
 	/**  */
 	projectDirectoryFileId: number | undefined,
 	/** 命名空间 */
-	nameSpace: string| null | undefined,
+	nameSpace: string | null | undefined,
 	/** 枚举名 */
 	name: string | undefined,
 	/** 注释 */
-	summary: string| null | undefined,
+	summary: string | null | undefined,
 	/** 备注 */
 	remark: string | undefined,
 	/** 前导 */
-	leadingTrivia: string| null | undefined,
+	leadingTrivia: string | null | undefined,
 	/** 成员列表 */
 	enumMembers: ModelsCodeMaidEnumMemberDefinition[],
 }
 /** 枚举成员定义 */
-interface ModelsCodeMaidEnumMemberDefinition {
+export interface ModelsCodeMaidEnumMemberDefinition {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** 枚举名称 */
@@ -148,9 +148,9 @@ interface ModelsCodeMaidEnumMemberDefinition {
 	/** 枚举值 */
 	value: number | undefined,
 	/** 注释 */
-	summary: string| null | undefined,
+	summary: string | null | undefined,
 	/** 描述 */
-	description: string| null | undefined,
+	description: string | null | undefined,
 }
 /** 文件类型 */
 enum ModelsCodeMaidFileType {
@@ -158,13 +158,13 @@ enum ModelsCodeMaidFileType {
 	cSahrp= 1,
 }
 /** 功能 */
-interface ModelsCodeMaidMaid {
+export interface ModelsCodeMaidMaid {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** 名称 */
@@ -200,13 +200,13 @@ enum ModelsCodeMaidMemberType {
 	structDeclarationSyntax= 3,
 }
 /** 项目定义 */
-interface ModelsCodeMaidProject {
+export interface ModelsCodeMaidProject {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** 项目名 */
@@ -227,13 +227,13 @@ interface ModelsCodeMaidProject {
 	classDefinitions: ModelsCodeMaidClassDefinition[],
 }
 /** 项目目录 */
-interface ModelsCodeMaidProjectDirectory {
+export interface ModelsCodeMaidProjectDirectory {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** 目录名 */
@@ -248,13 +248,13 @@ interface ModelsCodeMaidProjectDirectory {
 	projectDirectoryFiles: ModelsCodeMaidProjectDirectoryFile[],
 }
 /** 项目文件 */
-interface ModelsCodeMaidProjectDirectoryFile {
+export interface ModelsCodeMaidProjectDirectoryFile {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** 项目定义 */
@@ -285,13 +285,13 @@ interface ModelsCodeMaidProjectDirectoryFile {
 	enumDefinitions: ModelsCodeMaidEnumDefinition[],
 }
 /** 项目结构 */
-interface ModelsCodeMaidProjectStructure {
+export interface ModelsCodeMaidProjectStructure {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** 项目文件 */
@@ -302,13 +302,13 @@ interface ModelsCodeMaidProjectStructure {
 	propertyDefinitions: ModelsCodeMaidPropertyDefinition[],
 }
 /** 类定义 */
-interface ModelsCodeMaidPropertyDefinition {
+export interface ModelsCodeMaidPropertyDefinition {
 	/** 唯一ID1 */
 	id: number | undefined,
 	/** 创建时间 */
 	createTime: string | undefined,
 	/** 更新时间 */
-	updateTime: string| null | undefined,
+	updateTime: string | null | undefined,
 	/** 是否有效 */
 	isDeleted: boolean | undefined,
 	/** 类定义 */
@@ -316,17 +316,17 @@ interface ModelsCodeMaidPropertyDefinition {
 	/** 所属类Id */
 	classDefinitionId: number | undefined,
 	/** 前导 */
-	leadingTrivia: string| null | undefined,
+	leadingTrivia: string | null | undefined,
 	/** 注释 */
-	summary: string| null | undefined,
+	summary: string | null | undefined,
 	/** 备注 */
-	remark: string| null | undefined,
+	remark: string | null | undefined,
 	/** 完整文本内容 */
 	fullText: string | undefined,
 	/** 修饰符 */
 	modifiers: string | undefined,
 	/** 初始化器 */
-	initializer: string| null | undefined,
+	initializer: string | null | undefined,
 	/** 属性名称 */
 	name: string | undefined,
 	/** 数据类型 */
@@ -336,11 +336,11 @@ interface ModelsCodeMaidPropertyDefinition {
 	/** 是否包含Get */
 	hasGet: boolean | undefined,
 	/** Get方法体 */
-	get: string| null | undefined,
+	get: string | null | undefined,
 	/** 是否包含Set */
 	hasSet: boolean | undefined,
 	/** Set方法体 */
-	set: string| null | undefined,
+	set: string | null | undefined,
 	/** 枚举定义 */
 	enumDefinition: ModelsCodeMaidEnumDefinition,
 	/** 属性列表 */
@@ -349,32 +349,32 @@ interface ModelsCodeMaidPropertyDefinition {
 	projectDirectoryFile: ModelsCodeMaidProjectDirectoryFile,
 }
 /** 业务异常返回的结果模型 */
-interface ServicesModelsResultsIExceptionResult {
+export interface ServicesModelsResultsIExceptionResult {
 	/** 错误码 */
 	code: string | undefined,
 	/** 异常消息 */
-	msg: string| null | undefined,
+	msg: string | null | undefined,
 }
 /**  */
-interface SystemIntPtr {
+export interface SystemIntPtr {
 }
 /**  */
-interface SystemModuleHandle {
+export interface SystemModuleHandle {
 	/**  */
 	mdStreamVersion: number | undefined,
 }
 /**  */
-interface SystemReflectionAssembly {
+export interface SystemReflectionAssembly {
 	/**  */
 	definedTypes: SystemReflectionTypeInfo[],
 	/**  */
 	exportedTypes: SystemType[],
 	/**  */
-	codeBase: string| null | undefined,
+	codeBase: string | null | undefined,
 	/**  */
 	entryPoint: SystemReflectionMethodInfo,
 	/**  */
-	fullName: string| null | undefined,
+	fullName: string | null | undefined,
 	/**  */
 	imageRuntimeVersion: string | undefined,
 	/**  */
@@ -411,7 +411,7 @@ enum SystemReflectionCallingConventions {
 	explicitThis= 64,
 }
 /**  */
-interface SystemReflectionConstructorInfo {
+export interface SystemReflectionConstructorInfo {
 	/**  */
 	name: string | undefined,
 	/**  */
@@ -478,7 +478,7 @@ interface SystemReflectionConstructorInfo {
 	memberType: SystemReflectionMemberTypes,
 }
 /**  */
-interface SystemReflectionCustomAttributeData {
+export interface SystemReflectionCustomAttributeData {
 	/**  */
 	attributeType: SystemType,
 	/**  */
@@ -489,7 +489,7 @@ interface SystemReflectionCustomAttributeData {
 	namedArguments: SystemReflectionCustomAttributeNamedArgument[],
 }
 /**  */
-interface SystemReflectionCustomAttributeNamedArgument {
+export interface SystemReflectionCustomAttributeNamedArgument {
 	/**  */
 	memberInfo: SystemReflectionMemberInfo,
 	/**  */
@@ -500,11 +500,11 @@ interface SystemReflectionCustomAttributeNamedArgument {
 	isField: boolean | undefined,
 }
 /**  */
-interface SystemReflectionCustomAttributeTypedArgument {
+export interface SystemReflectionCustomAttributeTypedArgument {
 	/**  */
 	argumentType: SystemType,
 	/**  */
-	value: Blob| null | undefined,
+	value: Blob | null | undefined,
 }
 /**  */
 enum SystemReflectionEventAttributes {
@@ -513,7 +513,7 @@ enum SystemReflectionEventAttributes {
 	rtSpecialName= 1024,
 }
 /**  */
-interface SystemReflectionEventInfo {
+export interface SystemReflectionEventInfo {
 	/**  */
 	name: string | undefined,
 	/**  */
@@ -568,7 +568,7 @@ enum SystemReflectionFieldAttributes {
 	reservedMask= 38144,
 }
 /**  */
-interface SystemReflectionFieldInfo {
+export interface SystemReflectionFieldInfo {
 	/**  */
 	name: string | undefined,
 	/**  */
@@ -634,10 +634,10 @@ enum SystemReflectionGenericParameterAttributes {
 	specialConstraintMask= 28,
 }
 /**  */
-interface SystemReflectionICustomAttributeProvider {
+export interface SystemReflectionICustomAttributeProvider {
 }
 /**  */
-interface SystemReflectionMemberInfo {
+export interface SystemReflectionMemberInfo {
 	/**  */
 	memberType: SystemReflectionMemberTypes,
 	/**  */
@@ -693,7 +693,7 @@ enum SystemReflectionMethodAttributes {
 	hasSecurity= 53248,
 }
 /**  */
-interface SystemReflectionMethodBase {
+export interface SystemReflectionMethodBase {
 	/**  */
 	memberType: SystemReflectionMemberTypes,
 	/**  */
@@ -777,7 +777,7 @@ enum SystemReflectionMethodImplAttributes {
 	aggressiveInlining= 65535,
 }
 /**  */
-interface SystemReflectionMethodInfo {
+export interface SystemReflectionMethodInfo {
 	/**  */
 	name: string | undefined,
 	/**  */
@@ -850,7 +850,7 @@ interface SystemReflectionMethodInfo {
 	returnTypeCustomAttributes: SystemReflectionICustomAttributeProvider,
 }
 /**  */
-interface SystemReflectionModule {
+export interface SystemReflectionModule {
 	/**  */
 	assembly: SystemReflectionAssembly,
 	/**  */
@@ -885,13 +885,13 @@ enum SystemReflectionParameterAttributes {
 	reservedMask= 61440,
 }
 /**  */
-interface SystemReflectionParameterInfo {
+export interface SystemReflectionParameterInfo {
 	/**  */
 	attributes: SystemReflectionParameterAttributes,
 	/**  */
 	member: SystemReflectionMemberInfo,
 	/**  */
-	name: string| null | undefined,
+	name: string | null | undefined,
 	/**  */
 	parameterType: SystemType,
 	/**  */
@@ -907,9 +907,9 @@ interface SystemReflectionParameterInfo {
 	/**  */
 	isRetval: boolean | undefined,
 	/**  */
-	defaultValue: Blob| null | undefined,
+	defaultValue: Blob | null | undefined,
 	/**  */
-	rawDefaultValue: Blob| null | undefined,
+	rawDefaultValue: Blob | null | undefined,
 	/**  */
 	hasDefaultValue: boolean | undefined,
 	/**  */
@@ -929,7 +929,7 @@ enum SystemReflectionPropertyAttributes {
 	reservedMask= 62464,
 }
 /**  */
-interface SystemReflectionPropertyInfo {
+export interface SystemReflectionPropertyInfo {
 	/**  */
 	name: string | undefined,
 	/**  */
@@ -991,7 +991,7 @@ enum SystemReflectionTypeAttributes {
 	autoClass= 12582912,
 }
 /**  */
-interface SystemReflectionTypeInfo {
+export interface SystemReflectionTypeInfo {
 	/**  */
 	name: string | undefined,
 	/**  */
@@ -1005,11 +1005,11 @@ interface SystemReflectionTypeInfo {
 	/**  */
 	memberType: SystemReflectionMemberTypes,
 	/**  */
-	'namespace': string| null | undefined,
+	'namespace': string | null | undefined,
 	/**  */
-	assemblyQualifiedName: string| null | undefined,
+	assemblyQualifiedName: string | null | undefined,
 	/**  */
-	fullName: string| null | undefined,
+	fullName: string | null | undefined,
 	/**  */
 	assembly: SystemReflectionAssembly,
 	/**  */
@@ -1164,24 +1164,24 @@ enum SystemRuntimeInteropServicesLayoutKind {
 	auto= 3,
 }
 /**  */
-interface SystemRuntimeInteropServicesStructLayoutAttribute {
+export interface SystemRuntimeInteropServicesStructLayoutAttribute {
 	/**  */
 	typeId: Blob | undefined,
 	/**  */
 	value: SystemRuntimeInteropServicesLayoutKind,
 }
 /**  */
-interface SystemRuntimeFieldHandle {
+export interface SystemRuntimeFieldHandle {
 	/**  */
 	value: SystemIntPtr,
 }
 /**  */
-interface SystemRuntimeMethodHandle {
+export interface SystemRuntimeMethodHandle {
 	/**  */
 	value: SystemIntPtr,
 }
 /**  */
-interface SystemRuntimeTypeHandle {
+export interface SystemRuntimeTypeHandle {
 	/**  */
 	value: SystemIntPtr,
 }
@@ -1192,7 +1192,7 @@ enum SystemSecuritySecurityRuleSet {
 	level2= 2,
 }
 /**  */
-interface SystemType {
+export interface SystemType {
 	/**  */
 	name: string | undefined,
 	/**  */
@@ -1206,11 +1206,11 @@ interface SystemType {
 	/**  */
 	memberType: SystemReflectionMemberTypes,
 	/**  */
-	'namespace': string| null | undefined,
+	'namespace': string | null | undefined,
 	/**  */
-	assemblyQualifiedName: string| null | undefined,
+	assemblyQualifiedName: string | null | undefined,
 	/**  */
-	fullName: string| null | undefined,
+	fullName: string | null | undefined,
 	/**  */
 	assembly: SystemReflectionAssembly,
 	/**  */
@@ -1341,16 +1341,16 @@ interface SystemType {
 	isVisible: boolean | undefined,
 }
 /** 任务信息 */
-interface TaskServiceControllerCommandControllerCommandInfo {
+export interface TaskServiceControllerCommandControllerCommandInfo {
 	/** 程序名称 */
 	fileName: string | undefined,
 	/** 工作目录 */
-	workingDirectory: string| null | undefined,
+	workingDirectory: string | null | undefined,
 	/** 命令行 */
 	commands: string[],
 }
 /** 命令输出 */
-interface TaskServiceControllerCommandControllerCommandOutPut {
+export interface TaskServiceControllerCommandControllerCommandOutPut {
 	/** 输出 */
 	standardOutput: string | undefined,
 	/** 错误 */

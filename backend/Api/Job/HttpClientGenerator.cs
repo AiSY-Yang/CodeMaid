@@ -20,6 +20,8 @@ using Microsoft.OpenApi.Readers;
 
 using Models.CodeMaid;
 
+using Serilog;
+
 using ServicesModels.Settings;
 
 using static Api.Job.NamingConvert;
@@ -54,104 +56,111 @@ namespace Api.Job
 		/// <returns></returns>
 		public async Task ExecuteAsync(Maid maid)
 		{
-			var setting = maid.Setting.Deserialize<HttpClientSyncSetting>()!;
-			string json;
-			var url = setting.SourceUrl;
-			if (url is not null)
+			try
 			{
-				try
+
+				var setting = maid.Setting.Deserialize<HttpClientSyncSetting>()!;
+				string json;
+				var url = setting.SourceUrl;
+				if (url is not null)
 				{
-					var res = await httpClient.GetAsync(url);
-					if (!res.IsSuccessStatusCode)
+					try
 					{
-						logger.LogError("{maid}生成HTTP客户端错误,{url}返回状态码为{StatusCode}", maid.Name, url, res.StatusCode);
+						var res = await httpClient.GetAsync(url);
+						if (!res.IsSuccessStatusCode)
+						{
+							logger.LogError("{maid}生成HTTP客户端错误,{url}返回状态码为{StatusCode}", maid.Name, url, res.StatusCode);
+							return;
+						}
+						json = await res.Content.ReadAsStringAsync();
+					}
+					catch (Exception ex)
+					{
+						logger.LogError(ex, "{maid}生成HTTP客户端错误,{url}", maid.Name, url);
 						return;
 					}
-					json = await res.Content.ReadAsStringAsync();
 				}
-				catch (Exception ex)
+				else
 				{
-					logger.LogError(ex, "{maid}生成HTTP客户端错误,{url}", maid.Name, url);
+					json = setting.SwaggerDocument!;
+				}
+				var md5 = json.Hash(HashOption.MD5_32);
+				if (Md5s.TryGetValue((maid.Id, maid.SourcePath), out string? lastMd5) && lastMd5 == md5)
+				{
 					return;
 				}
-			}
-			else
-			{
-				json = setting.SwaggerDocument!;
-			}
-			var md5 = json.Hash(HashOption.MD5_32);
-			if (Md5s.TryGetValue((maid.Id, maid.SourcePath), out string? lastMd5) && lastMd5 == md5)
-			{
-				return;
-			}
-			else
-			{
-				Md5s[(maid.Id, maid.SourcePath)] = md5;
-			}
-			OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out var diagnostic);
-			RestfulApiDocument restfulApiDocument = new(openApiDocument);
-			if (!setting.RenameClient.IsNullOrEmpty()) restfulApiDocument.Title = setting.RenameClient.Replace("*", restfulApiDocument.Title);
-			var needCreateModel = !setting.ModelPath.IsNullOrEmpty();
-			var needCreateOptions = !setting.OptionsPath.IsNullOrEmpty();
-			#region create model file
-			if (needCreateModel)
-			{
-				//模型文件路径
-				var modelPath = setting.HttpClientType switch
+				else
 				{
-					HttpClientType.CSharp => Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.cs"),
-					HttpClientType.TypeScript => Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.ts"),
-					_ => throw new InvalidEnumArgumentException()
-				};
-				switch (setting.HttpClientType)
+					Md5s[(maid.Id, maid.SourcePath)] = md5;
+				}
+				OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out var diagnostic);
+				RestfulApiDocument restfulApiDocument = new(openApiDocument);
+				if (!setting.RenameClient.IsNullOrEmpty()) restfulApiDocument.Title = setting.RenameClient.Replace("*", restfulApiDocument.Title);
+				var needCreateModel = !setting.ModelPath.IsNullOrEmpty();
+				var needCreateOptions = !setting.OptionsPath.IsNullOrEmpty();
+				#region create model file
+				if (needCreateModel)
 				{
-					case HttpClientType.CSharp:
-						{
-							CompilationUnitSyntax modelUnit;
-							if (File.Exists(modelPath))
-								modelUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(modelPath)).GetCompilationUnitRoot();
-							else
-								modelUnit = CSharpSyntaxTree.ParseText($$"""
+					//模型文件路径
+					var modelPath = setting.HttpClientType switch
+					{
+						HttpClientType.CSharp => Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.cs"),
+						HttpClientType.TypeScript => Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.ts"),
+						_ => throw new InvalidEnumArgumentException()
+					};
+					switch (setting.HttpClientType)
+					{
+						case HttpClientType.CSharp:
+							{
+								CompilationUnitSyntax modelUnit;
+								if (File.Exists(modelPath))
+									modelUnit = CSharpSyntaxTree.ParseText(File.ReadAllText(modelPath)).GetCompilationUnitRoot();
+								else
+									modelUnit = CSharpSyntaxTree.ParseText($$"""
 				#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 				using System.Text.Json.Serialization;
 				namespace RestfulClient.{{restfulApiDocument.PropertyStyleName}}Model;
 				#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
 
 				""").GetCompilationUnitRoot();
-							var modelUnitNew = modelUnit;
-							foreach (var item in restfulApiDocument.Models)
-							{
-								var obj = modelUnitNew.GetDeclarationSyntaxes<BaseTypeDeclarationSyntax>().Where(x => x.Identifier.Text == PropertyStyle(item.Name)).FirstOrDefault();
-								if (obj == null)
-									modelUnitNew = modelUnitNew.AddMembers(SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
-								else
-									modelUnitNew = modelUnitNew.ReplaceNode(obj, SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
+								var modelUnitNew = modelUnit;
+								foreach (var item in restfulApiDocument.Models)
+								{
+									var obj = modelUnitNew.GetDeclarationSyntaxes<BaseTypeDeclarationSyntax>().Where(x => x.Identifier.Text == PropertyStyle(item.Name)).FirstOrDefault();
+									if (obj == null)
+										modelUnitNew = modelUnitNew.AddMembers(SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
+									else
+										modelUnitNew = modelUnitNew.ReplaceNode(obj, SyntaxFactory.ParseMemberDeclaration(item.ToCode())!);
+								}
+								await FileTools.Write(modelPath, modelUnit, modelUnitNew);
 							}
-							await FileTools.Write(modelPath, modelUnit, modelUnitNew);
-						}
-						break;
-					case HttpClientType.TypeScript:
-						{
-							StringBuilder stringBuilder = new StringBuilder();
-							foreach (var item in restfulApiDocument.Models)
+							break;
+						case HttpClientType.TypeScript:
 							{
-								var text = item.ToTsCode();
-								stringBuilder.Append(text);
+								StringBuilder stringBuilder = new StringBuilder();
+								foreach (var item in restfulApiDocument.Models)
+								{
+									var text = item.ToTsCode();
+									stringBuilder.Append(text);
+								}
+								await File.WriteAllTextAsync(modelPath, stringBuilder.ToString());
 							}
-							await File.WriteAllTextAsync(modelPath, stringBuilder.ToString());
-						}
-						break;
-					default:
-						break;
+							break;
+						default:
+							break;
+					}
 				}
-			}
-			#endregion
-			if (needCreateOptions)
-			{
-				var optionsPath = Path.Combine(maid.Project.Path, setting.OptionsPath!, restfulApiDocument.PropertyStyleName + "Options.cs");
-				if (!File.Exists(optionsPath))
+				#endregion
+				if (needCreateOptions)
 				{
-					File.WriteAllText(optionsPath, $$"""
+					switch (setting.HttpClientType)
+					{
+						case HttpClientType.CSharp:
+							{
+								var optionsPath = Path.Combine(maid.Project.Path, setting.OptionsPath!, restfulApiDocument.PropertyStyleName + "Options.cs");
+								if (!File.Exists(optionsPath))
+								{
+									File.WriteAllText(optionsPath, $$"""
 namespace RestfulClient;
 
 public class {{restfulApiDocument.PropertyStyleName}}Options
@@ -166,21 +175,45 @@ public class {{restfulApiDocument.PropertyStyleName}}Options
 	public double TimeoutSecond { get; set; } = 30;
 }
 """);
+								}
+								break;
+							}
+						case HttpClientType.TypeScript:
+							{
+								var optionsPath = Path.Combine(maid.Project.Path, setting.OptionsPath!, restfulApiDocument.PropertyStyleName + "Options.ts");
+								if (!File.Exists(optionsPath))
+								{
+									File.WriteAllText(optionsPath, $$"""
+class {{restfulApiDocument.PropertyStyleName}}Option {
+	baseURL = 'http://localhost:5241'
+}
+const option = new {{restfulApiDocument.PropertyStyleName}}Option()
+export default option
+""");
+								}
+								break;
+							}
+						default:
+							break;
+					}
+
 				}
-			}
-			//文件路径
-			var PATH = Path.Combine(maid.Project.Path, setting.ClientPath, restfulApiDocument.PropertyStyleName + ".cs");
-			CompilationUnitSyntax unit;
-			CompilationUnitSyntax unitNew;
-			if (File.Exists(PATH))
-			{
-				unit = CSharpSyntaxTree.ParseText(File.ReadAllText(PATH)).GetCompilationUnitRoot();
-				unitNew = unit;
-			}
-			else
-			{
-				var server = openApiDocument.Servers.FirstOrDefault()?.Url ?? "http://localhost:5000";
-				var text = $$"""
+				switch (setting.HttpClientType)
+				{
+					case HttpClientType.CSharp:
+						{
+							//文件路径
+							var PATH = Path.Combine(maid.Project.Path, setting.ClientPath, restfulApiDocument.PropertyStyleName + ".cs");
+							CompilationUnitSyntax unit;
+							CompilationUnitSyntax unitNew;
+							if (File.Exists(PATH))
+							{
+								unit = CSharpSyntaxTree.ParseText(File.ReadAllText(PATH)).GetCompilationUnitRoot();
+								unitNew = unit;
+							}
+							else
+							{
+								var text = $$"""
 using System.CodeDom.Compiler;
 using System.Net.Http.Json;
 using System.Text.Encodings.Web;
@@ -236,37 +269,105 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 	}
 }
 """;
-				unit = CSharpSyntaxTree.ParseText("").GetCompilationUnitRoot();
-				unitNew = CSharpSyntaxTree.ParseText(text).GetCompilationUnitRoot();
-			}
-			var c = unitNew.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
-			var newC = c;
+								unit = CSharpSyntaxTree.ParseText("").GetCompilationUnitRoot();
+								unitNew = CSharpSyntaxTree.ParseText(text).GetCompilationUnitRoot();
+							}
+							var c = unitNew.GetDeclarationSyntaxes<ClassDeclarationSyntax>().First();
+							var newC = c;
 
-			foreach (var api in restfulApiDocument.Api)
+							foreach (var api in restfulApiDocument.Api)
+							{
+								var methodName = api.MethodName;
+								var m = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().FirstOrDefault(x => x.Identifier.Text == methodName);
+								if (m != null)
+								{
+									if (m.AttributeLists.Any(x => x.Attributes.Any(x => x.Name.ToString() == "GeneratedCode")))
+										newC = newC.ReplaceNode(m, (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod())!);
+									//当已经存在方法的时候跳过
+									continue;
+								}
+								else
+								{
+									newC = newC.AddMembers((MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod())!);
+								}
+							}
+							//移除已被删除的接口
+							var methodNode = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().Where(m => m.AttributeLists.Any(x => x.Attributes.Any(x => x.Name.ToString() == "GeneratedCode")));
+							var allMethodName = methodNode.Select(x => x.Identifier.Text).ToList();
+							var removedMethod = methodNode.Where(node => !restfulApiDocument.Api.Any(x => x.MethodName == node.Identifier.Text)).ToList();
+							newC = newC.RemoveNodes(removedMethod, SyntaxRemoveOptions.KeepNoTrivia);
+
+							await FileTools.Write(PATH, unit, unitNew.ReplaceNode(c, newC!));
+						}
+						break;
+					case HttpClientType.TypeScript:
+						{
+							var PATH = Path.Combine(maid.Project.Path, setting.ClientPath, restfulApiDocument.PropertyStyleName + ".ts");
+							StringBuilder stringBuilder = new StringBuilder();
+							stringBuilder.AppendLine($$"""
+							import { $Fetch, ofetch } from 'ofetch'
+							import option from './{{restfulApiDocument.PropertyStyleName}}Options'
+							import * as Model from './{{restfulApiDocument.PropertyStyleName}}Model'
+
+							class {{restfulApiDocument.PropertyStyleName}} {
+								/** The client for making HTTP requests */
+								client: $Fetch
+								constructor() {
+									this.client = ofetch.create({ baseURL: option.baseURL })
+								}
+							""");
+							foreach (var api in restfulApiDocument.Api)
+							{
+								var parameter = new List<string>();
+								var parameterType = new List<string>();
+								//解析查询参数类型
+								if (api.QueryParameter.Count > 0)
+								{
+									var getParamsTypeBuilder = new StringBuilder();
+									var queryList = new List<string>();
+									foreach (var item in api.QueryParameter)
+										queryList.Add($"{item.Name}: {(item.Type.ReferenceId is not null ? "Model." : "")}{item.Type.TypeScriptType}");
+									getParamsTypeBuilder.Append(string.Join("; ", queryList));
+									parameter.Add("params");
+									parameterType.Add($"params: {{{getParamsTypeBuilder}}}");
+								}
+								if (api.BodyParameter?.Count > 0)
+								{
+									parameter.Add("body");
+									parameterType.Add($"body: any");
+								}
+								var parameterCodeText = $"{{ {string.Join(", ", parameter)} }} : {{ {string.Join("; ", parameterType)} }}";
+								var responseType = api.RestfulApiResponses.First().ResponseType;
+								var responseCodeText = responseType?.TypeScriptType is null ? "Blob"
+									: responseType.ReferenceId is not null ? $"Model.{responseType.TypeScriptType}"
+									: responseType.TypeScriptType;
+								//Console.WriteLine(api.Id);
+								//var methodName = api.Method + api.Path.Replace('/', '_').ToNamingConvention(NamingConvention.PascalCase).TrimStart("Api");
+								var methodName = api.Method + api.Id;
+								stringBuilder.AppendLine($$"""	{{methodName}}({{parameterCodeText}}): Promise<{{responseCodeText}}> {""");
+								stringBuilder.AppendLine($$"""		return this.client('{{api.Path}}', {""");
+								stringBuilder.AppendLine($$"""			method: '{{api.Method}}',""");
+								if (api.QueryParameter.Count > 0) stringBuilder.AppendLine($$"""			params: params,""");
+								if (api.BodyParameter?.Count > 0) stringBuilder.AppendLine($$"""			body: body,""");
+								stringBuilder.AppendLine($$"""		})""");
+								stringBuilder.AppendLine($$"""	}""");
+							}
+							stringBuilder.AppendLine("}");
+							stringBuilder.AppendLine($"const {restfulApiDocument.PropertyStyleName}Client = new {restfulApiDocument.PropertyStyleName}()");
+							stringBuilder.AppendLine($"export default {restfulApiDocument.PropertyStyleName}Client");
+							await File.WriteAllTextAsync(PATH, stringBuilder.ToString());
+
+						}
+						break;
+					default:
+						break;
+				}
+				logger.LogInformation("{maid}生成{name}Http客户端", maid.Name, restfulApiDocument.PropertyStyleName);
+			}
+			catch (Exception ex)
 			{
-				if (api.Method == OperationType.Get && api.BodyParameter is not null) logger.LogWarning("方法{MethodName}的body不为空", api.MethodName);
-				var methodName = api.MethodName;
-				var m = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().FirstOrDefault(x => x.Identifier.Text == methodName);
-				if (m != null)
-				{
-					if (m.AttributeLists.Any(x => x.Attributes.Any(x => x.Name.ToString() == "GeneratedCode")))
-						newC = newC.ReplaceNode(m, (MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod())!);
-					//当已经存在方法的时候跳过
-					continue;
-				}
-				else
-				{
-					newC = newC.AddMembers((MethodDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(api.CreateMethod())!);
-				}
+				logger.LogError(ex, "客户端生成错误");
 			}
-			//移除已被删除的接口
-			var methodNode = newC.ChildNodes().OfType<MethodDeclarationSyntax>().ToList().Where(m => m.AttributeLists.Any(x => x.Attributes.Any(x => x.Name.ToString() == "GeneratedCode")));
-			var allMethodName = methodNode.Select(x => x.Identifier.Text).ToList();
-			var removedMethod = methodNode.Where(node => !restfulApiDocument.Api.Any(x => x.MethodName == node.Identifier.Text)).ToList();
-			newC = newC.RemoveNodes(removedMethod, SyntaxRemoveOptions.KeepNoTrivia);
-
-			await FileTools.Write(PATH, unit, unitNew.ReplaceNode(c, newC!));
-			logger.LogInformation("{maid}生成{name}Http客户端", maid.Name, restfulApiDocument.PropertyStyleName);
 		}
 	}
 	class RestfulApiDocument
@@ -383,6 +484,9 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 						HeaderParameter = operation.Value.Parameters.Where(x => x != null)
 						.Where(x => x.In == ParameterLocation.Header).Select(x => new ClassField() { Name = x.Name, Type = x.Schema.GetTypeInfo(), Summary = x.Description }).ToList(),
 					};
+					if (restfulApiModel.Method == OperationType.Get && restfulApiModel.BodyParameter is not null)
+						Log.Warning("方法{MethodName}是Get请求,但是body不为空", restfulApiModel.MethodName);
+
 					Api.Add(restfulApiModel);
 				}
 			}
@@ -433,7 +537,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			AppendTsSummary(stringBuilder, Summary, "");
-			stringBuilder.AppendLine($$"""interface {{PropertyStyle(Name)}} {""");
+			stringBuilder.AppendLine($$"""export interface {{PropertyStyle(Name)}} {""");
 			foreach (var item in ClassFields)
 			{
 				AppendTsSummary(stringBuilder, item.Summary, "\t");
@@ -590,7 +694,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 				null => "Blob",
 				_ => Type,
 			}
-			+ (CanBeNull ? "| null" : "") + (!Required ? " | undefined" : "");
+			+ (CanBeNull ? " | null" : "") + (!Required ? " | undefined" : "");
 		/// <summary>
 		/// 作为参数的类型 判断required
 		/// </summary>
@@ -755,7 +859,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 		/// <summary>
 		/// Operation Id
 		/// </summary>
-		public required string? Id { private get; set; }
+		public required string? Id { get; set; }
 		/// <summary>
 		/// 无效的符号
 		/// </summary>

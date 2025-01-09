@@ -17,6 +17,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
 
 using OpenTelemetry.Exporter;
@@ -213,7 +214,9 @@ namespace Api
 				//自定义唯一ID
 				options.CustomOperationIds(apiDescription =>
 				{
-					return apiDescription.TryGetMethodInfo(out System.Reflection.MethodInfo methodInfo) ? methodInfo.Name : null;
+					var controllerName = apiDescription.ActionDescriptor is ControllerActionDescriptor controller ? controller.ControllerName : "";
+					var actionName = apiDescription.TryGetMethodInfo(out System.Reflection.MethodInfo methodInfo) ? methodInfo.Name : "";
+					return controllerName + actionName;
 				});
 				//添加XML注释
 				foreach (var item in Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly))

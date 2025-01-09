@@ -74,7 +74,7 @@ public partial class Self
 	/// <returns></returns>
 	/// <param name="body"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<TaskServiceControllerCommandControllerCommandOutPut> Command(TaskServiceControllerCommandControllerCommandInfo? body)
+	public async Task<TaskServiceControllerCommandControllerCommandOutPut> CommandCommand(TaskServiceControllerCommandControllerCommandInfo? body)
 	{
 var content = JsonContent.Create(body);
 		var httpRequestMessage = new HttpRequestMessage()
@@ -88,19 +88,19 @@ var content = JsonContent.Create(body);
 		return await GetResult<TaskServiceControllerCommandControllerCommandOutPut>(httpRequestMessage, response);
 	}
 	/// <summary>
-	/// 文件是否存在
+	/// 是否已存在
 	/// </summary>
 	/// <returns></returns>
 	/// <param name="path"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> Exist(string? path)
+	public async Task<bool> DirectoryExist(string? path)
 	{
 		var queryParameters = new List<string>();
 		if (path != null) queryParameters.Add($"path={path}");
 		var httpRequestMessage = new HttpRequestMessage()
 		{
 			Method = HttpMethod.Get,
-			RequestUri = new Uri($"File/Exist{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+			RequestUri = new Uri($"api/Directory/Exist{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
 		};
 		var response = await httpClient.SendAsync(httpRequestMessage);
 		
@@ -112,7 +112,7 @@ var content = JsonContent.Create(body);
 	/// <returns></returns>
 	/// <param name="path"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> Create(string? path)
+	public async Task<bool> DirectoryCreate(string? path)
 	{
 		var queryParameters = new List<string>();
 		if (path != null) queryParameters.Add($"path={path}");
@@ -126,41 +126,41 @@ var content = JsonContent.Create(body);
 		return await GetResult<bool>(httpRequestMessage, response);
 	}
 	/// <summary>
-	/// 删除文件
+	/// 删除目录
 	/// </summary>
 	/// <returns></returns>
-	/// <param name="filePath"></param>
+	/// <param name="path"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> Delete(string? filePath)
+	public async Task<bool> DirectoryDelete(string? path)
 	{
 		var queryParameters = new List<string>();
-		if (filePath != null) queryParameters.Add($"filePath={filePath}");
+		if (path != null) queryParameters.Add($"path={path}");
 		var httpRequestMessage = new HttpRequestMessage()
 		{
-			Method = HttpMethod.Delete,
-			RequestUri = new Uri($"File/Delete{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+			Method = HttpMethod.Post,
+			RequestUri = new Uri($"api/Directory/Delete{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
 		};
 		var response = await httpClient.SendAsync(httpRequestMessage);
 		
 		return await GetResult<bool>(httpRequestMessage, response);
 	}
 	/// <summary>
-	/// 文件大小
+	/// 获取目录大小
 	/// </summary>
 	/// <returns></returns>
 	/// <param name="path"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<long?> Size(string? path)
+	public async Task<long> DirectorySize(string? path)
 	{
 		var queryParameters = new List<string>();
 		if (path != null) queryParameters.Add($"path={path}");
 		var httpRequestMessage = new HttpRequestMessage()
 		{
 			Method = HttpMethod.Get,
-			RequestUri = new Uri($"File/Size{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+			RequestUri = new Uri($"api/Directory/Size{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
 		};
 		var response = await httpClient.SendAsync(httpRequestMessage);
-		if (response.StatusCode == System.Net.HttpStatusCode.NoContent) return null;
+		
 		return await GetResult<long>(httpRequestMessage, response);
 	}
 	/// <summary>
@@ -171,7 +171,7 @@ var content = JsonContent.Create(body);
 	/// <param name="needFile">是否需要返回文件 true返回文件和文件夹 false只返回文件</param>
 	/// <param name="recursive">是否需要递归查子文件夹</param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<ApiControllersCommonsSystemFolder> Content(string? path, bool? needFile, bool? recursive)
+	public async Task<ApiControllersCommonsSystemFolder> DirectoryContent(string? path, bool? needFile, bool? recursive)
 	{
 		var queryParameters = new List<string>();
 		if (path != null) queryParameters.Add($"path={path}");
@@ -192,7 +192,7 @@ var content = JsonContent.Create(body);
 	/// <returns></returns>
 	/// <param name="path"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<List<string>> File(string? path)
+	public async Task<List<string>> DirectoryFile(string? path)
 	{
 		var queryParameters = new List<string>();
 		if (path != null) queryParameters.Add($"path={path}");
@@ -206,46 +206,46 @@ var content = JsonContent.Create(body);
 		return await GetResult<List<string>>(httpRequestMessage, response);
 	}
 	/// <summary>
-	/// 移动文件
+	/// 移动文件夹
 	/// </summary>
 	/// <returns></returns>
-	/// <param name="sourceFileName"></param>
-	/// <param name="destinationFileName"></param>
+	/// <param name="path"></param>
+	/// <param name="to"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> Move(string? sourceFileName, string? destinationFileName)
+	public async Task<string> DirectoryMove(string? path, string? to)
 	{
 		var queryParameters = new List<string>();
-		if (sourceFileName != null) queryParameters.Add($"sourceFileName={sourceFileName}");
-		if (destinationFileName != null) queryParameters.Add($"destinationFileName={destinationFileName}");
+		if (path != null) queryParameters.Add($"path={path}");
+		if (to != null) queryParameters.Add($"to={to}");
 		var httpRequestMessage = new HttpRequestMessage()
 		{
 			Method = HttpMethod.Put,
-			RequestUri = new Uri($"File/Move{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+			RequestUri = new Uri($"api/Directory/Move{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
 		};
 		var response = await httpClient.SendAsync(httpRequestMessage);
 		
-		return await GetResult<bool>(httpRequestMessage, response);
+		return await response.Content.ReadAsStringAsync();
 	}
 	/// <summary>
-	/// 复制文件
+	/// 复制文件夹
 	/// </summary>
 	/// <returns></returns>
-	/// <param name="sourceFileName"></param>
-	/// <param name="destinationFileName"></param>
+	/// <param name="path"></param>
+	/// <param name="to"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> Copy(string? sourceFileName, string? destinationFileName)
+	public async Task<string> DirectoryCopy(string? path, string? to)
 	{
 		var queryParameters = new List<string>();
-		if (sourceFileName != null) queryParameters.Add($"sourceFileName={sourceFileName}");
-		if (destinationFileName != null) queryParameters.Add($"destinationFileName={destinationFileName}");
+		if (path != null) queryParameters.Add($"path={path}");
+		if (to != null) queryParameters.Add($"to={to}");
 		var httpRequestMessage = new HttpRequestMessage()
 		{
 			Method = HttpMethod.Put,
-			RequestUri = new Uri($"File/Copy{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+			RequestUri = new Uri($"api/Directory/Copy{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
 		};
 		var response = await httpClient.SendAsync(httpRequestMessage);
 		
-		return await GetResult<bool>(httpRequestMessage, response);
+		return await response.Content.ReadAsStringAsync();
 	}
 	/// <summary>
 	/// 获取指定目录的压缩包
@@ -253,7 +253,7 @@ var content = JsonContent.Create(body);
 	/// <returns></returns>
 	/// <param name="path"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<Stream> Zip(string? path)
+	public async Task<Stream> DirectoryZip(string? path)
 	{
 		var queryParameters = new List<string>();
 		if (path != null) queryParameters.Add($"path={path}");
@@ -267,12 +267,50 @@ var content = JsonContent.Create(body);
 		return await response.Content.ReadAsStreamAsync();
 	}
 	/// <summary>
+	/// 文件是否存在
+	/// </summary>
+	/// <returns></returns>
+	/// <param name="path"></param>
+	[GeneratedCode("codeMaid", "1.0.0")]
+	public async Task<bool> FileExist(string? path)
+	{
+		var queryParameters = new List<string>();
+		if (path != null) queryParameters.Add($"path={path}");
+		var httpRequestMessage = new HttpRequestMessage()
+		{
+			Method = HttpMethod.Get,
+			RequestUri = new Uri($"File/Exist{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+		};
+		var response = await httpClient.SendAsync(httpRequestMessage);
+		
+		return await GetResult<bool>(httpRequestMessage, response);
+	}
+	/// <summary>
+	/// 文件大小
+	/// </summary>
+	/// <returns></returns>
+	/// <param name="path"></param>
+	[GeneratedCode("codeMaid", "1.0.0")]
+	public async Task<long?> FileSize(string? path)
+	{
+		var queryParameters = new List<string>();
+		if (path != null) queryParameters.Add($"path={path}");
+		var httpRequestMessage = new HttpRequestMessage()
+		{
+			Method = HttpMethod.Get,
+			RequestUri = new Uri($"File/Size{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+		};
+		var response = await httpClient.SendAsync(httpRequestMessage);
+		if (response.StatusCode == System.Net.HttpStatusCode.NoContent) return null;
+		return await GetResult<long>(httpRequestMessage, response);
+	}
+	/// <summary>
 	/// 下载文件
 	/// </summary>
 	/// <returns></returns>
 	/// <param name="path"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<Stream?> Download(string? path)
+	public async Task<Stream?> FileDownload(string? path)
 	{
 		var queryParameters = new List<string>();
 		if (path != null) queryParameters.Add($"path={path}");
@@ -292,7 +330,7 @@ var content = JsonContent.Create(body);
 	/// <param name="filePath"></param>
 	/// <param name="text"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<string> WriteText(string? filePath, string? text)
+	public async Task<string> FileWriteText(string? filePath, string? text)
 	{
 		var content = new MultipartFormDataContent();
 		if (filePath is not null) content.Add(new StringContent(filePath), nameof(filePath));
@@ -314,7 +352,7 @@ var content = JsonContent.Create(body);
 	/// <param name="directory">目录名</param>
 	/// <param name="file"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<string> Write(string? directory, (HttpContent content, string fileName)? file)
+	public async Task<string> FileWrite(string? directory, (HttpContent content, string fileName)? file)
 	{
 		var queryParameters = new List<string>();
 		if (directory != null) queryParameters.Add($"directory={directory}");
@@ -336,7 +374,7 @@ var content = JsonContent.Create(body);
 	/// <returns></returns>
 	/// <param name="filePath">文件完整路径</param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<string> SyncWrite(string? filePath)
+	public async Task<string> FileSyncWrite(string? filePath)
 	{
 		var queryParameters = new List<string>();
 		if (filePath != null) queryParameters.Add($"filePath={filePath}");
@@ -355,7 +393,7 @@ var content = JsonContent.Create(body);
 	/// <returns></returns>
 	/// <param name="filePath"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<string?> TextContent(string? filePath)
+	public async Task<string?> FileTextContent(string? filePath)
 	{
 		var queryParameters = new List<string>();
 		if (filePath != null) queryParameters.Add($"filePath={filePath}");
@@ -372,20 +410,39 @@ var content = JsonContent.Create(body);
 	/// 多个文件文本内容
 	/// </summary>
 	/// <returns></returns>
-	/// <param name="body"></param>
+	/// <param name="filePaths"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<JsonElement> TextContents(List<string>? body)
+	public async Task<JsonElement> FileTextContents(List<string>? filePaths)
 	{
-var content = JsonContent.Create(body);
+		var queryParameters = new List<string>();
+		if (filePaths != null) queryParameters.Add(string.Join('&', filePaths.Select(x => $"filePaths={x}")));
 		var httpRequestMessage = new HttpRequestMessage()
 		{
 			Method = HttpMethod.Get,
-			RequestUri = new Uri($"File/TextContents", UriKind.Relative),
-			Content = content,
+			RequestUri = new Uri($"File/TextContents{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
 		};
 		var response = await httpClient.SendAsync(httpRequestMessage);
 		
 		return await GetResult<JsonElement>(httpRequestMessage, response);
+	}
+	/// <summary>
+	/// 删除文件
+	/// </summary>
+	/// <returns></returns>
+	/// <param name="filePath"></param>
+	[GeneratedCode("codeMaid", "1.0.0")]
+	public async Task<bool> FileDelete(string? filePath)
+	{
+		var queryParameters = new List<string>();
+		if (filePath != null) queryParameters.Add($"filePath={filePath}");
+		var httpRequestMessage = new HttpRequestMessage()
+		{
+			Method = HttpMethod.Delete,
+			RequestUri = new Uri($"File/Delete{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+		};
+		var response = await httpClient.SendAsync(httpRequestMessage);
+		
+		return await GetResult<bool>(httpRequestMessage, response);
 	}
 	/// <summary>
 	/// 移动文件
@@ -394,7 +451,28 @@ var content = JsonContent.Create(body);
 	/// <param name="sourceFileName"></param>
 	/// <param name="destinationFileName"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> MoveAndOverWrite(string? sourceFileName, string? destinationFileName)
+	public async Task<bool> FileMove(string? sourceFileName, string? destinationFileName)
+	{
+		var queryParameters = new List<string>();
+		if (sourceFileName != null) queryParameters.Add($"sourceFileName={sourceFileName}");
+		if (destinationFileName != null) queryParameters.Add($"destinationFileName={destinationFileName}");
+		var httpRequestMessage = new HttpRequestMessage()
+		{
+			Method = HttpMethod.Put,
+			RequestUri = new Uri($"File/Move{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+		};
+		var response = await httpClient.SendAsync(httpRequestMessage);
+		
+		return await GetResult<bool>(httpRequestMessage, response);
+	}
+	/// <summary>
+	/// 移动文件
+	/// </summary>
+	/// <returns></returns>
+	/// <param name="sourceFileName"></param>
+	/// <param name="destinationFileName"></param>
+	[GeneratedCode("codeMaid", "1.0.0")]
+	public async Task<bool> FileMoveAndOverWrite(string? sourceFileName, string? destinationFileName)
 	{
 		var queryParameters = new List<string>();
 		if (sourceFileName != null) queryParameters.Add($"sourceFileName={sourceFileName}");
@@ -415,7 +493,28 @@ var content = JsonContent.Create(body);
 	/// <param name="sourceFileName"></param>
 	/// <param name="destinationFileName"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> CopyAndOverWrite(string? sourceFileName, string? destinationFileName)
+	public async Task<bool> FileCopy(string? sourceFileName, string? destinationFileName)
+	{
+		var queryParameters = new List<string>();
+		if (sourceFileName != null) queryParameters.Add($"sourceFileName={sourceFileName}");
+		if (destinationFileName != null) queryParameters.Add($"destinationFileName={destinationFileName}");
+		var httpRequestMessage = new HttpRequestMessage()
+		{
+			Method = HttpMethod.Put,
+			RequestUri = new Uri($"File/Copy{(queryParameters.Count > 0 ? "?" + string.Join('&', queryParameters) : "")}", UriKind.Relative),
+		};
+		var response = await httpClient.SendAsync(httpRequestMessage);
+		
+		return await GetResult<bool>(httpRequestMessage, response);
+	}
+	/// <summary>
+	/// 复制文件
+	/// </summary>
+	/// <returns></returns>
+	/// <param name="sourceFileName"></param>
+	/// <param name="destinationFileName"></param>
+	[GeneratedCode("codeMaid", "1.0.0")]
+	public async Task<bool> FileCopyAndOverWrite(string? sourceFileName, string? destinationFileName)
 	{
 		var queryParameters = new List<string>();
 		if (sourceFileName != null) queryParameters.Add($"sourceFileName={sourceFileName}");
@@ -436,7 +535,7 @@ var content = JsonContent.Create(body);
 	/// <param name="sourceFileName"></param>
 	/// <param name="destinationFileName"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> Link(string? sourceFileName, string? destinationFileName)
+	public async Task<bool> FileLink(string? sourceFileName, string? destinationFileName)
 	{
 		var queryParameters = new List<string>();
 		if (sourceFileName != null) queryParameters.Add($"sourceFileName={sourceFileName}");
@@ -457,7 +556,7 @@ var content = JsonContent.Create(body);
 	/// <param name="zipFileName"></param>
 	/// <param name="destinationDirectory"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<List<string>> DecompressionZip(string? zipFileName, string? destinationDirectory)
+	public async Task<List<string>> FileDecompressionZip(string? zipFileName, string? destinationDirectory)
 	{
 		var queryParameters = new List<string>();
 		if (zipFileName != null) queryParameters.Add($"zipFileName={zipFileName}");
@@ -476,7 +575,7 @@ var content = JsonContent.Create(body);
 	/// </summary>
 	/// <returns></returns>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> SetRemoteSshCertAuth()
+	public async Task<bool> FunctionSetRemoteSshCertAuth()
 	{
 		var httpRequestMessage = new HttpRequestMessage()
 		{
@@ -492,7 +591,7 @@ var content = JsonContent.Create(body);
 	/// </summary>
 	/// <returns></returns>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<List<ModelsCodeMaidProject>> GetList()
+	public async Task<List<ModelsCodeMaidProject>> ProjectGetList()
 	{
 		var httpRequestMessage = new HttpRequestMessage()
 		{
@@ -509,7 +608,24 @@ var content = JsonContent.Create(body);
 	/// <returns></returns>
 	/// <param name="id"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> FlushAllFile(long? id)
+	public async Task<ModelsCodeMaidProject> ProjectGetDetail(long? id)
+	{
+		var httpRequestMessage = new HttpRequestMessage()
+		{
+			Method = HttpMethod.Get,
+			RequestUri = new Uri($"api/Project/{id}", UriKind.Relative),
+		};
+		var response = await httpClient.SendAsync(httpRequestMessage);
+		
+		return await GetResult<ModelsCodeMaidProject>(httpRequestMessage, response);
+	}
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	/// <param name="id"></param>
+	[GeneratedCode("codeMaid", "1.0.0")]
+	public async Task<bool> ProjectFlushAllFile(long? id)
 	{
 		var queryParameters = new List<string>();
 		if (id != null) queryParameters.Add($"id={id}");
@@ -528,7 +644,7 @@ var content = JsonContent.Create(body);
 	/// <returns></returns>
 	/// <param name="id"></param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<bool> GitHooks(long? id)
+	public async Task<bool> ProjectGitHooks(long? id)
 	{
 		var queryParameters = new List<string>();
 		if (id != null) queryParameters.Add($"id={id}");
@@ -546,7 +662,7 @@ var content = JsonContent.Create(body);
 	/// </summary>
 	/// <returns></returns>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<JsonElement> GetEnumDictionaries()
+	public async Task<JsonElement> SystemGetEnumDictionaries()
 	{
 		var httpRequestMessage = new HttpRequestMessage()
 		{
@@ -562,7 +678,7 @@ var content = JsonContent.Create(body);
 	/// </summary>
 	/// <returns></returns>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<List<ApiControllersCommonsControllerInfo>?> GetControllers()
+	public async Task<List<ApiControllersCommonsControllerInfo>?> SystemGetControllers()
 	{
 		var httpRequestMessage = new HttpRequestMessage()
 		{
@@ -580,7 +696,7 @@ var content = JsonContent.Create(body);
 	/// <param name="statusCode">返回的状态码</param>
 	/// <param name="delay">接口返回延迟</param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<Stream> Echo(int statusCode, int delay)
+	public async Task<Stream> SystemEcho(int statusCode, int delay)
 	{
 		var queryParameters = new List<string>();
 		if (statusCode != null) queryParameters.Add($"statusCode={statusCode}");
@@ -600,7 +716,7 @@ var content = JsonContent.Create(body);
 	/// <returns></returns>
 	/// <param name="forward">转发地址</param>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<Stream> Forward(string? forward)
+	public async Task<Stream> SystemForward(string? forward)
 	{
 		var queryParameters = new List<string>();
 		if (forward != null) queryParameters.Add($"forward={forward}");
@@ -618,7 +734,7 @@ var content = JsonContent.Create(body);
 	/// </summary>
 	/// <returns></returns>
 	[GeneratedCode("codeMaid", "1.0.0")]
-	public async Task<Stream> KeepAlive()
+	public async Task<Stream> SystemKeepAlive()
 	{
 		var httpRequestMessage = new HttpRequestMessage()
 		{

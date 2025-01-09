@@ -11,6 +11,8 @@
   "dependencies": {
     "antd": "^5.9.3",
     "next": "latest",
+    "ofetch": "^1.4.0",
+    "prettier-plugin-tailwindcss": "^0.6.8",
     "react": "latest",
     "react-dom": "latest",
     "react-syntax-highlighter": "^15.5.0"

@@ -21,6 +21,11 @@ namespace Api.Controllers
 		{
 			return maidContext.Projects.ToList();
 		}
+		[HttpGet("{id}")]
+		public Project GetDetail(long id)
+		{
+			return maidContext.Projects.First(x => x.Id == id);
+		}
 
 		[HttpPut("[action]")]
 		public bool FlushAllFile(long id)

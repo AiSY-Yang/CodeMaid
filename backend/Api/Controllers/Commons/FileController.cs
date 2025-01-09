@@ -141,7 +141,7 @@ public partial class FileController(ILogger<FileController> logger) : CommonCont
 	/// <param name="filePaths"></param>
 	/// <returns></returns>
 	[HttpGet("[action]")]
-	public async Task<Dictionary<string, string?>> TextContents(string[] filePaths)
+	public async Task<Dictionary<string, string?>> TextContents([FromQuery] string[] filePaths)
 	{
 		var result = new Dictionary<string, string?>();
 		foreach (var filePath in filePaths.Distinct())

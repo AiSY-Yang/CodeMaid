@@ -3,6 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace ServicesModels.Results
 {
+	public class ApiException<T> : Exception
+	{
+		public required T Model { get; set; }
+	}
+	public class RFC9457Exception : ApiException<RFC9457>
+	{
+	}
+
 	/// <summary>
 	/// A business exception with message
 	/// </summary>
