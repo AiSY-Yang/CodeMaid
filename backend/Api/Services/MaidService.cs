@@ -293,7 +293,7 @@ namespace Api.Services
 
 				using {{classDefinition.NameSpace}};
 				/// <summary>
-				/// {{(isAbstract ? "基类的配置" : "派生类的配置")}}
+				/// {{(isAbstract ? "Configuration of Base Classes" : "Configuration of Derived Classes")}}
 				/// </summary>
 				{{(
 				//当没有基类的时候 直接实现接口

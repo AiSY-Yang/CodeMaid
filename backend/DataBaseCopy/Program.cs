@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using System.Linq.Expressions;
+﻿#define SSHON
+using System.Diagnostics;
 
 using MaidContexts;
 
@@ -11,7 +11,7 @@ using Models.CodeMaid;
 
 using Renci.SshNet;
 
-namespace DataBaseSync;
+namespace DataBaseCopy;
 
 internal class Program
 {
@@ -25,7 +25,9 @@ internal class Program
 		Console.WriteLine("要求表的外键必须有显式的Id字段");
 		Console.ForegroundColor = colorBackup;
 		UseMapster();
+#if SSHON
 		using SshClient? client = null;
+#endif
 		#region 开启ssh隧道
 		// var client = new SshClient("remote", 22, "root", "123456");
 		//client.Connect();
@@ -53,8 +55,9 @@ internal class Program
 		Sync(targetContext, projects);
 		var maids = sourceContext.Maids.ToList();
 		Sync(targetContext, maids);
-
+#if SSHON
 		client?.Disconnect();
+#endif
 	}
 	/// <summary>
 	/// 复制数据
@@ -77,14 +80,14 @@ internal class Program
 			i++;
 			Console.SetCursorPosition(0, Console.CursorTop);
 			Console.Write($"已完成{i}/{ids.Count}");
-			var testData = has.FirstOrDefault(x => x.Id == item.Id);
-			if (testData is null)
+			var hasData = has.FirstOrDefault(x => x.Id == item.Id);
+			if (hasData is null)
 			{
 				targetContext.Set<T>().Add(item.Adapt<T>());
 			}
 			else
 			{
-				item.Adapt(testData);
+				item.Adapt(hasData);
 			}
 		}
 		var updateCount = targetContext.ChangeTracker.Entries().Where(x => x.State == EntityState.Modified).Count();

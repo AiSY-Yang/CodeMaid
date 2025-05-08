@@ -745,4 +745,20 @@ var content = JsonContent.Create(body);
 		
 		return await response.Content.ReadAsStreamAsync();
 	}
+	/// <summary>
+	/// 运行时版本
+	/// </summary>
+	/// <returns></returns>
+	[GeneratedCode("codeMaid", "1.0.0")]
+	public async Task<string> SystemRuntimeVersion()
+	{
+		var httpRequestMessage = new HttpRequestMessage()
+		{
+			Method = HttpMethod.Get,
+			RequestUri = new Uri($"api/System/RuntimeVersion", UriKind.Relative),
+		};
+		var response = await httpClient.SendAsync(httpRequestMessage);
+		
+		return await response.Content.ReadAsStringAsync();
+	}
 }

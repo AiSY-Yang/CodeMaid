@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Net;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -58,12 +59,13 @@ namespace Api.Job
 		{
 			try
 			{
-
 				var setting = maid.Setting.Deserialize<HttpClientSyncSetting>()!;
 				string json;
 				var url = setting.SourceUrl;
+				string? host = null;
 				if (url is not null)
 				{
+					host = new Uri(url).Host;
 					try
 					{
 						var res = await httpClient.GetAsync(url);
@@ -96,16 +98,19 @@ namespace Api.Job
 				OpenApiDocument openApiDocument = new OpenApiStringReader().Read(json, out var diagnostic);
 				RestfulApiDocument restfulApiDocument = new(openApiDocument);
 				if (!setting.RenameClient.IsNullOrEmpty()) restfulApiDocument.Title = setting.RenameClient.Replace("*", restfulApiDocument.Title);
-				var needCreateModel = !setting.ModelPath.IsNullOrEmpty();
-				var needCreateOptions = !setting.OptionsPath.IsNullOrEmpty();
+
+
 				#region create model file
+				var needCreateModel = !setting.ModelPath.IsNullOrEmpty();
 				if (needCreateModel)
 				{
+					var modelDirectory = Path.Combine(maid.Project.Path, setting.ModelPath!);
+					Directory.CreateDirectory(modelDirectory);
 					//模型文件路径
 					var modelPath = setting.HttpClientType switch
 					{
-						HttpClientType.CSharp => Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.cs"),
-						HttpClientType.TypeScript => Path.Combine(maid.Project.Path, setting.ModelPath!, restfulApiDocument.PropertyStyleName + "Model.ts"),
+						HttpClientType.CSharp => Path.Combine(modelDirectory, restfulApiDocument.PropertyStyleName + "Model.cs"),
+						HttpClientType.TypeScript => Path.Combine(modelDirectory, restfulApiDocument.PropertyStyleName + "Model.ts"),
 						_ => throw new InvalidEnumArgumentException()
 					};
 					switch (setting.HttpClientType)
@@ -151,13 +156,17 @@ namespace Api.Job
 					}
 				}
 				#endregion
+				var needCreateOptions = !setting.OptionsPath.IsNullOrEmpty();
 				if (needCreateOptions)
 				{
+					var optionsDirectory = Path.Combine(maid.Project.Path, setting.OptionsPath!);
+					Directory.CreateDirectory(optionsDirectory);
+
 					switch (setting.HttpClientType)
 					{
 						case HttpClientType.CSharp:
 							{
-								var optionsPath = Path.Combine(maid.Project.Path, setting.OptionsPath!, restfulApiDocument.PropertyStyleName + "Options.cs");
+								var optionsPath = Path.Combine(optionsDirectory, restfulApiDocument.PropertyStyleName + "Options.cs");
 								if (!File.Exists(optionsPath))
 								{
 									File.WriteAllText(optionsPath, $$"""
@@ -180,12 +189,12 @@ public class {{restfulApiDocument.PropertyStyleName}}Options
 							}
 						case HttpClientType.TypeScript:
 							{
-								var optionsPath = Path.Combine(maid.Project.Path, setting.OptionsPath!, restfulApiDocument.PropertyStyleName + "Options.ts");
+								var optionsPath = Path.Combine(optionsDirectory, restfulApiDocument.PropertyStyleName + "Options.ts");
 								if (!File.Exists(optionsPath))
 								{
 									File.WriteAllText(optionsPath, $$"""
 class {{restfulApiDocument.PropertyStyleName}}Option {
-	baseURL = 'http://localhost:5241'
+	baseURL = '{{host ?? "http://localhost"}}'
 }
 const option = new {{restfulApiDocument.PropertyStyleName}}Option()
 export default option
@@ -198,12 +207,15 @@ export default option
 					}
 
 				}
+				#region Create Client
+				var clientDirectory = Path.Combine(maid.Project.Path, setting.ClientPath);
+				Directory.CreateDirectory(clientDirectory);
 				switch (setting.HttpClientType)
 				{
 					case HttpClientType.CSharp:
 						{
 							//文件路径
-							var PATH = Path.Combine(maid.Project.Path, setting.ClientPath, restfulApiDocument.PropertyStyleName + ".cs");
+							var PATH = Path.Combine(clientDirectory, restfulApiDocument.PropertyStyleName + ".cs");
 							CompilationUnitSyntax unit;
 							CompilationUnitSyntax unitNew;
 							if (File.Exists(PATH))
@@ -302,7 +314,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 						break;
 					case HttpClientType.TypeScript:
 						{
-							var PATH = Path.Combine(maid.Project.Path, setting.ClientPath, restfulApiDocument.PropertyStyleName + ".ts");
+							var filePpath = Path.Combine(clientDirectory, restfulApiDocument.PropertyStyleName + ".ts");
 							StringBuilder stringBuilder = new StringBuilder();
 							stringBuilder.AppendLine($$"""
 							import { $Fetch, ofetch } from 'ofetch'
@@ -343,7 +355,7 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 									: responseType.TypeScriptType;
 								//Console.WriteLine(api.Id);
 								//var methodName = api.Method + api.Path.Replace('/', '_').ToNamingConvention(NamingConvention.PascalCase).TrimStart("Api");
-								var methodName = api.Method + api.Id;
+								var methodName = api.Method + (api.Id ?? api.Path.Replace("/", "").ToNamingConvention(NamingConvention.PascalCase).TrimStart("Api"));
 								stringBuilder.AppendLine($$"""	{{methodName}}({{parameterCodeText}}): Promise<{{responseCodeText}}> {""");
 								stringBuilder.AppendLine($$"""		return this.client('{{api.Path}}', {""");
 								stringBuilder.AppendLine($$"""			method: '{{api.Method}}',""");
@@ -355,13 +367,14 @@ public partial class {{restfulApiDocument.PropertyStyleName}}
 							stringBuilder.AppendLine("}");
 							stringBuilder.AppendLine($"const {restfulApiDocument.PropertyStyleName}Client = new {restfulApiDocument.PropertyStyleName}()");
 							stringBuilder.AppendLine($"export default {restfulApiDocument.PropertyStyleName}Client");
-							await File.WriteAllTextAsync(PATH, stringBuilder.ToString());
+							await File.WriteAllTextAsync(filePpath, stringBuilder.ToString());
 
 						}
 						break;
 					default:
 						break;
 				}
+				#endregion
 				logger.LogInformation("{maid}生成{name}Http客户端", maid.Name, restfulApiDocument.PropertyStyleName);
 			}
 			catch (Exception ex)

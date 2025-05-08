@@ -348,12 +348,47 @@ export interface ModelsCodeMaidPropertyDefinition {
 	/** 项目文件 */
 	projectDirectoryFile: ModelsCodeMaidProjectDirectoryFile,
 }
-/** 业务异常返回的结果模型 */
-export interface ServicesModelsResultsIExceptionResult {
-	/** 错误码 */
+/** A business exception with message */
+export interface ServicesModelsResultsResultException {
+	/**  */
+	targetSite: SystemReflectionMethodBase,
+	/**  */
+	message: string | undefined,
+	/**  */
+	data: object | undefined,
+	/**  */
+	innerException: SystemException,
+	/**  */
+	helpLink: string | null | undefined,
+	/**  */
+	source: string | null | undefined,
+	/**  */
+	hResult: number | undefined,
+	/**  */
+	stackTrace: string | null | undefined,
+	/**  */
 	code: string | undefined,
-	/** 异常消息 */
+	/**  */
 	msg: string | null | undefined,
+}
+/**  */
+export interface SystemException {
+	/**  */
+	targetSite: SystemReflectionMethodBase,
+	/**  */
+	message: string | undefined,
+	/**  */
+	data: object | undefined,
+	/**  */
+	innerException: SystemException,
+	/**  */
+	helpLink: string | null | undefined,
+	/**  */
+	source: string | null | undefined,
+	/**  */
+	hResult: number | undefined,
+	/**  */
+	stackTrace: string | null | undefined,
 }
 /**  */
 export interface SystemIntPtr {

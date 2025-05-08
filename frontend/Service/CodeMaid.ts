@@ -290,6 +290,11 @@ class CodeMaid {
 			method: 'Get',
 		})
 	}
+	GetSystemRuntimeVersion({  } : {  }): Promise<string | undefined> {
+		return this.client('/api/System/RuntimeVersion', {
+			method: 'Get',
+		})
+	}
 }
 const CodeMaidClient = new CodeMaid()
 export default CodeMaidClient

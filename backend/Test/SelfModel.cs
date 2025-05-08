@@ -3054,4 +3054,106 @@ public class TaskServiceControllerCommandControllerCommandOutPut
 	[JsonPropertyName("standardError")]
 	public string? StandardError { get; set; }
 }
+/// <summary>
+/// A business exception with message
+/// </summary>
+public class ServicesModelsResultsResultException
+{
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("targetSite")]
+	public SystemReflectionMethodBase? TargetSite { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("message")]
+	public string? Message { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("data")]
+	public JsonElement? Data { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("innerException")]
+	public SystemException? InnerException { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("helpLink")]
+	public string? HelpLink { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("source")]
+	public string? Source { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("hResult")]
+	public int? HResult { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("stackTrace")]
+	public string? StackTrace { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("code")]
+	public string? Code { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("msg")]
+	public string? Msg { get; set; }
+}
+/// <summary>
+/// 
+/// </summary>
+public class SystemException
+{
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("targetSite")]
+	public SystemReflectionMethodBase? TargetSite { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("message")]
+	public string? Message { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("data")]
+	public JsonElement? Data { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("innerException")]
+	public SystemException? InnerException { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("helpLink")]
+	public string? HelpLink { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("source")]
+	public string? Source { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("hResult")]
+	public int? HResult { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	[JsonPropertyName("stackTrace")]
+	public string? StackTrace { get; set; }
+}
 #pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。

@@ -125,7 +125,11 @@ namespace Api
 				{
 					options.InvalidModelStateResponseFactory = x =>
 					{
-						var error = new ExceptionResult("ParameterError", string.Join(';', x.ModelState.Values.Select(x => x.Errors.FirstOrDefault()?.ErrorMessage).ToList()));
+						var error = new RFC9457()
+						{
+							Detail = string.Concat(x.ModelState.Values.Select(x => x.Errors.FirstOrDefault()?.ErrorMessage).ToList()),
+							Title = "ParameterError"
+						};
 						return new ObjectResult(error) { StatusCode = 400 };
 					};
 				})
@@ -188,8 +192,8 @@ namespace Api
 						Delay = TimeSpan.FromMinutes(5),
 					};
 				});
-			;
 			//添加后台服务
+			builder.Services.AddHostedService<InitService>();
 			builder.Services.AddHostedService<TimedHostedService>();
 			//添加仓储
 			builder.Services.AddMaidRepository();
