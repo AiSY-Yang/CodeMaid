@@ -9,7 +9,7 @@ namespace ServicesModels.Filters
 	/// <summary>
 	/// 分页结果
 	/// </summary>
-	public record PagedFilter : IFilter
+	public record PageingFilter : IFilter
 	{
 		/// <summary>
 		/// 页码

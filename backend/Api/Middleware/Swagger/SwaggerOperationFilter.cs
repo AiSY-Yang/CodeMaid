@@ -26,7 +26,7 @@ public class AddBusinessExceptionResponse : IOperationFilter
 	///<inheritdoc cref="IOperationFilter.Apply(OpenApiOperation, OperationFilterContext)"/>
 	public void Apply(OpenApiOperation operation, OperationFilterContext context)
 	{
-		var schema = context.SchemaGenerator.GenerateSchema(typeof(ResultException), context.SchemaRepository);
+		var schema = context.SchemaGenerator.GenerateSchema(typeof(ErrorException), context.SchemaRepository);
 		operation.Responses.Add("400", new OpenApiResponse
 		{
 			Description = "业务异常",

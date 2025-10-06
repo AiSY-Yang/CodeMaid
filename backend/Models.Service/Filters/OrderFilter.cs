@@ -9,7 +9,7 @@ namespace ServicesModels.Filters
 	/// <summary>
 	/// 带排序的分页结果
 	/// </summary>
-	public record OrderFilter : PagedFilter
+	public record OrderFilter : PageingFilter
 	{
 		/// <summary>
 		/// 排序

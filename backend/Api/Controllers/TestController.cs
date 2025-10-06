@@ -1,16 +1,11 @@
 #pragma warning disable CS1591 // 缺少对公共可见类型或成员的 XML 注释
 using System.ComponentModel.DataAnnotations;
-using System.Net.Http;
-using System.Net.Mime;
-
-using ExtensionMethods;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 using ServicesModels.Methods;
-using ServicesModels.Results;
-using ServicesModels.Results.Exceptions;
+using ServicesModels.ResultExceptions;
 
 namespace Api.Controllers
 {
@@ -83,14 +78,15 @@ namespace Api.Controllers
 		}
 		static int delay = 3000;
 		[HttpGet("[action]")]
-		public int? Throw(string? error)
+		public int? Throw([MaxLength(5)]string? error)
 		{
-			if (delay>0)
+			if (delay > 0)
 			{
 				Task.Delay(delay);
 				delay -= 1000;
 			}
-			throw new BusinessException(error ?? "error", "msg");
+			throw new ProblemException(error ?? "message", "detail");
+			//throw new RFC9457Exception(error ?? "message","detail");
 		}
 
 		public class BodyClass

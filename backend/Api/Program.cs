@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Net;
+using System.Net.Mime;
 using System.Text.Json;
 
 using Api.Controllers.Commons;
@@ -39,7 +40,6 @@ namespace Api
 	/// </summary>
 	public class Program
 	{
-		const string ServiceName = "CodeMaid";
 		static readonly string[] I18N = ["zh-cn", "en-us"];
 		/// <summary>
 		/// root ServiceProvider
@@ -53,9 +53,11 @@ namespace Api
 		public static async Task Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
+			//从配置文件读取配置
 			//var myOptions = new MyRateLimitOptions();
 			//builder.Configuration.GetSection(MyRateLimitOptions.MyRateLimit).Bind(myOptions);
-			var openTelemetryEndpoint = builder.Configuration.GetValue<string>("OpenTelemetryEndpoint")!;
+			var serviceName = builder.Configuration.GetValue<string>("OpenTelemetry:serviceName")!;
+			var openTelemetryEndpoint = builder.Configuration.GetValue<string>("OpenTelemetry:Endpoint")!;
 			var openTelemetryLogsEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/logs";
 			var openTelemetryTracesEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/traces";
 			var openTelemetryMetricsEndpoint = openTelemetryEndpoint.TrimEnd('/') + "/v1/metrics";
@@ -66,25 +68,39 @@ namespace Api
 				//从配置文件读取日志规则
 				config.ReadFrom.Configuration(context.Configuration)
 				//写入OpenTelemetry
-				.WriteTo.OpenTelemetry(sinkOptions =>
-				{
-					sinkOptions.Endpoint = openTelemetryLogsEndpoint;
-					sinkOptions.ResourceAttributes = new Dictionary<string, object>
-					{
-						["service.name"] = ServiceName,
-					};
-					//sinkOptions.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
-					sinkOptions.HttpMessageHandler = new HttpClientHandler()
-					{
-						ServerCertificateCustomValidationCallback = (a, b, c, d) => true,
-						UseProxy = true,
-						Proxy = new WebProxy() { BypassProxyOnLocal = true }
-					};
-					sinkOptions.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
-				})
+				//.WriteTo.OpenTelemetry(sinkOptions =>
+				//{
+				//	sinkOptions.Endpoint = openTelemetryLogsEndpoint;
+				//	sinkOptions.ResourceAttributes = new Dictionary<string, object>
+				//	{
+				//		["service.name"] = serviceName,
+				//	};
+				//	//sinkOptions.IncludedData = Serilog.Sinks.OpenTelemetry.IncludedData.TraceIdField | Serilog.Sinks.OpenTelemetry.IncludedData.SpanIdField;
+				//	sinkOptions.HttpMessageHandler = new HttpClientHandler()
+				//	{
+				//		ServerCertificateCustomValidationCallback = (a, b, c, d) => true,
+				//		UseProxy = true,
+				//		Proxy = new WebProxy() { BypassProxyOnLocal = true }
+				//	};
+				//	sinkOptions.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
+				//})
 				;
 			});
-			builder.Services.AddHttpLogging(x => { });
+			//记录所有请求日志
+			builder.Services.AddHttpLogging(x =>
+			{
+				x.MediaTypeOptions.AddText(MediaTypeNames.Application.Json);
+				x.MediaTypeOptions.AddText(MediaTypeNames.Application.ProblemJson);
+				x.MediaTypeOptions.AddText(MediaTypeNames.Application.Xml);
+				x.MediaTypeOptions.AddText(MediaTypeNames.Application.ProblemXml);
+				x.MediaTypeOptions.AddText(MediaTypeNames.Text.Plain);
+				x.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestBody |
+					Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestPath |
+					Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestQuery |
+					Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.ResponseBody;
+				x.ResponseBodyLogLimit = 2 * 1024;
+				x.RequestBodyLogLimit = 2 * 1024;
+			});
 
 			//配置服务器
 			builder.WebHost.UseKestrel((context, options) =>
@@ -115,6 +131,7 @@ namespace Api
 							.UseInternalServiceProvider(serviceProvider)
 			);
 			//添加控制器
+			builder.Services.AddHttpContextAccessor();
 			builder.Services.AddControllers(options =>
 			{
 				//将业务异常转化为自定义信息
@@ -123,15 +140,15 @@ namespace Api
 				options.InputFormatters.Add(new TextFormatter());
 			}).ConfigureApiBehaviorOptions(options =>
 				{
-					options.InvalidModelStateResponseFactory = x =>
-					{
-						var error = new RFC9457()
-						{
-							Detail = string.Concat(x.ModelState.Values.Select(x => x.Errors.FirstOrDefault()?.ErrorMessage).ToList()),
-							Title = "ParameterError"
-						};
-						return new ObjectResult(error) { StatusCode = 400 };
-					};
+					//options.InvalidModelStateResponseFactory = x =>
+					//{
+					//	var error = new RFC9457()
+					//	{
+					//		Detail = string.Concat(x.ModelState.Values.Select(x => x.Errors.FirstOrDefault()?.ErrorMessage).ToList()),
+					//		Title = "ParameterError"
+					//	};
+					//	return new ObjectResult(error) { StatusCode = 400 };
+					//};
 				})
 				//配置json解析
 				.AddJsonOptions(options =>
@@ -141,6 +158,14 @@ namespace Api
 					options.JsonSerializerOptions.ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip;
 					options.JsonSerializerOptions.AllowTrailingCommas = true;
 				}).AddDataAnnotationsLocalization();
+			//异常返回
+			builder.Services.AddProblemDetails(x =>
+			{
+				x.CustomizeProblemDetails = context =>
+				{
+					context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+				};
+			});
 			////接口速率限制
 			//builder.Services.AddRateLimiter(x => x.GlobalLimiter = System.Threading.RateLimiting.PartitionedRateLimiter.Create<HttpContext, IPAddress>(context =>
 			//{
@@ -156,8 +181,6 @@ namespace Api
 
 			//	return System.Threading.RateLimiting.RateLimitPartition.GetNoLimiter(IPAddress.Loopback);
 			//}));
-			//添加响应压缩
-			builder.Services.AddResponseCompression();
 			//i18n
 			builder.Services.AddLocalization();
 			builder.Services.AddRequestLocalization(x =>
@@ -192,11 +215,11 @@ namespace Api
 						Delay = TimeSpan.FromMinutes(5),
 					};
 				});
+			//添加仓储
+			builder.Services.AddMaidRepository();
 			//添加后台服务
 			builder.Services.AddHostedService<InitService>();
 			builder.Services.AddHostedService<TimedHostedService>();
-			//添加仓储
-			builder.Services.AddMaidRepository();
 			//添加Job
 			builder.Services.AddScoped<HttpClientGenerator>();
 #if DEBUG
@@ -207,6 +230,8 @@ namespace Api
 			builder.Services.AddCors();
 			//响应缓存控制
 			builder.Services.AddResponseCaching();
+			//添加响应压缩
+			builder.Services.AddResponseCompression();
 			//添加swagger
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen(options =>
@@ -265,9 +290,9 @@ namespace Api
 				});
 			});
 			//添加OpenTelemetry
-			void openTelemetryTracesOptions(OtlpExporterOptions x) { x.Protocol = OtlpExportProtocol.HttpProtobuf; x.Endpoint = new Uri(openTelemetryTracesEndpoint); };
-			void openTelemetryMetricsOptions(OtlpExporterOptions x) { x.Protocol = OtlpExportProtocol.HttpProtobuf; x.Endpoint = new Uri(openTelemetryMetricsEndpoint); };
-			void resourceBuilder(ResourceBuilder x) => x.AddService(ServiceName, serviceInstanceId: Environment.MachineName);
+			void resourceBuilder(ResourceBuilder x) => x.AddService(serviceName, serviceInstanceId: Environment.MachineName);
+			void openTelemetryTracesOptions(OtlpExporterOptions x) { x.Protocol = OtlpExportProtocol.HttpProtobuf; x.Endpoint = new Uri(openTelemetryTracesEndpoint); }
+			void openTelemetryMetricsOptions(OtlpExporterOptions x) { x.Protocol = OtlpExportProtocol.HttpProtobuf; x.Endpoint = new Uri(openTelemetryMetricsEndpoint); }
 			builder.Services.AddOpenTelemetry()
 				.ConfigureResource(resourceBuilder)
 				.WithTracing(config =>
@@ -318,7 +343,6 @@ namespace Api
 							activity.SetTag("message", exception.Message);
 							activity.SetTag("stackTrace", exception.StackTrace);
 						};
-
 					});
 					//记录请求
 					config.AddAspNetCoreInstrumentation(options =>
@@ -349,8 +373,7 @@ namespace Api
 					});
 					config.AddRuntimeInstrumentation();
 					config.AddOtlpExporter(openTelemetryMetricsOptions);
-				})
-				;
+				});
 
 			I18n.I18nDictionary = new Dictionary<string, FrozenDictionary<string, string>>()
 			{
@@ -364,6 +387,7 @@ namespace Api
 			var app = builder.Build();
 			//保存容器为全局变量 以便手动创建DI对象
 			Services = app.Services;
+			//设置语言
 			app.Use(async (context, next) =>
 			{
 				I18n.Language.Value = context.Request.Headers.AcceptLanguage;
@@ -380,6 +404,7 @@ namespace Api
 						x.SwaggerEndpoint($"/swagger/{doc.Key}/swagger.json", doc.Key);
 				});
 			}
+			app.UseExceptionHandler();
 			//请求日志记录
 			app.Use(async (context, next) =>
 			{
@@ -401,6 +426,10 @@ namespace Api
 			});
 			//HTTPS重定向
 			//app.UseHttpsRedirection();
+			//健康检查
+			app.UseHealthChecks("/healthcheck");
+			//版本信息
+			app.MapGet("/healthcheck/version", () => $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
 			//添加静态文件支持
 			app.UseDefaultFiles();
 			app.UseStaticFiles(new StaticFileOptions()
@@ -432,8 +461,6 @@ namespace Api
 			//app.UseResponseCaching();
 			//使用控制器
 			app.MapControllers();
-			//版本信息
-			app.MapGet("/version", () => $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
 			//数据库迁移
 			var scope = app.Services.CreateScope();
 			var context = scope.ServiceProvider.GetRequiredService<MaidContext>();
